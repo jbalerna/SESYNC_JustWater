@@ -1,0 +1,350 @@
+---
+title: "Browse the NRRSS Database"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+## SET UP
+
+# set global options and load libraries
+knitr::opts_chunk$set(echo = TRUE)
+install.packages("here")
+install.packages("RSQLite")
+install.packages("sp")
+install.packages("sf")
+install.packages("biogeo")
+install.packages("devtools")
+devtools::install_github("UrbanInstitute/urbnmapr")
+
+library(devtools)
+library(here) # for relative file paths rather than fragile hard-coded file paths
+library(tidyverse) # for tidy data manipulation
+library(RSQLite) # for bridging to SQL databases / RDB
+library(sp) # for spatial data work
+library(sf) # for spatial data work
+library(biogeo) # helpful functions for working with lat-long and decimal coordinates
+library(urbnmapr) # for state and county boundaries
+
+# note root/working directory
+here()
+
+# pull the Alameda County boundary and California state boundary
+alameda_county_boundary <- get_urbn_map("counties", sf = TRUE) %>%
+  filter(county_name == "Alameda County") %>% # Alameda County boundary
+  st_transform(crs = 4326)
+ca_state_boundary <- get_urbn_map("states", sf = TRUE) %>%
+  filter(state_name == "California") %>% # California state boundary
+  st_transform(crs = 4326)
+
+# save common crs for ease of reference
+common_crs <- st_crs(alameda_county_boundary)
+```
+
+```{r db_connection}
+## DATABASE CONNECTION
+
+# select the driver
+drv <- dbDriver("SQLite")
+
+# give the database file path
+db_nrrss <- here("input_data", "NRRSS", "nrrss-master", "nrrss.sqlite")
+
+# connect to the database
+con_nrrss <- dbConnect(drv, db_nrrss)
+```
+
+```{r general_functions}
+## GENERAL ACCESS AND MANIPULATION FUNCTIONS - TUTORIAL
+
+# list tables in the database
+dbListTables(con_nrrss)
+nrrss_tables <- dbListTables(con_nrrss)
+
+# list column names in a specific table
+dbListFields(con_nrrss, "nrrss_record_table")
+
+# query the data - example
+# note the SQL syntax
+dbGetQuery(con_nrrss, "SELECT * FROM nrrss_record_table LIMIT 10")
+
+# read an entire table into R
+nrrss_record_table <- dbReadTable(con_nrrss, "nrrss_record_table")
+head(nrrss_record_table)
+```
+
+```{r}
+# CA-SPECIFIC DATABASE
+## NOTE: one-to-many and many-to-many structures throughout so be careful with joins and movement between wide and long formats!
+
+## grab California records
+# CA projects represented by state_terr_number 6
+ca_record_nums <- dbGetQuery(con_nrrss, "SELECT * FROM state_terr_num_nrrss_num_table WHERE state_terr_number = 6")
+
+# join in additional data stored in one-to-one tables
+# -- all lat/long table joins - no CA records in UTM database
+# -- all CA records that have a location, have that location stored in the geographic_table
+# -- additional info like time periods and nearest town in proj_ident_table
+# -- additional info like project funding and implementation entity in proj_activities_table
+ca_records <- dbGetQuery(con_nrrss, "SELECT * FROM nrrss_record_table") %>%
+  filter(nrrss_number %in% ca_record_nums$nrrss_number) %>% # CA records only
+  left_join(dbGetQuery(con_nrrss, "SELECT * FROM geographic_table"), by = "nrrss_number") %>% # location
+  left_join(dbGetQuery(con_nrrss, "SELECT * FROM proj_ident_table"), by = "nrrss_number") %>% # time periods, nearest town, etc.
+  left_join(dbGetQuery(con_nrrss, "SELECT * FROM proj_activities_table"), by = "nrrss_number") %>% # funding, involved entities
+  left_join(dbGetQuery(con_nrrss, "SELECT * FROM species_table"), by = "nrrss_number") # species management goals
+
+# could add in additional info in one-to-many tables by perhaps moving long to wide or just stick with RDB structure...
+# -- project intent - stored in proj_intent_num_nrrss_num_table
+# -- channel shaping activities - stored in shape_num_nrrss_num_table
+# -- restoration structures - stored in structure_num_nrrss_num_table
+# -- vegetation management activities - stored in vegetation_num_nrrss_num_table
+
+# create a spatial features object subset of CA database
+ca_records_sf <- ca_records %>%
+  filter(!is.na(lat_deg)) %>% # excluding records without location data
+  mutate(value = 1) %>% # adding column for eventual graphing
+  mutate(lat_full = paste0(lat_deg, "d", lat_min, "'", lat_sec, "\" ", lat_direction), # concatenating lat columns
+         lon_full = paste0(lon_deg, "d", lon_min, "'", lon_sec, "\" ", lon_direction) # concatenating long columns
+         ) %>%
+  mutate(lat_full_dm = as.numeric(char2dms(lat_full)), # converting lat to spatial data format
+         lon_full_dm = as.numeric(char2dms(lon_full)) # converting long to spatial data format
+         ) %>%
+  st_as_sf(coords = c("lon_full_dm", "lat_full_dm")) %>% # saving as spatial object
+  st_set_crs(common_crs) # setting crs to match boundary layers
+
+# make CA records tables dimensionally identical (one flat, one spatial)
+# start by adding empty columns to flat dataset
+ca_records <- ca_records %>%
+  filter(is.na(lat_deg)) %>%
+  mutate(value = 1,
+         lat_full = NA,
+         lon_full = NA
+         )
+
+# create full CA records table that includes properly formatted coordinates where available but is not a spatial object
+ca_records <- ca_records_sf %>%
+  st_drop_geometry() %>%
+  rbind(ca_records)
+
+rm(ca_record_nums, nrrss_record_table) # cleaning the workspace
+dbDisconnect(con_nrrss) # closing database connection
+```
+
+```{r}
+## VISUAL DOUBLE CHECK
+ggplot() +
+  geom_sf(data = ca_state_boundary) + # CA state outline
+  geom_sf(data = alameda_county_boundary, fill = "blue") + # Alameda County outline
+  geom_sf(data = ca_records_sf, size = 0.5) + # CA NRRSS records
+  theme_minimal()
+```
+
+```{r}
+## ALAMEDA COUNTY DATABASE
+# create a list of representations of Alameda County in CA database
+# fuzzy match to Alameda (County)
+# start with all data - with and without spatial data
+alameda_county_records <- ca_records %>%
+  filter(str_detect(county, ".ALAMEDA") |
+           str_detect(county, "ALAMEDA.") |
+           str_detect(county, "Alameda.") |
+           str_detect(county, ".Alameda") |
+           str_detect(proj_name, "ALAMEDA") |
+           str_detect(proj_name, "Alameda.") |
+           str_detect(proj_name, ".Alameda")
+         )
+
+# pull specifically spatial records with fuzzy text match
+alameda_county_records_sf <- ca_records_sf %>%
+  filter(str_detect(county, ".ALAMEDA") |
+           str_detect(county, "ALAMEDA.") |
+           str_detect(county, "Alameda.") |
+           str_detect(county, ".Alameda") |
+           str_detect(proj_name, "ALAMEDA") |
+           str_detect(proj_name, "Alameda.") |
+           str_detect(proj_name, ".Alameda")
+         )
+
+# identify records in Alameda County by spatial intersection
+alameda_county_records_sf <- st_filter(ca_records_sf, alameda_county_boundary, predicate = st_intersects)
+
+# confirm visually
+ggplot() +
+  geom_sf(data = ca_state_boundary) + # CA state outline
+  geom_sf(data = alameda_county_boundary, fill = "blue") + # Alameda County outline
+  geom_sf(data = ca_records_sf, size = 0.5) + # CA NRRSS records
+  geom_sf(data = alameda_county_records_sf, size = 0.5, color = "red") + # Alameda records by spatial intersection
+  theme_minimal()
+
+# join text-identified Alameda County records with spatially-identified Alameda County
+# then eliminate duplicates
+alameda_county_records <- alameda_county_records_sf %>% # grabbing spatial object
+  st_drop_geometry() %>% # dropping geomtery
+  rbind(alameda_county_records) %>% # appending non-spatial data
+  arrange(nrrss_number, lat_deg) %>% # arranging to keep spatially-identified records when dropping duplicated
+  distinct() # keeping unique records, first record selected where duplicated
+```
+
+# RDB Metadata
+
+## Foundational Tables
+
+*nrrss_record_table* - overarching index data - single entry for each unique project; indexed by `nrrss_number`
+
+*geographic_table* - lat-long coordinates for each project; indexed by `nrrss_number`
+*utm_table* - northing-easting coordinates for each project; indexed by `nrrss_number`
+
+*proj_activities_table* - activities and resources associated with each restoration project; indexed by `nrrss_number`
+*proj_ident_table* - detailed info on each project like nearest town and start and end dates; indexed by `nrrss_number`
+
+*proj_intent_num_nrrss_num_table* - intent associated with each project; indexed by `nrrss_number`
+*proj_intent_table* - codes translating intent; indexed by`proj_intent_number`
+
+*shape_num_nrrss_num_table* - shaping activities associated with each project; indexed by `nrrss_number`
+*shape_table* - codes translating channel/geomorphology restoration (e.g. grading, riffle creation); indexed by `shape_number`
+
+*species_table* - species and species management actions (e.g. protection, eradication) associated with each project; indexed by `nrrss_number`
+
+*state_terr_num_nrrss_num_table* - state code associated with each project; indexed by `nrrss_number`
+*state_territory_table* - state code translations; indexed by `state_terr_number`
+
+*structure_num_nrrss_num_table* - structures associated with each project; indexed by `nrrss_number`
+*structure_table* - structure codes associated with restoration (e.g. culverts added, fish ladders installed); indexed by `structure_number`
+
+*vegetation_num_nrrss_num_table* - vegetation activity associated with projects; indexed by `nrrss_number`
+*vegetation_table* - code translations for vegetation actions; indexed by `vegetation number`
+
+
+## Supplemental Information Tables
+
+*activities_other_table* - text fields describing restoration activities pursued; indexed by `nrrss_number`
+
+*country_table* - codes for countries (US / AU); indexed by `country_number`
+
+*flow_num_nrrss_num_table* - flow numbers for each project (see flow table); indexed by `nrrss_number`
+*flow_table* - codes for flow categories (e.g. "flow regime enhancement," "flushing")' indexed by `flow_number`
+
+*memo_table* - text fields describing miscellaneous information; indexed by `nrrss_number`
+
+*misc_act_num_nrrss_num_table* - miscellaneous activities (coded) associated with projects; indexed by `nrrss_number`
+*miscellaneous_activities_table* - miscellaneous activities code translations; indexed by `misc_activities_number`
+
+*monitor_num_nrrss_num_table* - monitoring foci (coded) associated with projects; indexed by `nrrss_number`
+*monitoring_focus_table* - codes for monitoring foci; indexed by `monitoring_focus_number`
+
+*new_user_table* - fields for new user access; no specific index
+*nrrss_user_table* - fields for registered user contact info and permissions; indexed by `user_number`
+*p_table* - passwords associated with user accounts; indexed by `user_number`
+*user_manager_table* - user access permissions (I think?); indexed by `user_number`
+
+*nrrss_node_table* - codes for "nodes" (geographic regions of analysis); indexed by `node_number`
+
+*phone_conversations_table* - recorded of phone call associated with projects; indexed by `nrrss_number`
+
+*prev_rem_inp_num_nrrss_num_table* - previous remediation efforts associated with projects; indexed by `nrrss_number`
+*prev_rem_inputs_table* - codes for previous remediation efforts; indexed by `prev_rem_inputs_number`
+
+*proj_contact_table* - contacts associated with each project; indexed by `nrrss_number`
+
+*proj_year_cat_table* - code translations for time range bins of projects; indexed by `proj_year_cat_number`
+
+*record_last_updated_table* - last update associated with each project; indexed by `nrrss_number`
+
+*source_data_cit_num_nrrss_num_table* - source data associated with each project; indexed by `nrrss_number`
+*source_data_cit_table* - source data associated with each source code; indexed by `source_data_cit_number`
+*source_data_type_table* - source data types associated with each source (e.g. phone conversation); indexed by `source_data_type_number`
+
+*water_num_nrrss_num_table* - waterway types associated with each project; indexed by `nrrss_number`
+*waterway_table* - waterway codes translation (e.g. brook, river); indexed by `water_number`
+
+
+## Unit Tables
+
+*area_unit_table* - codes for area units; indexed by `area_unit_number`
+*dollar_table* - codes for country currency units (US / AU); indexed by `dollar_number`
+*geo_indicator_table* - codes for geographic/coordinate units (eg. UTM); indexed by `geo_indicator`
+*linear_unit_table* - codes for linear units (e.g. linear feet); indexed by `linear_unit_number`
+
+
+```{r exploring}
+dbGetQuery(con_nrrss, "SELECT * FROM area_unit_table LIMIT 20")
+```
+
+
+
+# Background
+
+GitHub: https://github.com/khondula/nrrss 
+
+In 2004, the National River Restoration Scientific Synthesis (NRRSS) database was compiled by a team of ~20 scientists.  This was the first-ever comprehensive database on stream and river restoration projects. It includes basic information on more than 37,000 projects across the U.S. It resulted in many publications with the broad national-level results published in Science. Lead scientists for the project were: M.A. Palmer (Univ of Maryland), J.D. Allan (Univ Michigan), and E.S. Bernhardt (postdoc at Univ of Maryland; now faculty at Duke University).  The project included a collaboration with American Rivers and benefitted from funding from the National Center for Ecological Analysis and Synthesis, the Packard Foundation, the C.S. Mott Foundation; cyber support was provided by the U.S. Geological Survey.
+
+## Publications resulting from the NRRSS database
+
+### NRRSS national synthesis (entire U.S.) papers:
+
+#### 2005 
+
+- Bernhardt, Emily S.; Palmer, Margaret A.; Allan, J. David; Alexander, Gretchen; Barnas, Katie; Brooks, Shane; Carr, Jamie; Clayton, Steve; Dahm, Clifford; Follstad-Shah, Jennifer; Galat, David L.; Gloss, Steven P.; Goodwin, Peter; Hart, David; Hassett, Brooke; Jenkinson, Robin; Katz, Stephen L.; Kondolf, G. Mathias; Lake, P. Sam; Lave, Rebecca; Meyer, Judy; O'Donnell, T. Kevin; Pagano, Laura; Powell, Bruce; Sudduth, Elizabeth. 2005. [Synthesizing US river restoration efforts](https://github.com/palmerlab-umd/palmerlab-umd.github.io/raw/master/publications/Palmerpublications/Bernhardt2005.pdf). Science. Vol: 308(5722). Pages 636-637.
+
+- Palmer, Margaret A.; Bernhardt, Emily S.; Allan, J. David; Lake, P. Sam; Alexander, Gretchen; Brooks, Shane; Carr, Jamie; Clayton, Steve; Dahm, Clifford; Follstad-Shah, Jennifer; Galat, David L.; Loss, S. G.; Goodwin, Peter; Hart, David; Hassett, Brooke; Jenkinson, Robin; Kondolf, G. Mathias; Lave, Rebecca; Meyer, Judy; O'Donnell, T. Kevin; Pagano, Laura; Sudduth, Elizabeth. 2005. [Standards for ecologically successful river restoration](https://github.com/palmerlab-umd/palmerlab-umd.github.io/raw/master/publications/Palmerpublications/Palmer_et_al_Standards_for_Ecol_Successful_Restoration.pdf). Journal of Applied Ecology. Vol: 42. Pages 208-217.
+
+#### 2006
+
+- Palmer, Margaret A. and J. David Allan. 2006. [Restoring Rivers](https://github.com/palmerlab-umd/palmerlab-umd.github.io/raw/master/publications/Palmerpublications/Palmer_and_Allan_Federal_Policy_And_Restoration_IST_2006.pdf). 2006. Policy Recommendations to Enhance Effectiveness of River Restoration published in U. S. National Academy of Science: Issues in Science and Technology, 22: 40 - 48.  
+
+#### 2007
+
+- Palmer, Margaret A.; Allan, J. David; Meyer, Judy; Bernhardt, Emily S. 2007. [River restoration in the Twenty-First Century: Data and experiential knowledge to inform future efforts](http://onlinelibrary.wiley.com/doi/10.1111/j.1526-100X.2007.00243.x/abstract). Restoration Ecology. Vol: 15(3). Pages 472-481
+
+- Bernhardt, Emily S.; Sudduth, Elizabeth; Palmer, Margaret A.; Allan, J. David; Meyer, Judy; Alexander, Gretchen; Follstad-Shah, Jennifer; Hassett, Brooke; Jenkinson, Robin; Lave, Rebecca; Rumps, Jeanne M.; Pagano, Laura. 2007. [Restoring rivers one reach at a time: Results from a survey of U.S. river restoration practitioners](http://onlinelibrary.wiley.com/doi/10.1111/j.1526-100X.2007.00244.x/abstract). Restoration Ecology. Vol: 15(3). Pages 482-493.
+
+
+### Regional Synthesis Papers
+
+#### 2005
+
+- Hassett, Brooke; Palmer, Margaret A.; Bernhardt, Emily S.; Smith, Sean; Carr, Jamie; Hart, David. 2005. [Restoring watersheds project by project: Trends in Chesapeake Bay tributary restoration](https://github.com/palmerlab-umd/palmerlab-umd.github.io/raw/master/publications/Palmerpublications/Hassett2005.pdf). Frontiers in Ecology and the Environment. Vol: 3(5). Pages 259-267.
+
+#### 2006
+
+- Alexander, Gretchen G. and J. David Allan.  2006.  [Ecological success in stream restoration: case studies from the Midwestern United States](http://www.ncbi.nlm.nih.gov/pubmed/17557171).   Environmental Management 
+
+#### 2007
+
+- Barnas, Katie; Katz, Stephen L. 2010. [The Challenges of tracking Habitat Restoration at Various Spatial Scales](http://www.tandfonline.com/doi/abs/10.1577/1548-8446-35.5.232). Fisheries. Vol: 35(5). Pages 232-241.
+
+- Brooks, Shane; Lake, P. Sam. 2007. [River restoration in Victoria, Australia: Change is in the wind, and none too soon](http://onlinelibrary.wiley.com/doi/10.1111/j.1526-100X.2007.00253.x/abstract). Restoration Ecology. Vol: 15(3). Pages 584-591.
+
+- Follstad-Shah, Jennifer; Dahm, Clifford; Gloss, Steven P.; Bernhardt, Emily S. 2007. [River and riparian restoration in the southwest: Results of the National River Restoration Science Synthesis Project](http://onlinelibrary.wiley.com/doi/10.1111/j.1526-100X.2007.00250.x/abstract). Restoration Ecology. Vol: 15(3). Pages 550-562.
+
+- Hassett, Brooke; Palmer, Margaret A.; Bernhardt, Emily S. 2007. [Evaluating stream restoration in the Chesapeake Bay watershed through practitioner interviews](http://onlinelibrary.wiley.com/doi/10.1111/j.1526-100X.2007.00251.x/abstract). Restoration Ecology. Vol: 15(3). Pages 563-572.
+
+- Katz, Stephen L.; Barnas, Katie; Hicks, Ryan; Cowen, Jeff; Jenkinson, Robin. 2007. [Freshwater habitat restoration actions in the Pacific Northwest: A decade's investment in habitat improvement](http://onlinelibrary.wiley.com/doi/10.1111/j.1526-100X.2007.00245.x/abstract). Restoration Ecology. Vol: 15(3). Pages 494-505.
+
+- Kondolf, G. Mathias; Anderson, Shannah; Lave, Rebecca; Pagano, Laura; Merenlender, Adina M.; Bernhardt, Emily S. 2007. [Two decades of river restoration in California: What can we learn?](http://onlinelibrary.wiley.com/doi/10.1111/j.1526-100X.2007.00247.x/abstract). Restoration Ecology. Vol: 15(3). Pages 516-523.
+
+- Rumps, Jeanne M.; Katz, Stephen L.; Barnas, Katie; Morehead, Mark; Jenkinson, Robin; Clayton, Steve; Goodwin, Peter. 2007. [Stream restoration in the Pacific Northwest: Analysis of interviews with project managers](http://onlinelibrary.wiley.com/doi/10.1111/j.1526-100X.2007.00246.x/full). Restoration Ecology. Vol: 15(3). Pages 506-515.
+
+- Sudduth, Elizabeth; Meyer, Judy; Bernhardt, Emily S. 2007. [Stream restoration practices in the southeastern United States](http://onlinelibrary.wiley.com/doi/10.1111/j.1526-100X.2007.00252.x/abstract). Restoration Ecology. Vol: 15(3). Pages 573-583.
+
+- Tompkins, Mark R.; Kondolf, G. Mathias. 2007. [Systematic postproject appraisals to maximise lessons learned from river restoration projects: Case study of compound channel restoration projects in northern California](http://onlinelibrary.wiley.com/doi/10.1111/j.1526-100X.2007.00248.x/abstract). Restoration Ecology. Vol: 15(3). Pages 524-537.
+
+
+# How to access the database
+
+NRRSS is available as an sqlite database (13.7 MB) that you can download by clicking [this link](https://github.com/khondula/nrrss/raw/master/nrrss.sqlite). The NRRSS is a relational database, organized into 45 tables with pre-defined relationships between them. The primary method for interacting with a relational database is by using Structure Query Language (SQL). Information about development of the original database is available in the Supporting Online Material of the original Science publication [here](https://science.sciencemag.org/content/sci/suppl/2005/04/28/308.5722.636.DC1/pfBernhardt.SOM.pdf). 
+
+Here are some tools for viewing information once you have downloaded the file: 
+
+* Online [SQLite Viewer](https://inloop.github.io/sqlite-viewer/)
+* Download [DB Browser for SQLite](https://sqlitebrowser.org/)
+
+## R Users
+
+The [RSQLite](https://rsqlite.r-dbi.org/) package provides an interface to working with `.sqlite` files in R. Create a connection object using the `dbConnect()` function and specifying the location of the file.
