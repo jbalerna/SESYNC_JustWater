@@ -20,7 +20,7 @@ library(here)
 drv <- dbDriver("SQLite")
 
 # give the database file path
-db_nrrss <- here("input_data", "NRRSS", "nrrss-master", "nrrss.sqlite")
+db_nrrss <- paste(file.path(getwd()), 'input_data', 'NRRSS', 'nrrss-master', 'nrrss.sqlite', sep='/')
 
 # connect to the database
 con_nrrss <- dbConnect(drv, db_nrrss)
@@ -31,6 +31,23 @@ dbListTables(con_nrrss)
 #load in a couple of the data frames
 nrrss_record_table <- dbReadTable(con_nrrss, "nrrss_record_table")
 geographic_table <- dbReadTable(con_nrrss, 'geographic_table')
+proj_activities_table <- dbReadTable(con_nrrss, 'proj_activities_table')
 
-#adding code to check something
+head(geographic_table)
+head(proj_activities_table)
+
+#not sure what this does yet
+inner_join(geographic_table, proj_activities_table, by="nrrss_number")
+
+
+
+install.packages("dplyr")
+library(dplyr)
+geographic_table %>%
+  mutate(lat_deg= as.numeric(lat_deg), lat_min = as.numeric(lat_min), lat_sec = as.numeric(lat_sec))%>%
+  mutate(lat = ( lat_deg + (lat_min/60) + (lat_sec/3600)))
+
+geographic_table %>%
+  mutate(lon_deg= as.numeric(lon_deg), lon_min = as.numeric(lon_min), lon_sec = as.numeric(lon_sec))%>%
+  mutate(lon = -1*( lon_deg + (lon_min/60) + (lon_sec/3600)))
 
