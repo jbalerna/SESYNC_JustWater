@@ -1,4 +1,4 @@
-**Is Your Project just water or Just Water:Environmental Justice in Stream Restoration**
+**Is Your Project just water or Just Water: Environmental Justice in Stream Restoration**
 
 **Project Abstract:** 
 
