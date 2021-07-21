@@ -6,7 +6,6 @@
 #map number of restoration projects (points) AND census minority pop info as colors
 #simple regression correlating the two
 
-
 #install packages
 install.packages("RSQLite")
 install.packages("here")
