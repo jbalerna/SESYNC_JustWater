@@ -2,8 +2,8 @@
 #July 2021
 
 ##Goals of script:
-#select location from NRRSS - specific state or continental US? which is easier?
-#map number of restoration projects (points) AND census minority pop info as colors
+#select location from NRRSS - specific state or census tract?
+#map number of restoration projects (points) AND census minority pop info (or median income?) as colors
 #simple regression correlating the two
 
 #install packages
