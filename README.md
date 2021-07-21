@@ -1,6 +1,6 @@
 **Is Your Project just water or Just Water: Environmental Justice in Stream Restoration**
 
-**Project Abstract:** aa
+**Project Abstract:**
 
 Stream restoration is a socio-environmental process enacted in a socio-environmental system. However, many stream restoration practitioners and researchers only consider hydrology, geomorphology, and ecology when planning, implementing, and evaluating stream restoration. In this process, human engagement with streams and implications for environmental justice (EJ) go unnoticed. Similarly, environmental justice practitioners and researchers have not yet extended concepts of distributive, participatory, and recognition justice to stream restoration.
 
