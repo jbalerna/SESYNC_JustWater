@@ -1,7 +1,6 @@
-#**Is Your Project just water or Just Water:** 
-#**Environmental Justice in Stream Restoration**
+**Is Your Project just water or Just Water:Environmental Justice in Stream Restoration**
 
-###**Project Abstract:** 
+**Project Abstract:** 
 
 Stream restoration is a socio-environmental process enacted in a socio-environmental system. However, many stream restoration practitioners and researchers only consider hydrology, geomorphology, and ecology when planning, implementing, and evaluating stream restoration. In this process, human engagement with streams and implications for environmental justice (EJ) go unnoticed. Similarly, environmental justice practitioners and researchers have not yet extended concepts of distributive, participatory, and recognition justice to stream restoration.
 
@@ -9,12 +8,12 @@ Thus, there are critical, practical disconnects between research that demonstrat
 
 We will tailor our research process and publications to stream restoration practitioners in order to make this research practically useful. We anticipate distributing the results of our research in both academic (e.g., journals) and more public (e.g., blogs and social media) venues to reach and be accessible to researchers, activists, frontline communities, and practitioners alike.
 
-###**Principal Investigators:** 
+**Principal Investigators:** 
 
 * Lucy Andrews, University of California, Berkeley 
 * Jessica Balerna, University of South Florida
 
-###**Participants:** 
+**Participants:** 
 
 * Jabari Jones, University of Minnesota 
 * Vincent Chireh, University of British Columbia 
