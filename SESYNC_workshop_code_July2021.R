@@ -1,4 +1,4 @@
-##Created by J. Balerna for SESYNC Summer Cyberinfrastructure Workshop
+#Created by J. Balerna for SESYNC Summer Cyberinfrastructure Workshop
 #July 2021
 
 ##Goals of script:
