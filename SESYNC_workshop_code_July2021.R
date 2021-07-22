@@ -77,9 +77,16 @@ str(proj_location_cost)
 proj_location_cost_sf <- st_as_sf(proj_location_cost,
                  coords = c("lon","lat"),
                  crs = 32618)
+
+st_crs(proj_location_cost_sf)
+
 head(proj_location_cost_sf)
+
+par(mfrow=c(1,1))
 plot(proj_location_cost_sf["proj_cost"])
 
+#This doesn't work yet - Mary is working on changes
+#mapview(proj_location_cost_sf["proj_cost"]
 
 ### playing with filtering of data to show cost more clearly
 
@@ -110,5 +117,5 @@ ggplot(proj_cost_filter_high, aes(fill=proj_cost)) +
 ggplot(proj_location_cost_sf) +
   geom_sf() 
 
-mapview(proj_location_cost_sf["proj_cost"],
-        map.types = 'OpenStreetMap')
+
+
