@@ -74,10 +74,18 @@ str(proj_location_cost)
 #Change proj_location_cost from a data frame to spatial object
 
 proj_location_cost_sf <- st_as_sf(proj_location_cost,
-                 coords = c("lat","lon"),
+                 coords = c("lon","lat"),
                  crs = 32618)
+
+st_crs(proj_location_cost_sf)
+
 head(proj_location_cost_sf)
+
+par(mfrow=c(1,1))
 plot(proj_location_cost_sf["proj_cost"])
 
-mapview(proj_location_cost_sf["proj_cost"],
+mapview(proj_location_cost_sf["proj_cost"], 
         map.types = 'OpenStreetMap')
+
+
+
