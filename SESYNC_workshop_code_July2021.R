@@ -60,22 +60,19 @@ proj_location_cost <-inner_join(geographic_table, proj_activities_table, by="nrr
 head(proj_location_cost)
 
 #change coordinates to one column in decimal form
-proj_location_cost$lat <- proj_location_cost %>%
+proj_location_cost <- proj_location_cost %>%
   mutate(lat_deg= as.numeric(lat_deg), lat_min = as.numeric(lat_min), lat_sec = as.numeric(lat_sec))%>%
   mutate(lat = ( lat_deg + (lat_min/60) + (lat_sec/3600)))
 
-proj_location_cost$lon <- proj_location_cost %>%
+proj_location_cost <- proj_location_cost %>%
   mutate(lon_deg= as.numeric(lon_deg), lon_min = as.numeric(lon_min), lon_sec = as.numeric(lon_sec))%>%
   mutate(lon = -1*( lon_deg + (lon_min/60) + (lon_sec/3600)))
 
 head(proj_location_cost)
 str(proj_location_cost)
 
-proj_location_cost$lat <- as.numeric(unlist(proj_location_cost$lat))
-proj_location_cost$lon <- as.numeric(unlist(proj_location_cost$lon))
-
-
 #Change proj_location_cost from a data frame to spatial object
+
 proj_location_cost_sf <- st_as_sf(proj_location_cost,
                  coords = c("lat","lon"),
                  crs = 32618)
