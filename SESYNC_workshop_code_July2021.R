@@ -38,6 +38,7 @@ library(spatialreg)
 drv <- dbDriver("SQLite")
 
 # give the database file path
+
 db_nrrss <- paste(file.path(getwd()), 'input_data', 'NRRSS', 'nrrss-master', 'nrrss.sqlite', sep='/')
 
 # connect to the database
@@ -84,8 +85,37 @@ head(proj_location_cost_sf)
 par(mfrow=c(1,1))
 plot(proj_location_cost_sf["proj_cost"])
 
-mapview(proj_location_cost_sf["proj_cost"], 
-        map.types = 'OpenStreetMap')
+#This doesn't work yet - Mary is working on changes
+#mapview(proj_location_cost_sf["proj_cost"]
+
+### playing with filtering of data to show cost more clearly
+
+cost.filter<-proj_location_cost_sf %>%
+  filter(proj_cost>0)
+
+ggplot(cost.filter, aes(fill=proj_cost)) +
+  geom_sf()
+
+ggplot(proj_location_cost, aes(x=proj_cost)) +
+  geom_histogram()
+ggplot(cost.filter, aes(x=proj_cost)) +
+  geom_histogram()
+
+ggplot(filter(cost.filter, proj_cost<50000), aes(x=proj_cost)) +
+  geom_histogram()
+
+ggplot(proj_location_cost_sf, aes(fill=proj_cost)) +
+  geom_sf() 
+
+proj_cost_filter_high<- proj_location_cost_sf
+
+proj_cost_filter_high$proj_cost[which(proj_cost_filter_high$proj_cost>20000000)] <- 20000000
+ggplot(proj_cost_filter_high, aes(fill=proj_cost)) +
+  geom_sf() 
+
+
+ggplot(proj_location_cost_sf) +
+  geom_sf() 
 
 
 
