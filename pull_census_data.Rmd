@@ -1,0 +1,123 @@
+---
+title: "pull_census_data"
+author: "Jenny Rempel"
+date: "7/23/2021"
+output: html_document
+---
+
+A few notes
+* It will take some time to create statewide, block-group-level population & ACS estimates with spatial data. (See ~line 80.)
+* 
+
+```{r include = FALSE}
+# set knitr options
+knitr::opts_chunk$set(echo = TRUE)
+
+# load packages
+library(tidyverse) # for tidy syntax
+library(magrittr) # for more powerful tidy syntax
+library(sp) # for spatial data work - vectors
+library(sf) # for spatial data work - vectors
+library(arcpullr) # for pulling data from ArcGIS servers
+library(httr) # for building API calls
+library(tigris) # for state and county boundaries
+library(tidycensus) # for census data access
+library(here) # for relative file paths
+library(tictoc) # for timing how long code chunks take
+library(praise) # for positivity boosts :)
+
+# define functions and global options
+`%notin%` <- Negate(`%in%`)
+global_crs <- st_crs(4269) # set global CRS
+options(tigris_use_cache = TRUE)
+options(stringsAsFactors = FALSE)
+census_api_key("69b2a9fd058d6fdd18c67f3688ba9e909fb21f50") # my census API key
+# to get your own, go to https://api.census.gov/data/key_signup.html
+```
+
+```{r import california and minnesota, message = FALSE}
+# import and clean California state boundary as a spatial object
+ca_st_bound <- tigris::states() %>% # import all states
+  filter(NAME == "California") %>% # filter for California
+  st_transform(global_crs) %>% # transform to global CRS
+  rename_with(tolower) # rename columns to lowercase
+
+# import and clean Minnesota state boundary as a spatial object
+mn_st_bound <- tigris::states() %>% # import all states
+  filter(NAME == "Minnesota") %>% # filter for Minnesota
+  st_transform(global_crs) %>% # transform to global CRS
+  rename_with(tolower) # rename columns to lowercase
+
+# confirm spatial objects are selected and projected correctly
+ggplot() +
+  geom_sf(data = ca_st_bound) +
+  geom_sf(data = mn_st_bound) +
+  theme_minimal()
+```
+
+```{r message = FALSE, cache = TRUE}
+# pull census data variable tables
+census_vars <- load_variables(year = 2010, dataset = "sf1") # 2010 census is most current right now; 2020 coming soon
+acs_5y_vars <- load_variables(year = 2019, dataset = "acs5") # 2014-2019 5-year ACS estimates, down to the block group level
+acs_1y_vars <- load_variables(year = 2019, dataset = "acs1") # 2019 1-yr ACS estimates
+
+# simplify ACS variables for viewing
+acs_cleaner <- acs_5y_vars %>% 
+  count(concept) 
+
+# get CA block-group-level population estimates from the 2010 census
+tic()
+ca_census_pop_blkgrp <- get_decennial(state = "CA",
+                                           # county = "SET", # set county
+                                           geography = "block group", # pull block group-level data
+                                              # Note: we could go to block on 
+                                           variables = "P001001", # variable code for total population
+                                           geometry = TRUE) %>% # include vector geometry %>%
+  select(-variable) %>% # drop variable column
+  rename(tot_pop_census = value) %>% # rename value column to indicate what it captures
+  rename_with(tolower) # rename columns to lowercase
+toc()
+  # Note: Attempting this statewide crashed R for me, so we may want to run this on Savio, iterate through by county, or use a pre-made block group file (blasphemy, I know)
+
+# save that data
+tic()
+saveRDS(ca_census_pop_blkgrp, "intermediate_data/ca_census_pop_blkgrp.rds") # or could save a gpkg
+toc()
+
+# get MN block-group-level population estimates from the 2010 census
+tic()
+mn_census_pop_blkgrp <- get_decennial(state = "MN",
+                                           # county = "SET", # set county
+                                           geography = "block group", # pull block group-level data
+                                           variables = "P001001", # variable code for total population
+                                           geometry = TRUE) %>% # include vector geometry %>%
+  select(-variable) %>% # drop variable column
+  rename(tot_pop_census = value) %>% # rename value column to indicate what it captures
+  rename_with(tolower) # rename columns to lowercase
+toc()
+
+# save that data
+tic()
+saveRDS(mn_census_pop_blkgrp, "intermediate_data/mn_census_pop_blkgrp.rds") # or could save a gpkg
+toc()
+
+# Pull ACS data on MHI, % of population with a college education, % of population that is non-Hispanic white
+ca_acs_blkgrp <- get_acs(state = "CA",
+                                  #county = "SET", # set county
+                                  geography = "block group", # pull block group-level data
+                                    # for acs, we can only go to block group or place (ie. not block)
+                                  variables = c("B01003_001" # total population
+                                    "B02008_001" # white population (alone or in combination with other race)
+                                    # add more
+                                    ), 
+                                  # variables codes for total population and
+                                  
+                                  geometry = FALSE) %>% # do not include vector geometry
+  rename_with(tolower) %>% # rename columns to lowercase %>%
+  select(-moe, -name) %>% # drop measure of error and name columns
+  pivot_wider(names_from = "variable", values_from = "estimate") %>% # pivot from long to wide format
+  rename(tot_pop_acs = B01003_001, # rename columns after pivot
+         white_pop_acs = B02008_001) %>%
+  mutate(white_prop_acs = white_pop_acs / tot_pop_acs,
+         nonwhite_prop_acs = 1 - white_prop_acs) # add column giving proportion of population that is white
+```
