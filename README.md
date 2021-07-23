@@ -21,5 +21,3 @@ We will tailor our research process and publications to stream restoration pract
 * Jenny Rempel, University of California, Berkeley
 
 More information can be found here: https://www.sesync.org/project/graduate-pursuits-request-for-proposals/is-your-project-just-water-or-just-water
-
-Test
