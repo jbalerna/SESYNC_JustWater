@@ -1,3 +1,7 @@
+
+![image_name](GGplot_census_restorsites.jpeg)
+
+
 **Is Your Project just water or Just Water: Environmental Justice in Stream Restoration**
 
 **Project Abstract:**
