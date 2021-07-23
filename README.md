@@ -1,6 +1,15 @@
 
 ![image_name](GGplot_census_restorsites.jpeg)
 
+**Accomplishments this week**
+
+* Set up GitHub repository with an RProject and added collaborators
+* Created a connection with the National River Restoration Science Synthesis database for analysis
+* Looked through variables available for analysis - e.g., project size, project budget, project location
+* Connected census data for assessment of the question: "Where do restoration projects occur and how does that vary with sociodemographics?"
+* Created some visualizations of restoration project sites in MD and median income as well as looking at stream location as a confounding variable
+
+
 
 **Is Your Project just water or Just Water: Environmental Justice in Stream Restoration**
 
