@@ -13,24 +13,27 @@ md <- get_acs(geography = "county",
               year = 2009, 
               geometry=T)
 
-
+#Both md_sf and md_sf_test work in ggplot
+#but I think the md_sf_test has a more defined crs 
+#so I used that for leaflet mapping
 md_sf<- st_as_sf(md) #has same coordinate system as nrrss data
 
 md_sf_test <- st_sf(md, 
                      crs=4269)
 
-st_crs(md_sf_test)
-                     
-                     
+# proj_location_cost_sf made in All-nrrss-map.R - this is defined in workshop code Rscript
+md_nrrss<-st_filter(proj_location_cost_sf, md_sf_test) 
+
 
 #double check crs
+st_crs(md_sf)
 st_crs(md_sf_test)
 st_crs(md_nrrss)
 
+#Check visualizations
+
 ggplot(md_sf_test, aes(fill = estimate)) +
   geom_sf() 
-
-md_nrrss<-st_filter(proj_location_cost_sf, md_sf_test) # proj_location_cost_sf made in All-nrrss-map.R
 
 
 #Add some additional points for reference
@@ -44,10 +47,6 @@ oriole_park <- st_sfc(
 
 
 #plot plot plot!
-mapview(md_sf_test, 
-        map.types = "OpenStreetMap") +
-    mapview(md_nrrss)
-
 pal <- colorNumeric("PuBuGn", md_sf_test$estimate)
 
 leaflet() %>%
@@ -64,7 +63,6 @@ leaflet() %>%
                    fillOpacity = 0.7,
                    radius = 0.2)
 
-?addLegend
 
 ggplot(md_sf_test, 
        aes(fill = estimate/10000)) +
