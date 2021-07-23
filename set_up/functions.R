@@ -27,7 +27,8 @@ get_ca_boundary <- function() {
     filter(NAME == "California") %>%
     rename(name = NAME) %>%
     select(name) %>%
-    st_transform(crs = global_crs)
+    st_transform(crs = global_crs) %>%
+    st_make_valid()
 }
 
 get_mn_boundary <- function() {
@@ -35,7 +36,8 @@ get_mn_boundary <- function() {
     filter(NAME == "Minnesota") %>%
     rename(name = NAME) %>%
     select(name) %>%
-    st_transform(crs = global_crs)
+    st_transform(crs = global_crs) %>%
+    st_make_valid()
 }
 
 # -------------------------
