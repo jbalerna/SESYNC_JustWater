@@ -1,8 +1,27 @@
+**Is Your Project just water or Just Water: Environmental Justice in Stream Restoration**
+
 
 ![image_name](GGplot_census_restorsites.jpeg)
 
 
-**Is Your Project just water or Just Water: Environmental Justice in Stream Restoration**
+**Accomplishments this week**
+
+* Set up GitHub repository with an RProject and added collaborators
+* Created a connection with the [National River Restoration Science Synthesis database](https://github.com/khondula/nrrss) for analysis
+* Looked through variables available for analysis - e.g., project size, project budget, project location
+* Connected census data for assessment of the question: "Where do restoration projects occur and how does that vary with sociodemographics?"
+* Created some visualizations of restoration project sites in MD and median income as well as looking at stream location as a confounding variable
+
+
+**Next steps**
+
+* Updating code to be able to do some regression analysis of the correlation between project site locations (or budget, etc) and different sociodemographics
+* Consider some issues with the data: 
+    + How to create variables accounting for stream location as a confounding variable (e.g., miles of stream in a given area)
+    + How do we adjust for sociodemographic change (e.g., what happens before and after restoration projects are completed)?
+    + What are appropriate time lags to consider?
+    + What environmental justice variables can be extracted from the data available (e.g., key stakeholders?)
+* More advanced mapping and analysis of these questions
 
 **Project Abstract:**
 
