@@ -47,9 +47,12 @@ oriole_park <- st_sfc(
 
 
 #plot plot plot!
+library(leaflet)
+library(htmlwidgets)
+
 pal <- colorNumeric("PuBuGn", md_sf_test$estimate)
 
-leaflet() %>%
+Map_census_restor-sites_MD <- leaflet() %>%
   addTiles() %>%
   addPolygons(data = md_sf_test,
               fillColor = ~pal(estimate),
@@ -62,6 +65,9 @@ leaflet() %>%
                    color="red",
                    fillOpacity = 0.7,
                    radius = 0.2)
+
+#share map
+saveWidget(Map_census_restor-sites_MD, file="Map_census_restor-sites_MD.html")
 
 
 ggplot(md_sf_test, 
