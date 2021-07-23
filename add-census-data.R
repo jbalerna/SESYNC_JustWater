@@ -52,7 +52,7 @@ library(htmlwidgets)
 
 pal <- colorNumeric("PuBuGn", md_sf_test$estimate)
 
-Map_census_restor-sites_MD <- leaflet() %>%
+Map_census_restor_sites_MD <- leaflet() %>%
   addTiles() %>%
   addPolygons(data = md_sf_test,
               fillColor = ~pal(estimate),
@@ -67,7 +67,7 @@ Map_census_restor-sites_MD <- leaflet() %>%
                    radius = 0.2)
 
 #share map
-saveWidget(Map_census_restor-sites_MD, file="Map_census_restor-sites_MD.html")
+saveWidget(Map_census_restor_sites_MD, file="Map_census_restor_sites_MD.html")
 
 
 ggplot(md_sf_test, 
