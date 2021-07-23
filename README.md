@@ -13,7 +13,11 @@
 **Next steps**
 
 * Updating code to be able to do some regression analysis of the correlation between project site locations (or budget, etc) and different sociodemographics
-* Consider some issues with the data: how do we adjust for sociodemographic change (e.g., what happens before and after restoration projects are completed?)
+* Consider some issues with the data: 
+    + How do we adjust for sociodemographic change (e.g., what happens before and after restoration projects are completed)?
+    + What are appropriate time lags to consider?
+    + What environmental justice variables can be extract from the data available (e.g., key stakeholders?)
+* More advanced mapping of these questions
 
 
 
