@@ -5,6 +5,7 @@
 #select location from NRRSS - specific state or census tract?
 #map number of restoration projects (points) AND census minority pop info (or median income?) as colors
 #simple regression correlating the two
+#this continues with add-census-data.R script file!
 
 #install packages
 install.packages("RSQLite")
