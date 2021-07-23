@@ -1,5 +1,8 @@
+**Is Your Project just water or Just Water: Environmental Justice in Stream Restoration**
+
 
 ![image_name](GGplot_census_restorsites.jpeg)
+
 
 **Accomplishments this week**
 
@@ -18,11 +21,6 @@
     + What are appropriate time lags to consider?
     + What environmental justice variables can be extract from the data available (e.g., key stakeholders?)
 * More advanced mapping of these questions
-
-
-
-
-**Is Your Project just water or Just Water: Environmental Justice in Stream Restoration**
 
 **Project Abstract:**
 
