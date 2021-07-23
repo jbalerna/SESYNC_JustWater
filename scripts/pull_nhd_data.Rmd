@@ -1,0 +1,83 @@
+---
+title: "pull_nhd_data"
+author: "Lucy Andrews"
+date: "7/23/2021"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+source(here("set_up", "set_up_environment.R"))
+source(here("set_up", "functions.R"))
+```
+
+```{r}
+# load areas of interest for NHDPlus Seamless queries
+# will be returned in whatever CRS is set in global parameters (specified in `set_up_environment.R`)
+ca_boundary <- get_ca_boundary()
+mn_boundary <- get_mn_boundary()
+```
+
+```{r cache = TRUE}
+# query NHDPlus Seamless to get flowlines, value-added attributes, and HUC12 boundaries
+# run this in sequence rather than in parallel to avoid getting throttled
+# this will cache data on your computer in whatever cache your is set up on your computer
+# and it can take some time to pull files the first time so be patient!
+# and if you get an error message, just run it again; that's a server-side issue
+
+# California
+ca_flowlines <- get_nhdplus(AOI = ca_boundary, realization = "flowline") %>%
+  st_transform(global_crs)
+
+ca_huc12 <- get_huc12(AOI = ca_boundary) %>%
+  st_transform(global_crs)
+
+# Minnesota
+mn_flowlines <- get_nhdplus(AOI = mn_boundary, realization = "flowline") %>%
+  st_transform(global_crs)
+
+mn_huc12 <- get_huc12(AOI = mn_boundary) %>%
+  st_transform(global_crs)
+
+# HUC12 and ComID associations
+wbd_nhd_crosswalk_url <- "https://s3.amazonaws.com/edap-nhdplus/NHDPlusV21/Data/NationalData/NHDPlusV21_NationalData_Catchment_WBDHUC12_Crosswalk_01.7z"
+
+download_web_file(desired_filename_as_string = "wbd_nhd_crosswalk.7z",
+                  web_address_as_string = wbd_nhd_crosswalk_url,
+                  folder_as_string = here("raw_data"))
+
+archive_extract(archive = here("raw_data", "wbd_nhd_crosswalk.7z"),
+                dir = here("raw_data", "wbd_nhd_crosswalk"))
+
+file.rename(from = here("raw_data", "wbd_nhd_crosswalk", "NHDPlusNationalData"),
+            to = here("raw_data", "wbd_nhd_crosswalk_2"))
+
+file.remove(here("raw_data", "wbd_nhd_crosswalk"))
+
+file.rename(from = here("raw_data", "wbd_nhd_crosswalk_2"),
+            to = here("raw_data", "wbd_nhd_crosswalk"))
+
+ca_comid_huc12_assoc <- read.dbf(file = here("raw_data", "wbd_nhd_crosswalk", "NHDPlusV21_NHDflowline_WBDHUC12_Crosswalk.dbf")) %>%
+  rename(comid = COMID,
+         huc12 = HUC_12) %>%
+  filter(comid %in% ca_flowlines$comid)
+
+mn_comid_huc12_assoc <- read.dbf(file = here("raw_data", "wbd_nhd_crosswalk", "NHDPlusV21_NHDflowline_WBDHUC12_Crosswalk.dbf")) %>%
+  rename(comid = COMID,
+         huc12 = HUC_12) %>%
+  filter(comid %in% mn_flowlines$comid)
+
+# Value-added attributes
+all_vaa <- get_vaa()
+
+ca_vaa <- all_vaa %>%
+  filter(comid %in% ca_flowlines$comid)
+
+mn_vaa <- all_vaa %>%
+  filter(comid %in% mn_flowlines$comid)
+
+# Clean up
+unlink(dirname(get_vaa_path()), recursive = TRUE)
+rm(all_vaa)
+```

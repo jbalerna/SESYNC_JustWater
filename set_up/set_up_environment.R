@@ -13,7 +13,10 @@ library(tidycensus)
 library(units)
 library(here)
 library(markdown)
+
+# Support for various file types
 library(archive)
+library(foreign)
 
 # Plotting
 library(RColorBrewer)
@@ -22,6 +25,14 @@ library(ggnewscale)
 # NHDPlus data
 library(nhdR)
 library(nhdplusTools)
+
+# -------------------------
+
+# Create directories
+
+if (!dir.exists("here", "raw_data")) {
+  dir.create("here", "raw_data")
+}
 
 # -------------------------
 
@@ -35,6 +46,6 @@ options(scipen = 999999) # display numbers without using scientific notation
 
 # Set analytic parameters
 
-global_crs <- st_crs(4269)
+global_crs <- st_crs(4269) # specify CRS to use throughout analysis
 
 
