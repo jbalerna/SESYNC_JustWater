@@ -28,6 +28,14 @@ library(nhdplusTools)
 
 # -------------------------
 
+# Create directories
+
+if (!dir.exists("here", "raw_data")) {
+  dir.create("here", "raw_data")
+}
+
+# -------------------------
+
 # Set global options
 
 options(stringsAsFactors = FALSE) # get out of here factors
