@@ -67,7 +67,7 @@ Map_census_restor_sites_MD <- leaflet() %>%
                    radius = 0.2)
 
 #share map
-saveWidget(Map_census_restor_sites_MD, file="Map_census_restor_sites_MD.html")
+saveWidget(Map_census_restor_sites_MD, file="index.html")
 
 
 ggplot(md_sf_test, 

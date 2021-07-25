@@ -8,6 +8,8 @@ Thus, there are critical, practical disconnects between research that demonstrat
 
 We will tailor our research process and publications to stream restoration practitioners in order to make this research practically useful. We anticipate distributing the results of our research in both academic (e.g., journals) and more public (e.g., blogs and social media) venues to reach and be accessible to researchers, activists, frontline communities, and practitioners alike.
 
+![image_name](GGplot_census_restorsites.jpeg)
+
 **Principal Investigators:** 
 
 * Lucy Andrews, University of California, Berkeley 
