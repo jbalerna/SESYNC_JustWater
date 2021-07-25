@@ -70,7 +70,7 @@ tic()
 ca_census_pop_blkgrp <- get_decennial(state = "CA",
                                            # county = "SET", # set county
                                            geography = "block group", # pull block group-level data
-                                              # Note: we could go to block on 
+                                              # Note: we could go to block level
                                            variables = "P001001", # variable code for total population
                                            geometry = TRUE) %>% # include vector geometry %>%
   select(-variable) %>% # drop variable column
@@ -81,7 +81,7 @@ toc()
 
 # save that data
 tic()
-saveRDS(ca_census_pop_blkgrp, "intermediate_data/ca_census_pop_blkgrp.rds") # or could save a gpkg
+saveRDS(ca_census_pop_blkgrp, "intermediate_data/ca_census_pop_blkgrp.rds") # or could save a gpkg, gdb, or shapefiles (look into Arc options)
 toc()
 
 # get MN block-group-level population estimates from the 2010 census

@@ -13,6 +13,7 @@ library(tidycensus)
 library(units)
 library(here)
 library(markdown)
+library(tictoc)
 
 # Support for various file types
 library(archive)

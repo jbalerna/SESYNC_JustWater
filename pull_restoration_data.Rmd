@@ -1,0 +1,11 @@
+---
+title: "pull_restoration_data"
+author: "Jenny Rempel"
+date: "7/23/2021"
+output: html_document
+---
+
+```{r Minnesota data}
+https://solr.legacy.mn.gov/v2/export/download/bc29d464bec222dba9523a7ccfc0abfc
+```
+
