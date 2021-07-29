@@ -5,7 +5,36 @@ date: "7/23/2021"
 output: html_document
 ---
 
-```{r Minnesota data}
-https://solr.legacy.mn.gov/v2/export/download/bc29d464bec222dba9523a7ccfc0abfc
+```{r California data}
+# California Department of Fish and Wildlife (CDFW) Fisheries Restoration Grant Program (FRGP) 
+# I need to read more about the difference between these 2 downloads. The first is a gdb and the second contains shp files.
+
+# Download data from first link
+  # Info & metadata: https://map.dfg.ca.gov/metadata/ds0168.html
+download.file(url = "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/100_199/ds168.zip", 
+  destfile = "raw_data/cdfw_ds168.zip")
+unzip(zipfile = "raw_data/cdfw_ds168.zip")
+cdfw_part1 <- st_read(dsn = "ds168.gdb") 
+glimpse(cdfw_part1) # Contains "center lat" and "center long"
+summary(cdfw_part1) 
+
+# Check what layers exist
+part1_layers <- st_layers(dsn = "ds168.gdb")
+part1_layers
+
+# Pull the layer with point data
+part1_point <- st_read("ds168.gdb", layer = "ds168")
+glimpse(part1_point) 
+
+# Download data from the 2nd link
+  # Info and metadata: https://map.dfg.ca.gov/metadata/ds0734.html
+download.file(url = "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/700_799/ds734.zip", 
+  destfile = "raw_data/cdfw_ds734.zip")
+unzip(zipfile = "raw_data/cdfw_ds734.zip")
+cdfw_part2 <- st_read(dsn = "ds734.shp")
+glimpse(cdfw_part2)
 ```
 
+```{r Minnesota data}
+# for later: https://solr.legacy.mn.gov/v2/export/download/bc29d464bec222dba9523a7ccfc0abfc
+```
