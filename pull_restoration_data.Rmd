@@ -33,7 +33,13 @@ download.file(url = "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_
 unzip(zipfile = "raw_data/cdfw_ds734.zip")
 cdfw_part2 <- st_read(dsn = "ds734.shp")
 glimpse(cdfw_part2)
+st_crs(cdfw_part2)
 ```
+
+```{r Quick exploration}
+plot(cdfw_part2)
+```
+
 
 ```{r Minnesota data}
 # for later: https://solr.legacy.mn.gov/v2/export/download/bc29d464bec222dba9523a7ccfc0abfc
