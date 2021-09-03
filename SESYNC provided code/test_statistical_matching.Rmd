@@ -1,0 +1,240 @@
+---
+title: "Statistical matching test code"
+author: "Quentin Read"
+date: "9/2/2021"
+output: html_document
+---
+
+Here I am using the same code from the "randomly sample control points" notebook to get a bunch of control points. This time I am going to sample more control points than we have treatment points, to hopefully increase the odds that each treatment point has a good match among the control points. Also, I am going to pull the National Hydrography Dataset (NHD) stream network data so that we can actually sample the random control points from along streams instead of in completely random locations that are unlikely to be along streams (as I did in the older example notebook). The NHD dataset is already in a public folder on the SESYNC server so I will just pull it in from there. Notice I also made a folder called `example_data` inside your group's `/nfs/ejstream-data/` folder, where I put copies of the CDFW data that Jenny sent me the other day. 
+
+Like in the last example, I will just use 100 random treatment (restoration) points for simplicity and to speed up the demonstration. But I will randomly sample 1000 control points. Then I will use the MatchIt package to match the treatment points with 100 suitable control points. 
+
+## Load packages and data
+
+```{r packages, message = FALSE}
+library(sf)
+library(dplyr)
+library(ggplot2)
+library(glue)
+library(tidyr)
+library(units)
+library(raster)
+library(MatchIt)
+
+theme_set(theme_bw())
+
+direc <- '/nfs/ejstream-data/example_data'
+```
+
+Load the CDFW data (points and polygons) from the location on your team's shared data directory on the SESYNC server. Do a spatial union to get one large polygon from the many small polygons. Write it to a file so we can access it from outside of R.
+
+```{r load data, message = FALSE}
+cdfw_part1 <- st_read(dsn = glue("{direc}/cdfw_ds0168/ds168.gdb"), layer = "ds168_ex") %>%
+  st_as_sf(coords = c('Center_Longitude', 'Center_Latitude'), crs = 4326)
+cdfw_part2 <- st_read(dsn = glue("{direc}/cdfw_ds734"), layer = "ds734")
+```
+
+```{r, eval = FALSE}
+cali_polygon <- st_union(cdfw_part2)
+
+st_write(cali_polygon, glue('{direc}/cali_polygon.gpkg'))
+```
+
+```{r load polygon}
+cali_polygon <- st_read(glue('{direc}/cali_polygon.gpkg'))
+```
+
+
+## Process stream network dataset
+
+The following code is not R code. It's GDAL code to run from the command line to get the data we want out of the NHD stream network geodatabase from the location on the `public-data` directory on the SESYNC server. (Note: this may not really be the correct dataset to use but I'm just using it here for demonstration purposes. If you find a more accurate dataset, use that instead.) It's too big of a dataset to load into R and try to clip to the small area we care about, so what I did here is run these commands on the command line to pull out the one layer from the geodatabase we want (a 3-d shapefile of all streams in the USA), remove the third dimension to get a 2-d network, and simultaneously project to the California Albers projection and crop down to the bounding box of California. Then crop even more, in this case crop to the California restoration polygons for this particular analysis. Then we end up with a much smaller file we can load into R.
+
+```{bash, eval = FALSE}
+gdbfile="/nfs/public-data/NHDPlusV21/NHDPlusNationalData/NHDPlusV21_National_Seamless_Flattened_Lower48.gdb"
+direc="/nfs/ejstream-data/example_data"
+
+# Get CRS of California polygon
+gdalsrsinfo -o wkt ${direc}/cali_polygon.gpkg > ${direc}/cali_crs.wkt
+
+# Write the NHDflowline network layer from the geodatabase to a geopackage shapefile, using -dim 2 to remove the Z dimension
+# Use -t_srs to simultaneously reproject to the California coordinate system, and -clipsrc to clip to California bounding box in lat-longs.
+ogr2ogr -overwrite -f "GPKG" -dim 2 -t_srs ${direc}/cali_crs.wkt -clipsrc -124.5 32.5 -114.1 42.1 ${direc}/cali_nhd.gpkg ${gdbfile} "NHDFlowline_Network"
+ogr2ogr -overwrite -f "GPKG" -clipsrc ${direc}/cali_polygon.gpkg ${direc}/cali_nhd_cropped.gpkg ${direc}/cali_nhd.gpkg
+```
+
+Most of this code runs in a few seconds but the last line, cropping the stream network to the polygon, takes many hours to run so I had to run it on the computing cluster. Now we can load the resulting shapefile into R. It's a bunch of line features representing streams in the CDFW part 2 area. 
+
+```{r load nhd}
+cali_nhd <- st_read(glue('{direc}/cali_nhd_cropped.gpkg'))
+```
+
+## Sample and buffer treatment points
+
+Project the restoration points into the CRS of the California restoration polygon, take the subset of the points that are inside the polygon, and then take a subsample of 100 points from that (for demonstration purposes). In this case, I am doing the subsample to make the sampled points as regularly spaced as possible (at least 30 km apart because the radius to buffer each point is 15 km in this example). This uses a function I found in some code I wrote for another project a long time ago, that samples points randomly ensuring they are spaced out by a certain distance.
+
+```{r union polygon, message = FALSE}
+SRS_iterative_N1 <- function(focal_points, radius, n, point = NULL, show_progress = FALSE) {
+  require(sp)
+  
+  if (is.null(point)) {
+    point <- sample(length(focal_points), 1)
+  }
+  
+  focal_points <- focal_points@coords
+  dimnames(focal_points)[[1]] <- 1:nrow(focal_points)
+  remaining_points <- focal_points
+  
+  final_points <- c()
+  s <- 0
+  
+  # Keep going until the desired number of points is reached
+  while(s < n) {
+    final_points <- c(final_points, point)
+    s <- s+1
+    
+    if(show_progress) print(paste('Found', s, 'of', n, 'points.'))
+    
+    dist_s <- spDistsN1(pts = remaining_points, pt = focal_points[dimnames(focal_points)[[1]] == point, ], longlat = FALSE)
+    
+    # Cross off all points within 2*radius from the focal point
+    outside_circle <- dist_s >= 2*radius
+    remaining_points <- remaining_points[outside_circle, , drop = FALSE]
+    
+    # If none are left, quit.
+    if(nrow(remaining_points) == 0) {
+      warning('Final number of points is less than n.')
+      return(sort(as.numeric(final_points)))
+    }
+    
+    # Find shortest distance in the remaining points to any one of the previously chosen points.
+    point <- dimnames(remaining_points)[[1]][which.min(dist_s[outside_circle])]
+  }
+  
+  return(sort(as.numeric(final_points)))
+}
+
+cdfw_tosample <- cdfw_part1 %>%
+  st_transform(crs = st_crs(cali_polygon)) %>%
+  st_filter(cali_polygon) 
+
+set.seed(888)
+treatment_pt_index <- SRS_iterative_N1(as(cdfw_tosample, 'Spatial'), radius = 15000, n = 100)
+
+cdfw_subsample <- cdfw_tosample[treatment_pt_index, ]
+cdfw_buffer <- st_buffer(cdfw_subsample, dist = set_units(5, 'km'))
+```
+
+Plot the restoration polygon, stream network as lines, and sampled points to see how it all looks. The stream network is very dense. Maybe in the future you could limit it to some subset of the stream network that is above a certain stream order?
+
+```{r diagnostic plot}
+ggplot() +
+  geom_sf(data = cali_polygon) +
+  geom_sf(data = cali_nhd, size = 0.25) +
+  geom_sf(data = cdfw_buffer, fill = 'blue')
+```
+
+## Sample control points
+
+First subtract the buffer zones from the NHD line feature to ensure our control points are a good distance away from any of the treatment points. Next, take a random sample of size `1000` and type `"regular"` on that line feature. This will ensure that all the sampled points lie along one of the streams in the dataset, and that they are reasonably evenly spaced. The last lines of code are to clean up the object you get back from `st_sample`.
+
+```{r subtract buffers, message = FALSE}
+control_nhd <- st_difference(cali_nhd, st_union(cdfw_buffer)) %>% 
+  st_union
+
+control_points <- st_sample(control_nhd, size = 1000, type = 'regular') 
+control_points <- control_points[!is.na(st_dimension(control_points))] %>%
+  st_cast('POINT')
+```
+
+Make another plot to see how it all looks.
+
+```{r plot treatment and control}
+ggplot() +
+  geom_sf(data = cali_polygon) +
+  geom_sf(data = control_points, color = 'red', size = 0.5) +
+  geom_sf(data = cdfw_subsample, color = 'blue', size = 0.5)
+```
+
+
+## Get environmental covariates
+
+This is just a quick example for illustration purposes. We will use the Worldclim dataset to get some different variables based on temperature and precipitation patterns. I also picked a low resolution version. Again, these are just for example purposes and likely not to be the variables you will use later on. The NHD dataset itself has a lot of stream covariates you might want to use. Extract the variables at the points. (Maybe in your actual analysis you would want to aggregate these environmental variables over some area around the points, but here I am just using the point data so it all runs quicker.)
+
+```{r get worldclim}
+bioclim_data <- getData('worldclim', var = 'bio', res = 2.5)
+
+bioclim_treatment <- extract(bioclim_data, cdfw_subsample)
+bioclim_control <- extract(bioclim_data, st_as_sf(control_points))
+
+duplicates <- duplicated(bioclim_control)
+missing <- apply(bioclim_control, 1, function(x) any(is.na(x)))
+control_points <- control_points[!duplicates & !missing]
+bioclim_control <- bioclim_control[!duplicates & !missing, ]
+```
+
+A few of the control points ended up being either close enough together that they had duplicated environmental variables, or missing data, so I removed those but we still have over 900 control points.
+
+## Statistical matching between treatment and control
+
+Now, we have 100 treatment points where we know restoration occurred, and about 950 where we know it didn't occur within 5 kilometers of that point (**Note: this is not true in reality because I only used 100 treatment points to speed things up, leaving out the vast majority. So actually many of the control points probably have restoration near them in reality. This example is completely fake and wrong.**) We can use the `matchit()` function to match the 100 treatment points with 100 of the control points.
+
+First we need to combine the treatment and control bioclim into one data frame. We have to code the treatment (restoration) points with ones, and the control (no restoration) points with zeros. Also, we should standardize the covariates so that every variable is on the same scale.
+
+```{r create dataframe for matchit}
+standardized_data <- scale(rbind(bioclim_treatment, bioclim_control))
+
+data_to_match <- cbind(
+  data.frame(restoration = rep(c(1, 0), c(nrow(bioclim_treatment), nrow(bioclim_control)))),
+  standardized_data
+)
+```
+
+Now match them up! I have not yet explored all the possibilities of the `matchit()` function. The `"nearest"` method, according to the documentation, computes a distance between all the treatment points and control points, based on the covariates, then assigns each treated unit a control unit as a match based on the nearest neighbor. Each match is done independently so this is a very crude method. There are more sophisticated methods that are implemented in the package that you can look into in the future.
+
+```{r do matchit}
+match_nearestneighbor <- matchit(restoration ~ ., 
+                                 data = data_to_match, method = "nearest")
+
+summary(match_nearestneighbor)
+
+```
+
+The matching procedure returns an object with a lot of information in it. I am not sure what all the different elements mean. But we can extract the matched pairs from the element in the match object called `match.matrix`. In each row, it says which treatment point corresponds to which control point. Here, I will reshape the data to get a point geometry object with all the treatment and control points in it, and a column indicating which matched pair each one is part of.
+
+```{r reshape matched data}
+match_index <- rep(NA, nrow(data_to_match))
+match_index[1:100] <- 1:100
+match_index[as.numeric(match_nearestneighbor$match.matrix)] <- 1:100
+data_to_match$match_index <- match_index
+matched_points <- st_sf(data_to_match, geometry = c(st_geometry(cdfw_subsample), st_geometry(control_points))) %>%
+  filter(!is.na(match_index)) %>%
+  mutate(restoration = factor(restoration, labels = c('no', 'yes')))
+```
+
+## Diagnostic plots of matches
+
+I was curious how far apart in space the paired points are so I created a line object to connect all the matched pairs with a line, then draw it on a map. The `summarize()` does a spatial union of all the grouped pairs of points, then `st_cast()` converts the pairs of points into lines.
+
+```{r create match lines}
+matched_lines <- matched_points %>%
+  group_by(match_index) %>%
+  summarize() %>%
+  st_cast('LINESTRING')
+```
+
+Many are close together but a lot of them are really far apart. That seems problematic but again the variables used for the matching were just ones that were convenient to get so this isn't likely to resemble your final analysis that much.
+
+```{r plot line pairs}
+ggplot() +
+  geom_sf(data = cali_polygon) +
+  geom_sf(data = matched_lines, color = 'forestgreen', size = 0.3, alpha = 0.5) +
+  geom_sf(data = matched_points, size = 2, aes(color = restoration)) 
+```
+
+Here is a histogram of the distances, in kilometers, between the pairs.
+
+```{r}
+ggplot(data.frame(distance = as.numeric(set_units(st_length(matched_lines), 'km'))), aes(x = distance)) + 
+  geom_histogram(bins = 20)
+```
+
