@@ -72,7 +72,7 @@ cali_nhd <- st_read(glue('{direc}/cali_nhd_cropped.gpkg'))
 
 Project the restoration points into the CRS of the California restoration polygon, take the subset of the points that are inside the polygon, and then take a subsample of 100 points from that (for demonstration purposes). In this case, I am doing the subsample to make the sampled points as regularly spaced as possible (at least 30 km apart because the radius to buffer each point is 15 km in this example). This uses a function I found in some code I wrote for another project a long time ago, that samples points randomly ensuring they are spaced out by a certain distance.
 
-```{r union polygon, message = FALSE}
+```{r sample treatment points, message = FALSE}
 SRS_iterative_N1 <- function(focal_points, radius, n, point = NULL, show_progress = FALSE) {
   require(sp)
   
