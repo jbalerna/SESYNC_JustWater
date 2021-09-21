@@ -1,0 +1,15 @@
+---
+title: "clean_dwr_usrp"
+author: "Lucy Andrews"
+date: "9/21/2021"
+output: html_document
+---
+
+```{r setup}
+# load packages
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(sf))
+```
+
+
