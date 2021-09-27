@@ -15,9 +15,12 @@ suppressPackageStartupMessages(library(janitor))
 suppressPackageStartupMessages(library(here))
 suppressPackageStartupMessages(library(readxl))
 suppressPackageStartupMessages(library(sf))
+suppressPackageStartupMessages(library(tigris))
 
 # set global options
 options(stringsAsFactors = FALSE)
+options(tigris_use_cache = TRUE)
+global_crs <- st_crs(4269)
 
 # build custom functions and operators
 # %notin%: operator that returns the negation of %in%
@@ -33,35 +36,68 @@ paste_na_rm <- function(x, collapse = ", ") {
 # build is.nan() method for data.frame objects
 is.nan.data.frame <- function(x)
 do.call(cbind, lapply(x, is.nan))
+
+# build function that pulls CA boundary into global environment as sf object
+get_ca_boundary <- function(crs) {
+    states() %>%
+      filter(NAME == "California") %>%
+      rename(name = NAME) %>%
+      select(name) %>%
+      st_transform(crs = crs)
+}
 ```
 
 ```{r}
 # import all data
 
-# import data - usrp_all_projects.xlsx --> All Projects sheet
+# specify column names for attribute data sheet import
 attr_colnames <- c("project_num", "project_name", "year_awarded",
                    "funding_source", "sponsor", "co_sponsor", "project_desc",
                    "funding_amount", "total_project_cost", "county", "latitude",
                    "longitude")
 
+# import data - usrp_all_projects.xlsx --> All Projects sheet
+# and do an initial clean up pass by fixing typos and duplicates
 usrp_all_projects_attr <- read_excel(here("raw_data", "usrp_all_projects.xlsx"),
                                      sheet = "All Projects",
                                      col_names = attr_colnames,
                                      col_types = "text",
                                      skip = 1) %>%
-  mutate(year_awarded = substr(year_awarded, 1, 4),
+  mutate(project_name = str_replace(gsub("\\s+", " ", str_trim(project_name)), "B", "b"),
+         project_name = sub("Deveroux", "Devereux", project_name),
+         project_name = sub("Farmerville", "Farmersville", project_name),
+         project_name = sub("Dennet Dam", "Dennett Dam", project_name),
+         project_name = sub("Resoration", "Restoration", project_name),
+         project_name = sub("Ynacio", "Ygnacio", project_name),
+         year_awarded = substr(year_awarded, 1, 4),
          funding_amount = as.numeric(funding_amount),
          total_project_cost = as.numeric(total_project_cost),
          latitude = as.numeric(latitude),
          longitude = as.numeric(longitude)) %>%
   remove_empty(which = "cols") %>%
-  distinct()
+  # clean up duplicate records where the duplicates each contain partial information
+  # duplicates identified by matching project names and funding amounts
+  group_by(project_name, funding_amount) %>%
+  fill(project_num, year_awarded, funding_source, sponsor, co_sponsor,
+       project_desc, total_project_cost, county, latitude, longitude,
+       .direction = "updown") %>%
+  ungroup() %>%
+  distinct(project_num, project_name, .keep_all = TRUE)
 
-# import data - usrp_all_projects.xlsx --> Location sheet
+# deal with two random rows with project_num in project_name col
+usrp_all_projects_attr$project_num[usrp_all_projects_attr$project_name ==
+                                     "San Luis Obispo Creek (DWR #Z60000)"] <- "Z60000"
+
+usrp_all_projects_attr$project_num[usrp_all_projects_attr$project_name ==
+                                    "Little Chico / Dead Horse Creeks (DWR #Z60001)"] <- "Z60001"
+
+# specify column names for location data sheet import
 loc_colnames <- c("project_num", "project_name", "project_address_desc", "city",
                   "zip_code", "county", "huc8", "lat", "long", "latitude",
                   "longitude", "restored_length")
 
+# import data - usrp_all_projects.xlsx --> Location sheet
+# and do an initial clean up pass by fixing typos and duplicates
 usrp_all_projects_loc <- read_excel(here("raw_data", "usrp_all_projects.xlsx"),
                                     sheet = "Location",
                                     col_names = loc_colnames,
@@ -70,9 +106,27 @@ usrp_all_projects_loc <- read_excel(here("raw_data", "usrp_all_projects.xlsx"),
   remove_empty(which = "cols") %>%
   distinct()
 
+# deal with two random rows with project_num in project_name col
+usrp_all_projects_loc$project_num[usrp_all_projects_loc$project_name ==
+                                    "San Luis Obispo Creek (DWR #Z60000)"] <- "Z60000"
+
+usrp_all_projects_loc$project_num[usrp_all_projects_loc$project_name ==
+                                    "Little Chico / Dead Horse Creeks (DWR #Z60001)"] <- "Z60001"
+
+# clean up duplicate records where the duplicates each contain partial information
+# duplicates identified by matching project numbers
+usrp_all_projects_loc <- usrp_all_projects_loc %>%
+  group_by(project_num) %>%
+  fill(project_address_desc, city, zip_code, county, latitude, longitude, restored_length) %>%
+  ungroup() %>%
+  distinct(project_num, .keep_all = TRUE)
+
 # clean up environment
 rm(attr_colnames, loc_colnames)
 ```
+
+---> Cuddy Creek
+---> Las Virgenes (P13-047)
 
 ```{r}
 # clean the attributes dataframe
@@ -208,18 +262,49 @@ rm(usrp_all_projects_loc_na, seq_fill_na)
 
 ```{r}
 # create a single dataframe with all attributes
-usrp_all_projects <- full_join(x = usrp_all_projects_attr,
+usrp_all_projects_df <- full_join(x = usrp_all_projects_attr,
                                y = usrp_all_projects_loc,
                                by = c("project_num", "project_name"),
                                suffix = c("_attr", "_loc")) %>%
+  unite(col = latitude, latitude_attr, latitude_loc, na.rm = TRUE) %>%
+  unite(col = longitude, longitude_attr, longitude_loc, na.rm = TRUE) %>%
   arrange(desc(funding_amount)) %>%
   distinct(project_num, .keep_all = TRUE)
+
+# replace empty strings with NA
+usrp_all_projects_df[usrp_all_projects_df == ""] <- NA
+
+# fix and eliminate duplicates with autopopulated project ID numbers
+usrp_all_projects_df$project_num[usrp_all_projects_df$project_num == "X-loc-1"] <- "X-attr-1"
+usrp_all_projects_df$project_num[usrp_all_projects_df$project_num == "X-attr-5"] <- "P13-047"
+
+# deal with remaining duplicates from join and initial missing project ID numbers
+usrp_all_projects_df <- usrp_all_projects_df %>%
+  group_by(project_num) %>%
+  fill(everything(), .direction = "updown") %>%
+  distinct(project_num, .keep_all = TRUE) %>%
+  mutate(latitude = sub("_.*", "", latitude),
+         longitude = sub("_.*", "", longitude))
 
 # clean up
 rm(usrp_all_projects_attr, usrp_all_projects_loc)
 ```
 
 ```{r}
+# extract records with spatial attributes and create sf object
+usrp_all_projects_sf <- usrp_all_projects_df %>%
+  filter(!is.na(latitude)) %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = global_crs)
+```
 
+```{r}
+# import California state boundary
+ca_boundary <- get_ca_boundary(crs = global_crs)
+
+# check it all on a map
+ggplot() +
+  geom_sf(data = ca_boundary, fill = "grey93") +
+  geom_sf(data = usrp_all_projects_sf) +
+  theme_minimal()
 ```
 
