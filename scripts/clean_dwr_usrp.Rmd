@@ -16,6 +16,7 @@ suppressPackageStartupMessages(library(here))
 suppressPackageStartupMessages(library(readxl))
 suppressPackageStartupMessages(library(sf))
 suppressPackageStartupMessages(library(tigris))
+suppressPackageStartupMessages(library(ggnewscale))
 
 # set global options
 options(stringsAsFactors = FALSE)
