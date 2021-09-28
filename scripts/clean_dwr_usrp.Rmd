@@ -47,6 +47,12 @@ get_ca_boundary <- function(crs) {
       select(name) %>%
       st_transform(crs = crs)
 }
+
+# build function that quickly pulls up sf object attribute tables
+view_flat <- function(sf_obj) {
+  st_drop_geometry(sf_obj) %>%
+    View(.)
+}
 ```
 
 ```{r}
