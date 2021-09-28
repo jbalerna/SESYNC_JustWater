@@ -49,6 +49,12 @@ get_ca_boundary <- function(crs) {
       select(name) %>%
       st_transform(crs = crs)
 }
+
+# build function that quickly pulls up sf object attribute tables
+view_flat <- function(sf_obj) {
+  st_drop_geometry(sf_obj) %>%
+    View(.)
+}
 ```
 
 ```{r}
@@ -61,19 +67,54 @@ if(!dir.exists(here("raw_data", "cdfw_ds168"))) {
   dir.create(here("raw_data", "cdfw_ds168"))
 }
 
-# unzip zipped shape files
+# unzip zipped spatial files
 unzip(zipfile = here("raw_data", "cdfw_ds734.zip"), overwrite = TRUE,
       exdir = here("raw_data", "cdfw_ds734"))
 
 unzip(zipfile = here("raw_data", "cdfw_ds168.zip"), overwrite = TRUE,
       exdir = here("raw_data", "cdfw_ds168"))
 
+# read in files as sf objects
+# ds734: boundary regions for fisheries restoration grant program
+# multipolygon
 ds734 <- st_read(dsn = here("raw_data", "cdfw_ds734", "ds734.shp")) %>%
   st_transform(crs = global_crs)
 
+# ds168: locations of fisheries restoration grant program projects
 ds168 <- readOGR(dsn = here("raw_data", "cdfw_ds168", "ds168.gdb"), layer = "ds168") %>%
   st_as_sf() %>%
   st_transform(crs = global_crs)
+```
+
+```{r}
+# clean data
+ds734 <- ds734 %>%
+  rename(region = REGION,
+         sub_region = SUBREGION,
+         basin = BASIN,
+         sub_basin = SUBBASIN,
+         huc2 = HUC_2,
+         huc4 = HUC_4,
+         huc6 = HUC_6,
+         huc8 = HUC_8,
+         acres = ACRES,
+         sq_miles = SQ_MILES,
+         state_huc8 = HU_8_STATE,
+         fips = FIPS_C,
+         huc10_name = HU_10_NAME,
+         huc10_sq_miles = HUC10_SqMi,
+         llid = LLID,
+         name = NAME,
+         length_ft = LENGTH_FT,
+         mouth = MOUTH,
+         area_sq_miles = AREA_sq_mi)
+
+ds168 <- ds168 %>%
+  rename(project_id = ProjectID,
+         worksite_id = WorksiteID,
+         worksite_name = WorksiteNa,
+         award_year = Award_Year) %>%
+  select(-WorksiteLa, - WorksiteLo)
 ```
 
 ```{r}
