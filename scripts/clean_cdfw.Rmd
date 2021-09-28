@@ -1,0 +1,87 @@
+---
+title: "clean_cdfw"
+author: "Lucy Andrews"
+date: "9/27/2021"
+output: html_document
+---
+
+
+```{r setup}
+# set up packages, options, and functions
+
+# load packages
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(janitor))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(readxl))
+suppressPackageStartupMessages(library(sf))
+suppressPackageStartupMessages(library(rgdal))
+suppressPackageStartupMessages(library(tigris))
+suppressPackageStartupMessages(library(rmapshaper))
+suppressPackageStartupMessages(library(ggnewscale))
+
+# set global options
+options(stringsAsFactors = FALSE)
+options(tigris_use_cache = TRUE)
+global_crs <- st_crs(4269)
+
+# build custom functions and operators
+# %notin%: operator that returns the negation of %in%
+`%notin%` <- Negate(`%in%`)
+
+# paste_na_rm(): function that pastes values together while dropping NAs
+paste_na_rm <- function(x, collapse = ", ") {
+  
+  paste(x[!is.na(x)], collapse = collapse)
+  
+}
+
+# build is.nan() method for data.frame objects
+is.nan.data.frame <- function(x)
+do.call(cbind, lapply(x, is.nan))
+
+# build function that pulls CA boundary into global environment as sf object
+get_ca_boundary <- function(crs) {
+    states() %>%
+      filter(NAME == "California") %>%
+      rename(name = NAME) %>%
+      select(name) %>%
+      st_transform(crs = crs)
+}
+```
+
+```{r}
+# create directories
+if(!dir.exists(here("raw_data", "cdfw_ds734"))) {
+  dir.create(here("raw_data", "cdfw_ds734"))
+}
+
+if(!dir.exists(here("raw_data", "cdfw_ds168"))) {
+  dir.create(here("raw_data", "cdfw_ds168"))
+}
+
+# unzip zipped shape files
+unzip(zipfile = here("raw_data", "cdfw_ds734.zip"), overwrite = TRUE,
+      exdir = here("raw_data", "cdfw_ds734"))
+
+unzip(zipfile = here("raw_data", "cdfw_ds168.zip"), overwrite = TRUE,
+      exdir = here("raw_data", "cdfw_ds168"))
+
+ds734 <- st_read(dsn = here("raw_data", "cdfw_ds734", "ds734.shp")) %>%
+  st_transform(crs = global_crs)
+
+ds168 <- readOGR(dsn = here("raw_data", "cdfw_ds168", "ds168.gdb"), layer = "ds168") %>%
+  st_as_sf() %>%
+  st_transform(crs = global_crs)
+```
+
+```{r}
+ca_boundary <- get_ca_boundary(crs = global_crs)
+
+ggplot() +
+  geom_sf(data = ca_boundary, fill = "lightgrey") +
+  geom_sf(data = ds168, aes(color = Award_Year)) +
+  theme_minimal()
+```
+
