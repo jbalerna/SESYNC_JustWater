@@ -122,7 +122,8 @@ ca_boundary <- get_ca_boundary(crs = global_crs)
 
 ggplot() +
   geom_sf(data = ca_boundary, fill = "lightgrey") +
-  geom_sf(data = ds168, aes(color = Award_Year)) +
+  geom_sf(data = ds734, fill = "lightblue") +
+  geom_sf(data = ds168, aes(color = award_year)) +
   theme_minimal()
 ```
 
