@@ -133,9 +133,6 @@ usrp_all_projects_loc <- usrp_all_projects_loc %>%
 rm(attr_colnames, loc_colnames)
 ```
 
----> Cuddy Creek
----> Las Virgenes (P13-047)
-
 ```{r}
 # clean the attributes dataframe
 
