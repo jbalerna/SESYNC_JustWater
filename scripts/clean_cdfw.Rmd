@@ -18,6 +18,7 @@ suppressPackageStartupMessages(library(readxl))
 suppressPackageStartupMessages(library(sf))
 suppressPackageStartupMessages(library(rgdal))
 suppressPackageStartupMessages(library(tigris))
+suppressPackageStartupMessages(library(tidycensus))
 suppressPackageStartupMessages(library(rmapshaper))
 suppressPackageStartupMessages(library(ggnewscale))
 
@@ -117,13 +118,61 @@ ds168 <- ds168 %>%
   select(-WorksiteLa, - WorksiteLo)
 ```
 
+# Classification
+
+- bank stabilization
+- stormwater management
+- flow modification
+- channel reconfiguration
+- fish passage
+- riparian management
+- in-stream species management
+- dam removal/retrofit
+- floodplain reconnection
+- in-stream habitat improvement
+- aesthetics/recreation/education --> drop if alone
+- water quality management
+- land acquisition
+- other
+
 ```{r}
 ca_boundary <- get_ca_boundary(crs = global_crs)
 
 ggplot() +
   geom_sf(data = ca_boundary, fill = "lightgrey") +
-  geom_sf(data = ds734, fill = "lightblue") +
+  geom_sf(data = ms_simplify(ds734, keep = 0.05), fill = "lightblue") +
   geom_sf(data = ds168, aes(color = award_year)) +
   theme_minimal()
 ```
+```{r}
+incorp_cdp <- places(state = "CA", year = 2020) %>%
+  rename(place_fip = PLACEFP,
+         geo_id = GEOID,
+         name = NAME,
+         name_w_type = NAMELSAD,
+         type_code = LSAD,
+         fips_code = CLASSFP,
+         area_land = ALAND,
+         area_water = AWATER) %>%
+  select(place_fip, geo_id, name, name_w_type, type_code, fips_code, area_land, area_water)
+
+ggplot() +
+  geom_sf(data = ca_boundary, fill = "lightgrey") +
+  geom_sf(data = ms_simplify(incorp_cdp, keep = 0.05), aes(fill = type_code), lwd = 0) +
+  theme_minimal()
+```
+
+```{r}
+ds168_incorp_cdp <- st_join(x = ds168, y = incorp_cdp, join = st_intersects, left = FALSE)
+
+ggplot() +
+  geom_sf(data = ca_boundary, fill = "lightgrey") +
+  geom_sf(data = ms_simplify(ds734, keep = 0.05), fill = "lightblue") +
+  geom_sf(data = ds168_incorp_cdp, aes(color = award_year)) +
+  theme_minimal()
+```
+
+
+
+
 
