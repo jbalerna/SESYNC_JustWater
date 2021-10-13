@@ -15,6 +15,8 @@ suppressPackageStartupMessages(library(magrittr))
 suppressPackageStartupMessages(library(janitor))
 suppressPackageStartupMessages(library(here))
 suppressPackageStartupMessages(library(readxl))
+suppressPackageStartupMessages(library(readr))
+suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(sf))
 suppressPackageStartupMessages(library(rgdal))
 suppressPackageStartupMessages(library(tigris))
@@ -120,22 +122,8 @@ ds168 <- ds168 %>%
 
 # Classification
 
-- bank stabilization
-- stormwater management
-- flow modification
-- channel reconfiguration
-- fish passage
-- riparian management
-- in-stream species management
-- dam removal/retrofit
-- floodplain reconnection
-- in-stream habitat improvement
-- aesthetics/recreation/education --> drop if alone
-- water quality management
-- land acquisition
-- other
-
 ```{r}
+# quickly visualize all the restoration sites
 ca_boundary <- get_ca_boundary(crs = global_crs)
 
 ggplot() +
@@ -145,6 +133,7 @@ ggplot() +
   theme_minimal()
 ```
 ```{r}
+# load census bureau "places" sf polygon objects
 incorp_cdp <- places(state = "CA", year = 2020) %>%
   rename(place_fip = PLACEFP,
          geo_id = GEOID,
@@ -154,17 +143,24 @@ incorp_cdp <- places(state = "CA", year = 2020) %>%
          fips_code = CLASSFP,
          area_land = ALAND,
          area_water = AWATER) %>%
-  select(place_fip, geo_id, name, name_w_type, type_code, fips_code, area_land, area_water)
+  select(place_fip, geo_id, name, name_w_type, type_code,
+         fips_code, area_land, area_water)
 
+# visualize census places by type code
+# which roughly aligns with incorporation status
 ggplot() +
   geom_sf(data = ca_boundary, fill = "lightgrey") +
-  geom_sf(data = ms_simplify(incorp_cdp, keep = 0.05), aes(fill = type_code), lwd = 0) +
+  geom_sf(data = ms_simplify(incorp_cdp, keep = 0.05),
+          aes(fill = type_code),
+          lwd = 0) +
   theme_minimal()
 ```
 
 ```{r}
+# filter restoration project sites to only those within census place boundaries
 ds168_incorp_cdp <- st_join(x = ds168, y = incorp_cdp, join = st_intersects, left = FALSE)
 
+# quickly visualize restoration sites falling with census place boundaries
 ggplot() +
   geom_sf(data = ca_boundary, fill = "lightgrey") +
   geom_sf(data = ms_simplify(ds734, keep = 0.05), fill = "lightblue") +
@@ -172,7 +168,79 @@ ggplot() +
   theme_minimal()
 ```
 
+```{r}
+# identify and tally unique words in worksite names
+desc_word_counts <- ds168_incorp_cdp %>%
+  pull(worksite_name) %>%
+  paste(collapse = " ") %>% # create a single string of all worksite names
+  gsub("[^[:alpha:][:space:]]", " ", .) %>% # drop all non-alphabetic characters
+  str_squish() %>% # remove multiple spaces
+  str_to_lower() %>% # convert everything to lowercase
+  str_split(" ") %>% # split string on spaces to isolate single words
+  as_tibble(.name_repair = "minimal") %>% # convert to tibble
+  set_colnames("word") %>%
+  group_by(word) %>%
+  tally() %>% # count occurrences of each word
+  filter(word %notin% stopwords("en")) %>% # drop common stop words that don't have value
+  arrange(desc(n)) # arrange descending by frequency
 
+### EVERYTHING BELOW HERE IS IN PROGRESS / EXPERIMENTAL!
 
+# list out nrrss categorization words
+bank_stabilization <- c("stabilization", "stabilize")
+
+stormwater_mgmt <- c("road", "detention", "erosion", "sediment")
+
+flow_mod <- c("tailwater", "irrigation")
+
+channel_reconfig <- c("ditch", "bioengineering", "realignment")
+
+fish_passage <- c("passage", "fishway", "ladder", "tidegate")
+
+riparian_mgmt <- c("planting","bamboo", "fencing", "fence", "vegetation",
+                   "plants", "donax", "riparian", "upslope")
+
+species_mgmt <- c()
+
+barrier_removal_retrofit <- c("culvert", "barrier", "dam", "bridge", "diversion")
+
+floodplain_reconnect <- c()
+
+hab_improvement <- c("habitat", "boulder", "log", "microcover", "berm", "cover",
+                     "riffle", "logjam", "gravel", "reef", "lagoon", "instream")
+
+pub_access <- c("trail")
+
+water_quality <- c()
+
+land_acq <- c("acquisition")
+
+# list out words to potentially exclude
+exclude <- c("planning", "assessment", "monitoring", "survey", "organization",
+             "inventory", "outreach", "education", "training", "festival",
+             "analysis", "symposium", "conference", "design", "permitting",
+             "coordinator", "publication", "protocol", "mapping", "workgroup")
+```
+
+Patterns that might appear mid-word:
+- log
+- dam
+
+rearing
+conference
+release
+enhancement
+training
+plantings
+education
+structures
+stabilization
+planning
+inventory
+analysis
+fencing
+passage
+pen
+shelters
 
 
