@@ -1,0 +1,1187 @@
+project_id,worksite_id,worksite_name,award_year,place_fip,geo_id,name,name_w_type,type_code,fips_code,area_land,area_water
+100031,7209252,CDFG Program Administration 08/09,2008,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+700005,7000051,Rowdy Creek - Rowdy Creek Fish Hatchery (steelhead spawning/rearing),1997,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+700011,7000061,Sonoma State University - salmonid restoration conference,1997,72654,0672654,Sonoma State University,Sonoma State University CDP,57,U1,1081020,0
+700017,7000065,San Pablo Bay - mobile net pen (Chinook acclimation/release),1997,16000,0616000,Concord,Concord city,25,C1,79130630,0
+700046,7000078,Incubators in the Classroom - Fortuna Centerpoint,1996,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+700073,7000098,High Prairie Creek - fish passage improvement/riparian enhancement,1997,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+700081,7000102,Monterey Bay - Mobile Net Pens (Chinook acclimation/release),1997,48872,0648872,Monterey,Monterey city,25,C1,22390414,9365025
+700086,7000114,Salmonids in the Classroom Equipment Upgrade,1997,60088,0660088,Redway,Redway CDP,57,U1,3239490,55629
+700094,7000123,"Quail Hollow Elementary School, Ben Lomond - teacher training",1997,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+700098,7000125,Rhoner Creek - culvert upgrade,1997,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+700101,7208468,Streaminders Environmental Education Project,1997,09324,0609324,Butte Valley,Butte Valley CDP,57,U1,47368451,29332
+700109,7000137,Salmon Creek - bank stabilization/riparian plantings,1997,07246,0607246,Bodega,Bodega CDP,57,U1,7515783,0
+700124,7000143,Community Involvement/Public Education Program,1997,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+700153,7000155,Rowdy Creek - Rowdy Creek Fish Hatchery (salmonid rearing),1998,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+700169,7000160,Eel River Watershed - watershed group support,1997,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+700179,7000168,Austin Creek - instream habitat structures,1997,12146,0612146,Cazadero,Cazadero CDP,57,U1,18431243,3546
+700183,7000169,Pole Mountain Creek tributary - landslide stabilization,1997,12146,0612146,Cazadero,Cazadero CDP,57,U1,18431243,3546
+700197,7000183,"Corte Madera Del Rprsidio, Arr - riparian plantings",1997,47710,0647710,Mill Valley,Mill Valley city,25,C1,12385974,218653
+700203,7000184,Public Education Brochure - center point for coverage area,1997,87090,0687090,Zayante,Zayante CDP,57,U1,7308969,0
+700272,7000337,Humboldt Bay Watershed - restoration and management planning,1997,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+700280,7000383,"Trinity River Watershed, Upper S Fk - road inventory and watershed analysis",1997,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700280,7007605,Happy Camp Creek Watershed - road inventory and watershed analysis,1997,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700280,7007606,Palmer Creek Watershed - road inventory and watershed analysis,1997,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700283,7000384,Bay Area schools,1997,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+700306,7000405,Eel River Community Education Project,1997,00786,0600786,Alderpoint,Alderpoint CDP,57,U1,6288254,0
+700343,7000424,Brookdale Lodge - restoration conference,1998,08478,0608478,Brookdale,Brookdale CDP,57,U1,9963087,0
+700373,7000439,Rowdy Creek - Rowdy Creek Fish Hatchery (salmon and steelhead rearing),1996,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+700410,7000457,San Luis Obispo Bay - pen rearing/release,1996,03330,0603330,Avila Beach,Avila Beach CDP,57,U1,15766061,575455
+700421,7000462,Quail Hollow Elementary School - STEP education program,1996,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+700423,7000464,Monterey Harbor pens - Chinook rearing/release,1996,48872,0648872,Monterey,Monterey city,25,C1,22390414,9365025
+700434,7000471,San Pablo Bay - mobile net pen (Chinook acclimation/release),1996,16000,0616000,Concord,Concord city,25,C1,79130630,0
+700439,7208475,Streaminders Hands-on Environmental Education and Restoration,1996,13014,0613014,Chico,Chico city,25,C1,88423543,445035
+700445,7000485,Bear Canyon Creek - instream habitat structures,1996,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+700449,7000488,UC Davis - Chinook recovery workgroup meetings,1996,81302,0681302,University of California-Davis,University of California-Davis CDP,57,U1,4473488,0
+700485,7000498,Coyote Creek - exotic vegetation removal,1995,68000,0668000,San Jose,San Jose city,25,C1,461691712,8089813
+700489,7000499,Monterey Bay - Chinook release,1995,45778,0645778,Marina,Marina city,25,C1,23070824,2333714
+700489,7007607,Moss Landing Harbor - Chinook release,1995,45778,0645778,Marina,Marina city,25,C1,23070824,2333714
+700494,7000500,Rowdy Creek - Rowdy Creek Fish Hatchery (Chinook and Coho rearing),1995,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+700499,7000501,Big Chico Creek - education/riparian planting,1995,13014,0613014,Chico,Chico city,25,C1,88423543,445035
+700534,7000516,Salmonid Classroom Project - Crescent City centerpoint,1995,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+700597,7209505,Big Creek - riparian plantings,1995,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700597,7209506,Carr Creek - riparian,1995,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700597,7000553,Salt Creek - fencing and riparian plantings,1995,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700606,7000567,Madden Creek - upper site (instream habitat structures/riparian plantings),1995,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+700606,7000566,Madden Creek - lower site (instream habitat structures/riparian plantings),1995,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+700609,7000570,Sonoma State University - salmonid restoration conference,1994,72654,0672654,Sonoma State University,Sonoma State University CDP,57,U1,1081020,0
+700611,7000572,Kidder Creek Restoration Project- Etna Elementary,1994,22972,0622972,Etna,Etna city,25,C1,1967952,2444
+700616,7000573,Watersheds stewards project - Fortuna Centerpoint,1994,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+700659,7000602,"Community Involvement/Public Education Program - Incubation, Surveys and Habitat Enhancement",1994,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+700674,7000610,Rowdy Creek - Rowdy Creek Fish Hatchery (salmonid rearing),1994,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+700691,7209501,Carr Creek - Stewart riparian planting,1995,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700691,7209502,Carr Creek - Bowker riparian planting,1995,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700691,7209500,Carr Creek - Beck riparian fencing and planting,1995,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700691,7000621,Salt Creek - Site C (riparian fencing/plantings),1995,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700691,7000620,Salt Creek - Site B (riparian fencing/plantings),1995,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700691,7209499,Carr Creek - Owens riparian fencing and planting,1995,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700691,7000619,Salt Creek - Site A (riparian fencing/plantings),1995,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700691,7209504,Tule Creek - riparian fencing and plantings,1995,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+700701,7000626,Pioneer High School - STEP teacher training,1994,68000,0668000,San Jose,San Jose city,25,C1,461691712,8089813
+700733,7000646,Prarie Creek - riparian fencing and plantings,1994,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+700741,7000649,Dominie Creek - fish passage improvement,1994,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+700792,7000676,Watershed Stewards Project,1994,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+700811,7000683,Rodeo (Bennett Marina) - mobile net pen,1993,16000,0616000,Concord,Concord city,25,C1,79130630,0
+700811,7000685,Hercules (Wickland Oil Terminal) - mobile net pen,1993,16000,0616000,Concord,Concord city,25,C1,79130630,0
+700811,7000684,Benicia (West 9th Street boat launching ramp) - mobile net pen,1993,16000,0616000,Concord,Concord city,25,C1,79130630,0
+700814,7000686,Moss Landing/Elkhorn Slough - hatchery release site,1993,49488,0649488,Moss Landing,Moss Landing CDP,57,U1,1029920,531988
+700816,7000688,Santa Cruz County Public Education Project,1993,83668,0683668,Watsonville,Watsonville city,25,C1,17370216,247360
+700825,7000694,Rowdy Creek Fish Hatchery - hatchery operations/salmonid education,1993,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+700857,7000711,Old Mill School Elementary School - salmonid education,1993,47710,0647710,Mill Valley,Mill Valley city,25,C1,12385974,218653
+700864,7000716,Lake Oroville - brush shelters,1993,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+700866,7000717,Fall Creek - instream habitat structures,1993,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+700941,7000758,Pacific Heights Middle School - aquatic education program,1993,65028,0665028,San Bruno,San Bruno city,25,C1,14215362,0
+700942,7208456,Streaminders Hands-on Environmental Education Program - Classroom Aquaria Project,1993,09324,0609324,Butte Valley,Butte Valley CDP,57,U1,47368451,29332
+700945,7000774,Temporary Help for Yreka Fish Habitat Improvement Shop,1993,86944,0686944,Yreka,Yreka city,25,C1,25861889,188154
+700963,7000778,Clear Creek - Site A (restoration planning),1992,32036,0632036,Happy Valley,Happy Valley CDP,57,U1,43681146,297681
+700963,7000780,Clear Creek - Site C (restoration planning),1992,32036,0632036,Happy Valley,Happy Valley CDP,57,U1,43681146,297681
+700963,7000779,Clear Creek - Site B (restoration planning),1992,32036,0632036,Happy Valley,Happy Valley CDP,57,U1,43681146,297681
+700965,7000782,Upper Penitencia Creek - streambank stabilization,1992,68000,0668000,San Jose,San Jose city,25,C1,461691712,8089813
+700973,7000784,Rowdy Creek Fish Hatchery - Chinook and steelhead rearing,1992,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+700987,7000806,Uvas Creek - bamboo removal,1992,29504,0629504,Gilroy,Gilroy city,25,C1,42826753,26658
+700999,7000817,Browns Creek - instream habitat structurs,1992,16434,0616434,Corralitos,Corralitos CDP,57,U1,23273553,37138
+701025,7000849,Willits Creek - passage improvement/instream habitat improvement,1992,08530,0608530,Brooktrails,Brooktrails CDP,57,U1,18835634,122096
+701042,7000858,Salmon and Trout Education Program (STEP) Statewide Teacher Training,1992,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+701068,7000887,Alpine Creek - fishway modification,1992,39318,0639318,La Honda,La Honda CDP,57,U1,11022981,20735
+701078,7000898,Corralitos Creek - City of Watsonville Dam (fish passage improvement),1992,16434,0616434,Corralitos,Corralitos CDP,57,U1,23273553,37138
+701079,7000901,Zayante Creek - barrier modifications,1992,87090,0687090,Zayante,Zayante CDP,57,U1,7308969,0
+701079,7000902,Zayante Creek - log/boulder deflectors,1992,87090,0687090,Zayante,Zayante CDP,57,U1,7308969,0
+701129,7000927,Uvas Creek - channel stabilization/fish passage improvement,1992,29504,0629504,Gilroy,Gilroy city,25,C1,42826753,26658
+701129,7007176,Carnadero Creek - channel stabilization/fish passage improvement,1992,29504,0629504,Gilroy,Gilroy city,25,C1,42826753,26658
+701137,7000934,Moss Landing Harbor - Elkhorn Slough Facility (Chinook hatchery),1992,49488,0649488,Moss Landing,Moss Landing CDP,57,U1,1029920,531988
+701150,7000943,Rowdy Creek - Rowdy Creek Fish Hatchery (hatchery operations),1991,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+701153,7000944,Broaddus Creek - instream habitat structures,1991,85600,0685600,Willits,Willits city,25,C1,7296486,1546
+701171,7000952,Del Norte County - salmonid education,1991,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+701207,7000979,Lake Oroville - microcover construction/berms,1991,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+701317,7001047,Willits Creek - Site B,1991,08530,0608530,Brooktrails,Brooktrails CDP,57,U1,18835634,122096
+701317,7001046,Willits Creek - Site A,1991,08530,0608530,Brooktrails,Brooktrails CDP,57,U1,18835634,122096
+701324,7001049,Clear Creek - passage improvement/instream habitat structures,1991,08478,0608478,Brookdale,Brookdale CDP,57,U1,9963087,0
+701329,7001050,Mendocino County - Mendocino County schools (salmonid education),1991,85600,0685600,Willits,Willits city,25,C1,7296486,1546
+701340,7001056,Rowdy Creek - Rowdy Creek Fish Hatchery (salmonid rearing),1989,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+701345,7001059,Gannon Slough - aquaculture facility,1989,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+701349,7001067,Pescadero Creek - instream habitat structures/bank stabilization,1989,42384,0642384,Loma Mar,Loma Mar CDP,57,U1,4487609,0
+701350,7001068,"Eel River, S Fk - steelhead rearing",1989,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+701407,7001100,Cosumnes River College - plant nursery,1989,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+701415,7001136,Butte Creek Stream Survey Educational Program,1989,09310,0609310,Butte Creek Canyon,Butte Creek Canyon CDP,57,U1,53133631,68391
+701433,7001148,Mendocino County - salmonid education,1989,85600,0685600,Willits,Willits city,25,C1,7296486,1546
+701445,7001152,Valencia Creek - fish passage improvement,1989,02378,0602378,Aptos,Aptos CDP,57,U1,17037116,0
+701461,7001155,Arroyo Aguague - stabilize bank,1989,68000,0668000,San Jose,San Jose city,25,C1,461691712,8089813
+701461,7001154,Penitencia Creek - stabilize bank,1989,68000,0668000,San Jose,San Jose city,25,C1,461691712,8089813
+701537,7001194,Mill Creek - bank stabilization/riparian plantings,1989,16728,0616728,Covelo,Covelo CDP,57,U1,18377116,111658
+701557,7001216,Rowdy Creek - Rowdy Creek Fish Hatchery (hatchery operations),1990,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+701607,7001233,Lake McClure - livestock exclusion fencing,1990,39484,0639484,Lake Don Pedro,Lake Don Pedro CDP,57,U1,47708999,3331031
+701622,7001237,Mill Creek - Chinook rearing,1990,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+701622,7001239,Tish Tang A Tang Creek - Chinook rearing,1990,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+701622,7001238,Supply Creek - Chinook rearing,1990,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+701632,7001241,Zayante Creek - fish ladder installation,1990,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+701636,7001246,Broaddus Creek - instream habitat structures,1990,85600,0685600,Willits,Willits city,25,C1,7296486,1546
+701647,7001249,Mendocino County - Mendocino County schools (salmonid education),1990,85600,0685600,Willits,Willits city,25,C1,7296486,1546
+701654,7001254,Spear Creek - instream habitat structures/bank stabilization,1990,58436,0658436,Poso Park,Poso Park CDP,57,U1,112854,0
+701654,7001253,White River - instream habitat structures/bank stabilization,1990,58436,0658436,Poso Park,Poso Park CDP,57,U1,112854,0
+701660,7001256,Norton Creek - bank stabilization/instream habitat structures,1990,44910,0644910,McKinleyville,McKinleyville CDP,57,U1,54083206,657148
+701660,7001255,Widow White Creek - fish passage improvement/bank stabilization/instream habitat structures,1990,44910,0644910,McKinleyville,McKinleyville CDP,57,U1,54083206,657148
+701734,7001369,Bean Creek - instream habitat structures,1990,49796,0649796,Mount Hermon,Mount Hermon CDP,57,U1,1683560,0
+701775,7001395,Eureka City Schools Aquatic Ecology Program Phase II,1988,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+701790,7001405,Rowdy Creek - Rowdy Creek Fish Hatchery (hatchery operations),1988,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+701804,7001410,Bass Lake - cover structures,1988,04198,0604198,Bass Lake,Bass Lake CDP,57,U1,4874800,1570518
+701809,7001411,Ward Creek - barrier modification/slide stabilization,1988,12146,0612146,Cazadero,Cazadero CDP,57,U1,18431243,3546
+701811,7001412,"Eel River, S Fk - rearing facility",1988,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+701844,7001438,Clear Creek - Site B (fish passage improvement),1988,08478,0608478,Brookdale,Brookdale CDP,57,U1,9963087,0
+701844,7001437,Clear Creek - Site A (fish passage improvement),1988,08478,0608478,Brookdale,Brookdale CDP,57,U1,9963087,0
+701845,7001439,Gold Gulch Creek - boulder structures,1988,23826,0623826,Felton,Felton CDP,57,U1,12017049,0
+701846,7001440,Valencia Creek - culvert modification,1988,02378,0602378,Aptos,Aptos CDP,57,U1,17037116,0
+701850,7001442,Humboldt Bay - Arcata Wastewater Project (hatchery operations),1988,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+701853,7001445,Freshwater Creek - trapping and spawning station,1988,17722,0617722,Cutten,Cutten CDP,57,U1,3318362,0
+701853,7001444,Cochran Creek - rearing ponds,1988,17722,0617722,Cutten,Cutten CDP,57,U1,3318362,0
+701853,7001443,King Salmon Slough - rearing ponds,1988,17722,0617722,Cutten,Cutten CDP,57,U1,3318362,0
+701858,7001448,Yreka Creek - streambank stabilization,1988,86944,0686944,Yreka,Yreka city,25,C1,25861889,188154
+701859,7001449,Yreka Creek - interpretive trail construction,1988,86944,0686944,Yreka,Yreka city,25,C1,25861889,188154
+701871,7001453,Del Norte County - classroom incubation program,1988,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+701908,7001471,White Widow Creek - educational program,1988,44910,0644910,McKinleyville,McKinleyville CDP,57,U1,54083206,657148
+701909,7001472,Widow White Creek - bank stabilization,1988,44910,0644910,McKinleyville,McKinleyville CDP,57,U1,54083206,657148
+701929,7001479,Willits Creek - riparian plantings,1988,08530,0608530,Brooktrails,Brooktrails CDP,57,U1,18835634,122096
+701947,7001489,Casa Grande High School - salmonid education,1988,56784,0656784,Petaluma,Petaluma city,25,C1,37333943,277684
+701997,7001554,"Streamside Rearing on Mill, Supply and Tish Tang Creeks",1988,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702000,7001555,Little River - salmon trapping/rearing,1988,84385,0684385,Westhaven-Moonstone,Westhaven-Moonstone CDP,57,U2,20963594,70662
+702008,7001560,Mill Creek - fish barrier removal,1981,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702008,7001564,Supply Creek - instream habitat structures,1981,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702008,7001563,Pine Creek - fish barrier removal,1981,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702008,7001562,Hostler Creek - fish barrier removal,1981,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702008,7001561,Tish-Tang-A-Tang Creek - fish barrier removal/instream habitat structures,1981,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702071,7007608,Denziel Reynolds' irrigation ditch,1982,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702071,7001580,Barker Creek - fish passage improvement,1982,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702073,7209242,Mendocino Fisheries Program Anadromous Fish Restoration,1982,81134,0681134,Ukiah,Ukiah city,25,C1,12390978,116878
+702146,7001623,Kingsbury Gulch - culvert modification,1983,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702149,7001624,Conner Creek - Sites A-C (barrier modification/bank stabilization),1983,37596,0637596,Junction City,Junction City CDP,57,U1,68728396,87697
+702154,7001638,Corralitos Creek - fishway modification,1983,18153,0618153,Day Valley,Day Valley CDP,57,U1,47922346,0
+702154,7001639,Corralitos Creek - culvert modification,1983,18153,0618153,Day Valley,Day Valley CDP,57,U1,47922346,0
+702154,7001640,Zayante Creek - barrier modification,1983,18153,0618153,Day Valley,Day Valley CDP,57,U1,47922346,0
+702156,7001641,Mendocino County (various locations) - barrier removal,1983,85600,0685600,Willits,Willits city,25,C1,7296486,1546
+702261,7001643,Tiburon - fish rearing facility,1984,78666,0678666,Tiburon,Tiburon town,43,C1,11603822,22626730
+702307,7001648,Barker Creek - barrier modification,1984,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702308,7001649,Devils Gulch - culvert modification,1984,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702333,7001675,Deadwood Creek - barrier modification,1984,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+702347,7001703,Powers Creek - site G (culvert improvement),1984,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+702347,7001697,Powers Creek - site A (bank stabilization),1984,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+702347,7001702,Powers Creek - site F (bank stabilization/riparian fencing and plantings),1984,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+702347,7001704,Powers Creek - site H (culvert improvement),1984,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+702347,7001698,Powers Creek - site B (stabilize bank),1984,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+702347,7001699,Powers Creek - site C (fish passage improvement),1984,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+702347,7001700,Powers Creek - site D - fish passage improvement,1984,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+702347,7001701,Powers Creek - site E (bank stabilization),1984,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+702353,7001707,Love Creek - fish ladder replacement,1984,08478,0608478,Brookdale,Brookdale CDP,57,U1,9963087,0
+702408,7001711,Yreka Creek - spawning riffle construction,1985,86944,0686944,Yreka,Yreka city,25,C1,25861889,188154
+702409,7001712,Portable Fish Screens - Tracy CP,1985,80238,0680238,Tracy,Tracy city,25,C1,67052560,351998
+702413,7001714,Yreka Creek - spawning improvement,1985,86944,0686944,Yreka,Yreka city,25,C1,25861889,188154
+702419,7001717,Rowdy Creek - Rowdy Creek Fish Hatchery (hatchery operations),1985,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+702421,7001718,"Gualala River, S Fk - instream cover structures",1985,70712,0670712,Sea Ranch,Sea Ranch CDP,57,U1,41742090,277559
+702436,7001738,Don Juan Creek - fish passage improvement,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702436,7001742,Limestone Creek - fish passage improvement,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702436,7001743,Little French Creek - fish passage improvement,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702436,7001736,Olsen Creek - fish passage improvement,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702436,7001744,Deadwood Creek - fish passage improvement,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702436,7001739,Hall City Creek - fish passage improvement,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702436,7001740,Rattlesnake Creek - instream habitat structures,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702436,7001737,Manzanita Creek - fish barrier removal,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702436,7001741,Price Creek - fish passage improvement,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702436,7001735,Potato Creek - instream habitat structures,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702436,7001734,Chanchellula Gulch - fish barrier removal,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702440,7001745,Brush Creek - logjam barrier removal,1985,45386,0645386,Manchester,Manchester CDP,57,U1,6780881,0
+702441,7001746,Albion River - barrier removal (appx centerpoint),1985,15030,0615030,Comptche,Comptche CDP,57,U1,2987584,0
+702449,7001762,Tish-Tang-A-Tang Creek - fish passage improvement,1985,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702449,7001763,Campbell Creek - culvert modification,1985,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702449,7001761,Supply Creek - spawning gravel placement,1985,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702458,7001776,Carmel River - steelhead rearing,1985,11324,0611324,Carmel Valley Village,Carmel Valley Village CDP,57,U1,49166228,507112
+702470,7001787,Chinook Mixed Fishery Management Research,1986,18100,0618100,Davis,Davis city,25,C1,25826324,90331
+702494,7001803,Devils Gulch - culvert maintenance/repair,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702497,7001806,Tule Creek - restoration planning,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702499,7001807,Merced River - instream vegetation removal,1989,42006,0642006,Livingston,Livingston city,25,C1,9518104,7397
+702518,7001820,San Geronimo Creek - Site E (livestock exclusion fencing/riparian restoration),1985,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+702518,7001816,Lagunitas Creek Watershed - Site A (road upgrade),1985,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+702518,7001818,San Geronimo Creek - Site C (bank stabilization),1985,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+702518,7001822,San Geronimo Creek tributary - Site G (dam repair),1985,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+702518,7001825,Devils Gulch Creek - Sites J-L (bank stabilization and instream habitat improvements),1985,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+702518,7001819,San Geronimo Creek - Site D (bank stabilization),1985,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+702518,7001817,Lagunitas Creek Watershed - Site B (culvert upgrade),1985,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+702518,7001821,San Geronimo Creek tributary - Site F (riparian fencing/plantings),1985,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+702518,7001824,Lagunitas Creek tributary -  Sites H-I (bank stabilization and riparian fencing),1985,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+702520,7001832,Santa Ana River Habitat Enhancement,1985,65000,0665000,San Bernardino,San Bernardino city,25,C1,160920195,853495
+702527,7001839,Low Water Crossings on Deep Creek Wild Trout Tributaries,1985,65000,0665000,San Bernardino,San Bernardino city,25,C1,160920195,853495
+702531,7210041,"Salmon and Steelhead Habitat Restoration Projects, Del Norte Center - Klamath CP",1985,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+702649,7001897,Zayante Creek - fish passage improvement/riparian plantings,1985,87090,0687090,Zayante,Zayante CDP,57,U1,7308969,0
+702655,7001915,Trinity River - Steelbridge Site (gravel ripping),1985,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+702655,7001913,Trinity River - Smith Site (gravel ripping),1985,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+702655,7001914,Trinity River - Lewiston Site (gravel ripping),1985,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+702662,7001921,Klamath Sonar Test Program - Happy Camp CP,1985,32030,0632030,Happy Camp,Happy Camp CDP,57,U1,31357295,618829
+702667,7001935,Cochran Creek  - Rearing Ponds,1985,17722,0617722,Cutten,Cutten CDP,57,U1,3318362,0
+702667,7001934,Humboldt Bay - saltwater rearing ponds,1985,17722,0617722,Cutten,Cutten CDP,57,U1,3318362,0
+702667,7001936,Freshwater Creek - Hatchery Facility (Chinook and Coho rearing),1985,17722,0617722,Cutten,Cutten CDP,57,U1,3318362,0
+702787,7001949,Thompson Gulch - fish barrier removal,1985,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702792,7001953,Tularcitos Creek - rescue stranded steelhead,1986,11324,0611324,Carmel Valley Village,Carmel Valley Village CDP,57,U1,49166228,507112
+702796,7001964,Lake Oroville - Craig Saddle (artificial reef),1986,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+702796,7001961,Lake Oroville - Foreman Creek (artificial reef),1986,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+702796,7001962,Lake Oroville - Potter Ravine (artificial reef),1986,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+702796,7001960,Lake Oroville - Bloomer Ravine (artificial reef),1986,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+702796,7001956,Lake Oroville - Lime Saddle (artificial reef),1986,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+702796,7001957,Lake Oroville - Rich Gulch (artificial reef),1986,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+702796,7001959,Lake Oroville - Spring Valley (artificial reef),1986,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+702796,7001963,Lake Oroville - Bidwell Canyon (artificial reef),1986,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+702796,7001958,Lake Oroville - Dark Canyon (artificial reef),1986,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+702796,7001965,Lake Oroville - McCabe (artificial reef),1986,06070,0606070,Berry Creek,Berry Creek CDP,57,U1,147940054,154403
+702799,7001970,Rowdy Creek - Rowdy Creek Fish Hatchery (hatchery operations),1986,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+702800,7001971,High Prairie Creek Fish Rearing,1986,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+702802,7001973,Rowdy Creek - fish hatchery facility (filter system installation),1986,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+702842,7002009,Tule Creek - surveys/restoration planning,1986,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+702843,7002010,"Eel River, S Fk - steelhead rearing/release",1986,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+702844,7002013,Eagle Creek Rearing Facility - steelhead and Coho rearing,1986,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+702844,7002012,Salinas Pen Rearing Facility - steelhead and Coho rearing,1986,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+702844,7002011,Big Creek - Big Creek Fish Hatchery (hatchery operations),1986,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+702889,7002035,Bean Creek,1986,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+702889,7002036,Love Creek - culvert upgrade,1986,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+702889,7002028,San Lorenzo River - culvert upgrade,1986,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+702889,7002030,Hester Creek - culvert upgrade,1986,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+702889,7002031,Moore's Gulch - fish passage improvement,1986,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+702889,7002034,Carbonera Creek - fish passage improvement,1986,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+702889,7002033,Mill Creek - sediment detention basin,1986,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+702889,7002032,Shingle Mill Gulch - culvert upgrade,1986,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+702889,7002029,Clear Creek - fish passage improvement,1986,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+702896,7002065,Ambrose Property Rearing Ponds Operations,1989,19724,0619724,Douglas City,Douglas City CDP,57,U1,78799839,32384
+702977,7002086,Supply Creek - rearing tanks (Chinook rearing),1987,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702977,7002087,Tish-Tang-A-Tang  Creek - rearing pond (Chinook rearing),1987,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702977,7002085,Mill Creek - rearing ponds (Chinook rearing),1987,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+702980,7002089,Salmon Creek - riparian fencing and plantings,1987,53266,0653266,Occidental,Occidental CDP,57,U1,12862112,0
+702981,7002090,Corte Madera Creek (Doug Bosco Fish Ladder) - improve fish ladder,1987,38114,0638114,Kentfield,Kentfield CDP,57,U1,7839024,49346
+702982,7002091,Smith River - fish rearing facility,1987,29154,0629154,Gasquet,Gasquet CDP,57,U1,12318649,171875
+702983,7002092,Yreka Creek - bank stabilization,1987,86944,0686944,Yreka,Yreka city,25,C1,25861889,188154
+702984,7002093,Humboldt Bay - Arcata Aquaculture Project,1987,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+702992,7002101,Salmonids in the Classroom,1987,85600,0685600,Willits,Willits city,25,C1,7296486,1546
+702995,7002103,Eureka Schools Aquatic Ecology Program,1987,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+703007,7002107,Fishery Management Plans Development - Sacramento CP,1987,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+703095,7002109,Wildcat Creek (Alvarado Park) - bank stabilization/passage improvement/instream structures,1987,21061,0621061,East Richmond Heights,East Richmond Heights CDP,57,U1,1501846,0
+703137,7002120,San Pedro Creek - fish ladder improvement,1987,54806,0654806,Pacifica,Pacifica city,25,C1,32589429,23854
+703154,7002153,San Pablo Bay - mobile net pens,1998,16000,0616000,Concord,Concord city,25,C1,79130630,0
+703184,7002155,Eel River Watershed - Fortuna River Lodge (salmon restoration conference),1998,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+703245,7002162,Reading Creek - diversion dam removal,1998,19724,0619724,Douglas City,Douglas City CDP,57,U1,78799839,32384
+703415,7002184,Dave Powers Creek (I Street Bridge) - barrier modification,1983,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+703429,7002196,Kingsbury Gulch Fishway Project,1984,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+703441,7002211,Eel River Watershed - Pacific Lumber Company (educational signs),1996,70518,0670518,Scotia,Scotia CDP,57,U1,1932251,247386
+703449,7002214,Talmadge Rearing Ponds and Hatchery,1984,81134,0681134,Ukiah,Ukiah city,25,C1,12390978,116878
+703452,7002217,Salmon Stamp Logo and Brochures - Sacramento CP,1992,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+703453,7002218,Yreka Creek - Yreka Creek Trail (interpretive signage),1989,86944,0686944,Yreka,Yreka city,25,C1,25861889,188154
+703469,7002241,Coastal Southern California - fish study - LA CP,1988,44000,0644000,Los Angeles,Los Angeles city,25,C1,1215978552,83031312
+703471,7002243,CCC Salmon and Steelhead Projects - Fortuna CP,1988,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+703487,7002299,Dana Gray School - salmonid education,1989,25058,0625058,Fort Bragg,Fort Bragg city,25,C1,7508182,86606
+703488,7002300,Ocean Salmon Stock Analysis Project - Sacramento CP,1989,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+703500,7002314,Nimbus Fish Hatchery - interpretive and educational services,1989,30345,0630345,Gold River,Gold River CDP,57,U1,6884489,213093
+703513,7002328,Salmon Protection and Enhancement Program - Sacramento CP,1988,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+703514,7002329,Trout Population and Habitat Evaluation - Berkeley CP,1988,06000,0606000,Berkeley,Berkeley city,25,C1,27018309,18712737
+703516,7002331,Development of Preserve Designs for Native California Fishes - Sacramento CP,1988,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+703518,7002333,Propagation of Flood Tolerant Plants - Sacramento,1988,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+703520,7002336,Mitchell Senior Elementary - salmonid education,1992,03162,0603162,Atwater,Atwater city,25,C1,17008587,11735
+703521,7002337,Pioneer High School - salmonid education,1993,68000,0668000,San Jose,San Jose city,25,C1,461691712,8089813
+703533,7002383,Cloney Gulch - Coho habitat analysis,1995,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+703533,7002381,Little Lost Man Creek - Coho habitat analysis,1995,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+703533,7002380,"Mill Creek, W Br - Coho habitat analysis",1995,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+703533,7002384,"Noyo River, Little N Fk - Coho habitat analysis",1995,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+703533,7002382,"Little River, Lower S Fk - Coho habitat analysis",1995,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+703534,7002385,Sacramento River - spawning gravel placement,1995,59920,0659920,Redding,Redding city,25,C1,154482290,3954285
+703536,7002387,Sacramento/San Joaquin River Watersheds - spawning gravel assessment,1992,41474,0641474,Lincoln,Lincoln city,25,C1,62599874,110309
+703537,7002388,Nimbus Fish Hatchery - interpretive and educational program,1992,30345,0630345,Gold River,Gold River CDP,57,U1,6884489,213093
+703539,7002390,Nimbus Fish Hatchery - interpretive services,1990,30345,0630345,Gold River,Gold River CDP,57,U1,6884489,213093
+703540,7002392,Monterey Bay - Moss Landing Pen site,1991,41922,0641922,Live Oak,Live Oak CDP,57,U1,8398178,0
+703540,7002391,Big Creek - Big Creek Hatchery (Chinook rearing),1991,41922,0641922,Live Oak,Live Oak CDP,57,U1,8398178,0
+703548,7002413,Nimbus Fish Hatchery - interpretive program,1989,30345,0630345,Gold River,Gold River CDP,57,U1,6884489,213093
+703550,7002415,New Hogan Lake - Wrinkle Cove (cover enhancement/riparian plantings),1993,81890,0681890,Valley Springs,Valley Springs CDP,57,U1,10344077,0
+703562,7002429,New Hogan Reservoir (Wrinkle Cove) - cover enhancement/riparian plantings,1996,81890,0681890,Valley Springs,Valley Springs CDP,57,U1,10344077,0
+703567,7002434,Carquinez Strait - Benicia Point (Chinook holding pens),1993,05290,0605290,Benicia,Benicia city,25,C1,33185400,3386032
+703569,7002436,Stanislaus Fly-Fishermen Salmonid in the Classroom Project,1995,48354,0648354,Modesto,Modesto city,25,C1,111485793,4740717
+703572,7002443,Salmon Education Equipment Upgrade -  Eel River Salmon Restoration,1999,60088,0660088,Redway,Redway CDP,57,U1,3239490,55629
+703573,7002444,New Hogan Reservoir - Wrinkle Cove (cover improvement),1999,81890,0681890,Valley Springs,Valley Springs CDP,57,U1,10344077,0
+703582,7002454,Monterey Harbor - net pens (Chinook acclimation),1997,48872,0648872,Monterey,Monterey city,25,C1,22390414,9365025
+703583,7002455,McDaniel Slough - instream habitat structures/bank stabilization and plantings,1998,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+703585,7002457,Corte Madera Creek - fishway construction,1981,40438,0640438,Larkspur,Larkspur city,25,C1,7767799,566326
+703588,7002462,California Salmon Protection and Enhancement - Fortuna CP,1992,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+703589,7002463,"Alameda, Contra Costa, Monterey, San Benito, San Francisco, San Mateo, Santa Clara, Santa Cruz counties - STEP training",2001,68000,0668000,San Jose,San Jose city,25,C1,461691712,8089813
+703614,7002516,Trinity River - Salt Flat Bridge (bridge upgrade),2001,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+703615,7002520,Steelhead ESUs 10 and 11 - organizational support,2001,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+703618,7002523,Central Valley Spring-Run Chinook ESU - organizational support,2001,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+703638,7007502,Eel River Watershed - River Lodge Conference Center (public/landowner workshops),2001,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+703642,7002591,San Francisquito Creek - Waverly Street Barrier (fish passage improvement),2001,03092,0603092,Atherton,Atherton town,43,C1,12991701,82320
+703642,7002588,Bear Creek - Barrier 1 (fish passage improvement),2001,03092,0603092,Atherton,Atherton town,43,C1,12991701,82320
+703642,7002590,West Union Creek - Barrier 19 (fish passage improvement),2001,03092,0603092,Atherton,Atherton town,43,C1,12991701,82320
+703646,7002598,Mynot Creek - Mynot Creek Road (fish passage improvement),2001,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+703655,7002652,California Coastal Anadromous Watersheds - Adaptive Watershed Improvement Project 01/02,2001,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+703692,7002705,San Luis Obispo - salmonid restoration conference,2001,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+703699,7205434,Rowdy Creek - classroom salmonid release site,2001,25086,0625086,Fort Dick,Fort Dick CDP,57,U1,8331464,662
+703699,7002719,Jordan Creek - riparian plantings,2001,25086,0625086,Fort Dick,Fort Dick CDP,57,U1,8331464,662
+703699,7205432,Hunter Creek - Alexandre Dairy (bioengineering bank stabilization),2001,25086,0625086,Fort Dick,Fort Dick CDP,57,U1,8331464,662
+703699,7205433,Tryon Creek - Alexandre Dairy (riparian plantings),2001,25086,0625086,Fort Dick,Fort Dick CDP,57,U1,8331464,662
+703712,7002931,Jolly Giant Creek - 11th Street (fish passage improvement),2001,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+703716,7002973,San Luis Obispo and Santa Barbara Counties - salmonid education,2001,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+703725,7002985,"Eel River, lower; Eel River, S Fk; and Van Duzen River Watersheds - organizational support",2001,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+703738,7002999,Shasta River Watershed - watershed coordination,2001,86944,0686944,Yreka,Yreka city,25,C1,25861889,188154
+703743,7205435,City of Etna - Etna Union High School (watershed education program),2001,22972,0622972,Etna,Etna city,25,C1,1967952,2444
+703752,7003036,Big Lagoon - restoration design/planning,2001,49950,0649950,Muir Beach,Muir Beach CDP,57,U1,1276408,0
+703755,7003057,"Santa Cruz County watersheds (San Lorenzo, Arana, Soquel, Aptos, Corralitos) - stream crossing assessment/planning",2001,70588,0670588,Scotts Valley,Scotts Valley city,25,C1,11961717,0
+703762,7003064,Smith River Watershed - community education and outreach,2001,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+703765,7003067,Indian Creek - Indian Creek Ranch (dam removal/diversion improvement),2001,19724,0619724,Douglas City,Douglas City CDP,57,U1,78799839,32384
+703778,7003115,Feliz Creek - instream habitat strucutres/riparian restoration,2001,34652,0634652,Hopland,Hopland CDP,57,U1,9128964,124597
+703788,7003161,"San Luis Obispo, Santa Barbara and Ventura Counties - organizational support",2001,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+703798,7003175,San Francisquito Creek - fish barrier removal planning,2001,46870,0646870,Menlo Park,Menlo Park city,25,C1,25873981,19152744
+703800,7003177,Lagunitas Creek Watershed and Pine Gulch Creek Watershed - coho and steelhead monitoring,2001,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+703814,7003209,Gualala River Watershed - landowner education and outreach,2001,70712,0670712,Sea Ranch,Sea Ranch CDP,57,U1,41742090,277559
+703828,7003228,Mendocino County - watershed monitoring education/training,2001,85600,0685600,Willits,Willits city,25,C1,7296486,1546
+703845,7003252,Santa Rosa Creek - downtown Santa Rosa (instream habitat structures/bank stabilization),2001,70098,0670098,Santa Rosa,Santa Rosa city,25,C1,110145874,451570
+703854,7205465,High Prarie Creek - stream habitat assessment/restoration planning,2001,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+703854,7000007,Salt Creek Watershed - habitat assessment/planning,2001,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+703854,7205464,Salt Creek - stream habitat assessment/restoration planning,2001,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+703867,7000020,"Select California Counties (Del Norte, Humboldt, Trinity, Siskiyou, Mendocino) - organizational support",2001,83794,0683794,Weaverville,Weaverville CDP,57,U1,33363065,0
+703868,7000021,San Geronimo Creek Watershed - erosion control planning,1999,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+703877,7000035,Humboldt County - technical training and assistance,1999,50188,0650188,Myrtletown,Myrtletown CDP,57,U1,5436579,212721
+703890,7002851,Gualala River Watershed - education/outreach,1999,70712,0670712,Sea Ranch,Sea Ranch CDP,57,U1,41742090,277559
+704000,7002861,Los Osos Creek - Morrissey Property (instream and riparian habitat improvement),1999,44182,0644182,Los Osos,Los Osos CDP,57,U1,33057047,52650
+704001,7002863,Napa River - Site 2 (Arundo donax removal),1999,64140,0664140,St. Helena,St. Helena city,25,C1,12832970,325922
+704001,7002862,Napa River - Site 1 (Arundo donax removal),1999,64140,0664140,St. Helena,St. Helena city,25,C1,12832970,325922
+704001,7002864,Napa River - Site 3 (Arundo donax removal),1999,64140,0664140,St. Helena,St. Helena city,25,C1,12832970,325922
+704003,7002866,Salinas River Watershed (upper) - organizational support,1999,78162,0678162,Templeton,Templeton CDP,57,U1,20484545,0
+704008,7002875,Shasta River Watershed - organizational support,1999,83850,0683850,Weed,Weed city,25,C1,12479111,13340
+704010,7002878,Sullivan Gulch/Riverside Drive - culvert barrier improvement,1999,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+704010,7002881,"Anker Creek, N Fk/Fieldbrook Road Culvert - culvert barrier improvement",1999,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+704010,7002880,"Anker Creek, S Fk - Fieldbrook Road and Anker Road Culverts (fish passage improvements)",1999,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+704010,7002879,Lindsay Creek/Murray Road Culvert - culvert barrier improvement,1999,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+704022,7002904,San Lorenzo River Watershed - organizational support,1999,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+704031,7003282,Round Valley Resource Center - organizational suport,1999,16728,0616728,Covelo,Covelo CDP,57,U1,18377116,111658
+704033,7003284,Alderpoint Blocksburg Casterlin Community Center - organizational support,1999,00786,0600786,Alderpoint,Alderpoint CDP,57,U1,6288254,0
+704036,7003287,Ward Creek/Gualala Watershed - sediment assessment/project planning,1999,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+704039,7003290,Coastal Watersheds Santa Cruz to Oregon border,1999,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704045,7003296,Carquinez Strait - San Pablo Bay Net Pens (Chinook acclimation),1999,16000,0616000,Concord,Concord city,25,C1,79130630,0
+704050,7208464,Kids and Creeks: Restoration Ecology in Action,1999,13014,0613014,Chico,Chico city,25,C1,88423543,445035
+704053,7003312,Rowdy Creek - Rowdy Creek Fish Hatchery (hatchery operations),1999,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+704054,7003313,Senior Geologist Services,1999,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704056,7003315,Coastal California Anadromous Watersheds - aerial stream survey,2000,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704060,7003319,Los Osos Creek - Morrissey Property (bank stabilization/instream habitat structures),2000,44182,0644182,Los Osos,Los Osos CDP,57,U1,33057047,52650
+704076,7003349,Pine Gulch Creek Watershed - Star Route Farms (irrigation reservoir construction),2000,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+704076,7003350,Pine Gulch Creek Watershed - New Land Trust (irrigation reservoir construction),2000,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+704076,7003352,Pine Gulch Creek Watershed - Fresh Run Farms Site 2 (irrigation reservoir construction),2000,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+704076,7003351,Pine Gulch Creek Watershed - Fresh Run Farms Site 1 (irrigation reservoir construction),2000,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+704078,7003354,Soquel Creek - lagoon enhancement,2000,11040,0611040,Capitola,Capitola city,25,C1,4129576,213680
+704082,7003358,Smith River Watershed - watershed planning,1999,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+704091,7003678,"Trinity River Watershed, S Fk - organizational support",1999,36098,0636098,Hyampom,Hyampom CDP,57,U1,52507399,0
+704094,7003686,West Union Creek tributary 1 - barrier assessment,1999,86440,0686440,Woodside,Woodside town,43,C1,29697449,0
+704094,7003685,McGarvey Gulch - barrier assessment,1999,86440,0686440,Woodside,Woodside town,43,C1,29697449,0
+704094,7003687,West Union Creek tributary 2 - barrier assessment,1999,86440,0686440,Woodside,Woodside town,43,C1,29697449,0
+704094,7003681,Bear Gulch - barrier assessment,1999,86440,0686440,Woodside,Woodside town,43,C1,29697449,0
+704094,7003684,Squealer Gulch - barrier assessment,1999,86440,0686440,Woodside,Woodside town,43,C1,29697449,0
+704094,7003682,Appletree Gulch - barrier assessment,1999,86440,0686440,Woodside,Woodside town,43,C1,29697449,0
+704094,7003680,West Union Creek - barrier assessment,1999,86440,0686440,Woodside,Woodside town,43,C1,29697449,0
+704094,7003683,Tripp Gulch - barrier assessment,1999,86440,0686440,Woodside,Woodside town,43,C1,29697449,0
+704097,7003697,Arana Gulch Watershed - watershed assessment/planning,1999,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+704102,7003729,AmeriCorps Watershed Stewards Project - Fortuna CP,1999,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704104,7003732,Fish Passage Section for California Salmonid Stream Habitat Restoration Manual - Fortuna CP,1999,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704107,7003735,California Northcoast - riparian plantings (exact locations unknown),1999,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704109,7003737,Eel River Watershed (partial) - organizational support,1999,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704115,7003743,Smith River Watershed - organizational support,1999,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+704116,7003744,Santa Cruz County - technical restoration training,1999,87090,0687090,Zayante,Zayante CDP,57,U1,7308969,0
+704118,7003747,Sonoma Ecology Center - landowner outreach/education,1999,72646,0672646,Sonoma,Sonoma city,25,C1,7105863,0
+704121,7003755,Lobitos Creek Watershed - road (culvert inventory/upgrade),1999,39318,0639318,La Honda,La Honda CDP,57,U1,11022981,20735
+704121,7003754,Gazos Creek Watershed - road (culvert inventory/upgrade),1999,39318,0639318,La Honda,La Honda CDP,57,U1,11022981,20735
+704121,7003752,La Honda Creek Watershed - road (culvert inventory/upgrade),1999,39318,0639318,La Honda,La Honda CDP,57,U1,11022981,20735
+704121,7003753,Alpine Creek Watershed - road (culvert inventory/upgrade),1999,39318,0639318,La Honda,La Honda CDP,57,U1,11022981,20735
+704121,7003756,Tunitas Creek - Road (culvert inventory/upgrade),1999,39318,0639318,La Honda,La Honda CDP,57,U1,11022981,20735
+704122,7003757,Pescadero Creek - barrier removal,1999,42384,0642384,Loma Mar,Loma Mar CDP,57,U1,4487609,0
+704125,7003762,Rattlesnake Creek Watershed - road inventory/restoration planning,1999,58456,0658456,Post Mountain,Post Mountain CDP,57,U1,32146965,0
+704126,7003763,Barker Creek - fish passage improvement,1999,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+704127,7003764,City of Etna - Siskiyou Resource Conservation District Office (organizational support),1999,22972,0622972,Etna,Etna city,25,C1,1967952,2444
+704129,7003766,San Pedro Creek Watershed - watershed assessment,1999,54806,0654806,Pacifica,Pacifica city,25,C1,32589429,23854
+704155,7003837,Arana Gulch - riparian restoration,1998,41922,0641922,Live Oak,Live Oak CDP,57,U1,8398178,0
+704156,7003838,AmeriCorps Watershed Stewards Project - Fortuna CP,1997,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704162,7003844,San Geronomo Creek Watershed - Summit Road (road upgrade),2000,86216,0686216,Woodacre,Woodacre CDP,57,U1,4653150,0
+704164,7003846,Mendocino Community Center (location estimated) - watershed festival,2000,46814,0646814,Mendocino,Mendocino CDP,57,U1,5846594,2006861
+704172,7003859,Sulphur Creek - fishway ladder installation,2000,64140,0664140,St. Helena,St. Helena city,25,C1,12832970,325922
+704176,7003864,San Luis Obispo and Santa Barbara Counties - salmonid education,2000,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+704178,7208477,FishNet 4C,2000,48760,0648760,Montara,Montara CDP,57,U1,10040503,0
+704179,7003867,Selected California Counties - STEP teacher training,2000,68000,0668000,San Jose,San Jose city,25,C1,461691712,8089813
+704180,7003868,Indian Creek - bank stabilization,2000,56868,0656868,Philo,Philo CDP,57,U1,5353556,0
+704181,7003869,Indian Creek - bank stabilization,2000,56868,0656868,Philo,Philo CDP,57,U1,5353556,0
+704182,7003870,Russian River - Healdsburg Dam (fish ladder installation),2000,33056,0633056,Healdsburg,Healdsburg city,25,C1,11448706,0
+704184,7003872,Mendocino County (selected watersheds) - GIS development,2000,85600,0685600,Willits,Willits city,25,C1,7296486,1546
+704194,7003934,Eldridge Creek Watershed - organizational support (Calpella Centerpoint),2000,09990,0609990,Calpella,Calpella CDP,57,U1,6598677,64954
+704202,7003950,Gold Ridge Resource Conservation District - organizational support,2000,70770,0670770,Sebastopol,Sebastopol city,25,C1,4874901,0
+704212,7003966,Scott Creek Watershed - organizational support,2000,18086,0618086,Davenport,Davenport CDP,57,U1,7367925,0
+704219,7202045,Russian River - bank stabilization/riparian plantings,2000,60214,0660214,Redwood Valley,Redwood Valley CDP,57,U1,7112072,31597
+704219,7003982,Russian River - Mumford Dam (fish passage improvement/riparian restoration),2000,60214,0660214,Redwood Valley,Redwood Valley CDP,57,U1,7112072,31597
+704224,7003987,Carmel River - instream habitat structures/riparian plantings,2000,11324,0611324,Carmel Valley Village,Carmel Valley Village CDP,57,U1,49166228,507112
+704225,7003988,Aptos Creek Watershed - watershed assessment/planning,2000,02378,0602378,Aptos,Aptos CDP,57,U1,17037116,0
+704226,7003989,Stevens Creek - fish passage improvement,2000,49670,0649670,Mountain View,Mountain View city,25,C1,30971479,719719
+704230,7003998,San Lorenzo River Watershed - watershed management internship,2000,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+704236,7004004,Topanga Creek Watershed - watershed analysis/planning,2000,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+704249,7004027,Connick Creek - instream habitat structures/riparian plantings,2000,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+704258,7004058,"Eel River (lower), Eel River (S Fk), and Van Duzen River Watersheds - organizational support",2000,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704264,7208459,Adopt-A-Watershed Leadership Institute,2000,67000,0667000,San Francisco,San Francisco city,25,C1,121507089,479146790
+704281,7004116,Salt River Watershed and Eel River Estuary - organizational support,2000,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+704286,7004126,Willow Creek - fish trap/anadromous monitoring,2000,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+704287,7007285,Sonoma Creek Steelhead Education Project,2000,70098,0670098,Santa Rosa,Santa Rosa city,25,C1,110145874,451570
+704292,7004135,South Fork Fisheries Secondary Schools Education Project,2000,48060,0648060,Miranda,Miranda CDP,57,U1,3868285,20675
+704298,7004141,San Pablo Bay - mobile net pens (acclimation and release site),2000,16000,0616000,Concord,Concord city,25,C1,79130630,0
+704299,7004142,Rowdy Creek - Rowdy Creek Fish Hatchery (hatchery operations),2000,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+704300,7002741,Avila Beach - pen rearing (Chinook acclimation/release),2000,03330,0603330,Avila Beach,Avila Beach CDP,57,U1,15766061,575455
+704303,7002748,Eel River Watershed - Alderpoint-Blocksburg-Casterlin Community Center,2000,00786,0600786,Alderpoint,Alderpoint CDP,57,U1,6288254,0
+704304,7002749,Eureka - Humboldt County Resource Conservation District (organizational support),2000,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+704305,7002750,California Coastal Anadromous Watersheds - Adaptive Watershed Improvement Project,2000,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704313,7002801,San Luis Obispo County (steelhead watersheds) - organizational support,2000,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+704319,7002807,San Lorenzo River Watershed - erosion control technical training,2000,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+704323,7002811,Soquel Creek Watershed - organizational support,2000,11040,0611040,Capitola,Capitola city,25,C1,4129576,213680
+704327,7002815,San Lorenzo River - barrier assessment/planning,2000,07652,0607652,Boulder Creek,Boulder Creek CDP,57,U1,19456234,0
+704327,7006562,Branciforte Creek - barrier assessment/planning,2000,07652,0607652,Boulder Creek,Boulder Creek CDP,57,U1,19456234,0
+704328,7002816,Willits Creek - instream and riparian restoration,2000,08530,0608530,Brooktrails,Brooktrails CDP,57,U1,18835634,122096
+704329,7002817,San Geronimo Creek Watershed - Conifer Fire Road (road upgrade),2000,86216,0686216,Woodacre,Woodacre CDP,57,U1,4653150,0
+704332,7002821,Grist Creek - riparian fencing/plantings,2000,16728,0616728,Covelo,Covelo CDP,57,U1,18377116,111658
+704344,7004155,Humboldt State University - fish and water management symposium,2000,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+704354,7004167,Hunter Creek - streambank stabilization/instream structures,2000,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+704355,7004168,Barker Creek - pump installation/dam removal,2000,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+704364,7004183,City of Ukiah - salmonid restoration conference (location estimated),2000,81134,0681134,Ukiah,Ukiah city,25,C1,12390978,116878
+704370,7004450,"Trinity River Watershed, S Fk - organizational support",2000,36098,0636098,Hyampom,Hyampom CDP,57,U1,52507399,0
+704377,7004459,Trinity River - Poker Bar Bridge (bridge replacement design/permitting),2000,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+704377,7004457,Trinity River - Salt Flat Bridge (bridge replacement design/permitting),2000,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+704377,7004458,Trinity River - Bucktail Bridge (bridge replacement design/permitting),2000,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+704377,7004460,Trinity River - Treadwell Bridge (bridge replacement design/permitting),2000,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+704379,7004462,Arcata USFWS Facility - training,2000,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+704385,7004468,Etna - Scott River Watershed Council office (organizational support),2000,22972,0622972,Etna,Etna city,25,C1,1967952,2444
+704388,7004474,Humboldt Bay Watershed - watershed coordinator/planning,2000,50188,0650188,Myrtletown,Myrtletown CDP,57,U1,5436579,212721
+704403,7004498,Jolly Giant Creek - channel excavation/riparian plantings/instream structures,2000,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+704404,7004499,"Anker Creek, S Fk - culvert upgrade",2000,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+704412,7004507,Shasta River Watershed - organizational support,2000,83850,0683850,Weed,Weed city,25,C1,12479111,13340
+704413,7004508,Del Norte County - classroom incubation program,2000,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+704415,7004510,California Coastal Anadromous Watersheds - fish passage evaluation protocol development (centerpoint),2000,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704427,7004525,Humboldt and Mendocino Counties - salmon in the classroom program,2000,50188,0650188,Myrtletown,Myrtletown CDP,57,U1,5436579,212721
+704429,7004527,Fortuna - Riverwood Lodge (landowner training),2000,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704434,7004532,Central Valley Spring-Run Chinook ESU - organizational support,2001,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704435,7004533,California Coastal Anadromous Watersheds - senior engineering geologist (centerpoint),2000,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704436,7004534,California Coastal Anadromous Watersheds - education/outreach,2000,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704437,7004535,"California Coastal Anadromous Watersheds - restoration project database/NHD 1:24,000 Networking (centerpoint)",2001,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704438,7004536,California Coastal Anadromous Watersheds - restoration project database (centerpoint),2001,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704443,7004542,Central Coast Counties - archeological and rare plant surveys,1998,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704446,7004545,Napa River - riparian restoration,2000,09892,0609892,Calistoga,Calistoga city,25,C1,6673845,46827
+704447,7004546,San Luis Obispo Creek Watershed - Froom Creek/Foster Property (land acquisition),2000,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+704450,7004549,Department of Conservation - Sacramento,1998,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704506,7004558,Marsh Creek - Flynn Creek Road (culvert upgrade/fish passage improvement),2001,15030,0615030,Comptche,Comptche CDP,57,U1,2987584,0
+704506,7004557,Albion River - Flynn Creek Road (culvert upgrade/fish passage improvement),2001,15030,0615030,Comptche,Comptche CDP,57,U1,2987584,0
+704549,7004646,Shasta River Watershed - RY Ranch (tailwater return system development),2001,86944,0686944,Yreka,Yreka city,25,C1,25861889,188154
+704576,7004689,AmeriCorps Watershed Stewards Project - Member Match Fortuna CP,1998,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704577,7004690,Grass Valley Creek - fish passage improvement,1998,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+704579,7004694,"California Salmonid Stream Habitat Restoration Manual, Upslope Component (Section 9)",1998,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704581,7004696,Eel River Watershed - organizational support,1998,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704584,7004699,Sacramento and San Joaquin River Watersheds - Chinook genetic analysis,1997,41474,0641474,Lincoln,Lincoln city,25,C1,62599874,110309
+704585,7004700,Detection of Viral Diseases in Signal Crayfish,1997,18100,0618100,Davis,Davis city,25,C1,25826324,90331
+704586,7004701,San Pablo Bay - mobile net pens (acclimation and release site),1998,16000,0616000,Concord,Concord city,25,C1,79130630,0
+704592,7003404,Secret Ravine - spawning gravel placement/riparian restoration,1998,62938,0662938,Roseville,Roseville city,25,C1,114162282,0
+704600,7003427,Rowdy Creek - Rowdy Creek Fish Hatchery (hatchery operations),1998,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+704605,7003439,Watershed Processes and Erosion Control Publication,1998,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+704620,7003487,Willow Creek - anadromous monitoring,1998,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+704631,7003517,Coastal Mendocino County - culvert assessment/planning,1998,08530,0608530,Brooktrails,Brooktrails CDP,57,U1,18835634,122096
+704632,7003518,Humboldt and northern Mendocino Counties - Eureka CP,1998,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+704633,7003519,All California counties in the coho range - Eureka CP,1998,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+704638,7003526,Monterey Harbor - saltwater acclimation pens,1999,48872,0648872,Monterey,Monterey city,25,C1,22390414,9365025
+704645,7003542,Variation in Microsatellites and Flanking Region Sequences Amplified from Central Valley Chinook Spawning Populations,1999,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704646,7003543,"Salmon Trout Education Program (STEP) For the Restoration and Conservation of Steelhead, Coho Salmon and Chinook Salmon",1999,68000,0668000,San Jose,San Jose city,25,C1,461691712,8089813
+704650,7003596,Fall Creek - instream structure maintenance,1999,05332,0605332,Ben Lomond,Ben Lomond CDP,57,U1,21674901,0
+704653,7003605,"Weaver Creek, West - Oregon Street crossing (culvert upgrade)",2000,83794,0683794,Weaverville,Weaverville CDP,57,U1,33363065,0
+704657,7003609,Monterey Bay - saltwater acclimation pens,2000,48872,0648872,Monterey,Monterey city,25,C1,22390414,9365025
+704662,7003617,"tributaries to the Eel, Mattole, Van Duzen and Russian Rivers, tributaries to Humboldt Bay and various coastal streams in Mendocino County",1996,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704700,7006591,Rowdy Creek - Rowdy Creek Fish Hatchery (hatchery operations),2002,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+704704,7004710,Etna Elementary School - environmental education/riparian restoration,2002,22972,0622972,Etna,Etna city,25,C1,1967952,2444
+704706,7006638,Santa Cruz Harbor - saltwater acclimation pens (Chinook acclimation/release),2002,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+704707,7004711,City of San Jose - Children's Discovery Museum (environmental education training),2002,68000,0668000,San Jose,San Jose city,25,C1,461691712,8089813
+704710,7004712,Coastal California Salmonid Watersheds - adaptive restoration projects,2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704736,7004866,Froom Creek - Froom Creek Road (road decommissioning),2002,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+704739,7004867,California Northern Coastal Watersheds - organizational support,2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704746,7207379,City of Ben Lomond - Sequoia Seminars (Adopt-a-Watershed training),2002,08478,0608478,Brookdale,Brookdale CDP,57,U1,9963087,0
+704752,7004876,Northern California Coho Salmon Watersheds - organizational support,2002,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704763,7004884,San Pedro Creek Watershed - organizational support,2002,54806,0654806,Pacifica,Pacifica city,25,C1,32589429,23854
+704774,7005878,City of Davis - Veterans Memorial Building (salmonid restoration conference),2002,18100,0618100,Davis,Davis city,25,C1,25826324,90331
+704777,7004899,Humboldt and Mendocino Counties - salmonid/watershed education,2002,50188,0650188,Myrtletown,Myrtletown CDP,57,U1,5436579,212721
+704783,7004914,San Lorenzo River Watershed - organizational support,2002,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+704786,7004915,California Coastal Watersheds (partial) - organizational support (centerpoint),2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704787,7004916,Napa River Watershed (Central) - watershed assessment/planning,2002,64140,0664140,St. Helena,St. Helena city,25,C1,12832970,325922
+704796,7004918,Smith River Watershed - organizational support,2002,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+704813,7205385,Willow Creek - salmonid spawning monitoring,2002,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+704813,7004933,Willow Creek - trap (anadromous monitoring),2002,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+704822,7004941,"Del Norte, Humboldt, and Trinity Counties - landowner education/outreach (Fortuna Centerpoint)",2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704823,7004942,Trinity River - Treadwell Bridge (bridge upgrade),2002,19724,0619724,Douglas City,Douglas City CDP,57,U1,78799839,32384
+704829,7004945,Fish Creek Watershed - sediment assessment/planning,2002,05262,0605262,Benbow,Benbow CDP,57,U1,12641980,0
+704836,7208419,"Del Norte, Humboldt, Mendocino, and Sonoma Counties - SB 271 Road Decommissioning Effectiveness Monitoring (Fortuna Centerpoint)",2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+704846,7005042,Lompico Creek - fish passage improvement,2002,42510,0642510,Lompico,Lompico CDP,57,U1,8749690,315
+704861,7006334,5 Counties Salmonid Conservation Program - organizational support,2002,83794,0683794,Weaverville,Weaverville CDP,57,U1,33363065,0
+704866,7005167,Hunter Creek - riparian fencing,2002,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+704866,7005166,Hunter Creek - reach 2 (bank stabilization/riparian plantings),2002,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+704866,7005165,Hunter Creek - reach 1 (instream habitat structures/riparian plantings),2002,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+704872,7005170,"Eel Watershed, S Fk/Van Duzen/Eel River Watershed (lower) - watershed coordinators/organizational support",2002,81134,0681134,Ukiah,Ukiah city,25,C1,12390978,116878
+704880,7005174,Soquel Creek Watershed - organizational support,2002,11040,0611040,Capitola,Capitola city,25,C1,4129576,213680
+704881,7005883,"San Lorenzo River, Aptos Creek, Soquel Creek Watersheds - training/upslope restoration",2002,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+704884,7005884,"San Luis Obiosp, Santa Barbara, and Ventura Counties - restoration training",2002,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+704893,7005178,Campbell Creek/Gannon Slough - riparian fencing and plantings,2002,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+704896,7005195,Coastal California Watersheds - monitoring plan database development,2002,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704908,7208363,Community Involvement - Public Education Program,2002,84385,0684385,Westhaven-Moonstone,Westhaven-Moonstone CDP,57,U2,20963594,70662
+704914,7005203,Deadwood Creek (Deadwood Rd.) - barrier modification,2002,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+704916,7005205,Tomales Bay Watershed - organizational support,2002,36616,0636616,Inverness,Inverness CDP,57,U1,16575450,1130139
+704921,7006443,District Capacity Building Program,2002,22972,0622972,Etna,Etna city,25,C1,1967952,2444
+704942,7004267,Humboldt County - landowner education and outreach,2002,50188,0650188,Myrtletown,Myrtletown CDP,57,U1,5436579,212721
+704969,7004293,Coastal California Watersheds - presence/absence protocol development,2002,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+704996,7006330,San Luis Obispo County - landowner education/outreach,2002,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+705015,7005313,Eel River Watershed (Central) - organizational support (centerpoint),2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+705040,7208422,Santa Cruz State Parks District,2002,87090,0687090,Zayante,Zayante CDP,57,U1,7308969,0
+705044,7006204,California Coastal Anadromous Watersheds (South portion) - restoration project monitoring/evaluation (centerpoint),2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+705045,7006205,Humboldt Bay Watershed - organizational support/restoration planning,2002,50188,0650188,Myrtletown,Myrtletown CDP,57,U1,5436579,212721
+705046,7006206,Garrapata Creek Watershed - watershed assessment/planning,2002,48872,0648872,Monterey,Monterey city,25,C1,22390414,9365025
+705051,7006208,City of Ojai Watersheds - watershed assessment/planning,2002,53476,0653476,Ojai,Ojai city,25,C1,11281691,39811
+705054,7006331,San Lorenzo-Soquel Watershed - education/outreach,2002,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+705058,7004373,Sonoma Creek Watershed - Jack London State Historical Park (sediment assessment/planning),2002,30028,0630028,Glen Ellen,Glen Ellen CDP,57,U1,5438518,2744
+705075,7005317,Various coastal watersheds - organizational support,1998,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+705103,7200385,Etna Elementary School - salmonid education,2003,22972,0622972,Etna,Etna city,25,C1,1967952,2444
+705126,7201768,San Pedro Creek - Capistrano Bridge site (fish passage improvement),2003,54806,0654806,Pacifica,Pacifica city,25,C1,32589429,23854
+705127,7201731,Frenchmans Creek - culvert barrier removal,2003,31708,0631708,Half Moon Bay,Half Moon Bay city,25,C1,16167307,27799
+705146,7200381,Coastal California Watersheds - Adaptive Watershed Improvement Projects,2003,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+705161,7201588,Humboldt Bay (Salmon Creek estuary) - juvenile salmonid monitoring,2003,17722,0617722,Cutten,Cutten CDP,57,U1,3318362,0
+705161,7201586,Humboldt Bay (Jacoby Creek estuary) - juvenile salmonid monitoring,2003,17722,0617722,Cutten,Cutten CDP,57,U1,3318362,0
+705161,7201587,Humboldt Bay (Elk River estuary) - juvenile salmonid monitoring,2003,17722,0617722,Cutten,Cutten CDP,57,U1,3318362,0
+705161,7201585,Humboldt Bay (Freshwater Slough estuary) - juvenile salmonid monitoring,2003,17722,0617722,Cutten,Cutten CDP,57,U1,3318362,0
+705170,7201537,California North Coast Hydrologic Region - restoration project monitoring and evaluation,2003,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+705184,7201664,Dooley Creek - bioengineering restoration and training,2003,34652,0634652,Hopland,Hopland CDP,57,U1,9128964,124597
+705185,7208440,Fishery Network of Central California Counties,2003,67000,0667000,San Francisco,San Francisco city,25,C1,121507089,479146790
+705186,7201606,Napa River (Rutherford Reach) - restoration planning/organizational support,2003,63400,0663400,Rutherford,Rutherford CDP,57,U1,4350420,10389
+705197,7200445,Marsh Creek (Flynn Creek Rd) - fish barrier removal,2003,15030,0615030,Comptche,Comptche CDP,57,U1,2987584,0
+705197,7200444,Albion River (Flynn Creek Rd) - fish barrier removal,2003,15030,0615030,Comptche,Comptche CDP,57,U1,2987584,0
+705207,7200539,Dooley Creek - bank stabilization/riparian plantings,2003,34652,0634652,Hopland,Hopland CDP,57,U1,9128964,124597
+705223,7201590,"Eel Watershed, S Fk/Van Duzen/Eel River Watershed (lower) - watershed coordinators/organizational support",2003,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+705235,7200460,San Antonio Creek - Soule Park site (fish passage improvement),2003,53476,0653476,Ojai,Ojai city,25,C1,11281691,39811
+705238,7201725,Mynot Creek - restoration project mapping,2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+705238,7201722,Tarup Creek - restoration project mapping,2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+705238,7201719,Ah Pah Creek - restoration project mapping,2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+705238,7201727,"Blue Creek, W. Fk. - restoration project mapping",2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+705238,7201720,Hunter Creek - restoration project mapping,2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+705238,7201728,High Prairie Creek - restoration project mapping,2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+705238,7201721,Moon Creek - restoration project mapping,2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+705238,7201724,Turwar Creek - restoration project mapping,2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+705238,7201726,"Blue Creek, W. Fk. - restoration project mapping",2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+705238,7201723,McGarvey Creek - restoration project mapping,2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+705253,7201658,City of Fortuna - Fortuna River Lodge (salmonid restoration conference),2003,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+705256,7201659,Arroyo Grande (United Methodist Camp) - culvert/road restoration training,2003,02868,0602868,Arroyo Grande,Arroyo Grande city,25,C1,15382200,0
+705269,7201532,Big-Navarro-Garcia HUC - juvenile salmonid abundance monitoring,2003,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+705269,7201533,French Creek Watershed - juvenile salmonid abundance monitoring,2003,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+705269,7201531,Mad River-Redwood Creek Watershed - juvenile salmonid abundance monitoring,2003,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+705269,7201535,Freshwater Creek Watershed - validation monitoring,2003,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+705269,7201534,McGarvey Creek Watershed - validation monitoring,2003,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+705269,7201530,Klamath River Watershed (Lower) - juvenile salmonid abundance monitoring,2003,85642,0685642,Willow Creek,Willow Creek CDP,57,U1,78501415,777004
+705271,7200383,Salmonid Riparian Education Project,2003,83794,0683794,Weaverville,Weaverville CDP,57,U1,33363065,0
+705275,7200451,Gannon Slough - channel realignment/instream/fish passage,2003,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+705275,7200453,Gannon Slough - riparian plantings,2003,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+705275,7200455,Gannon Slough - tidegate installation/fish passage improvement,2003,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+705300,7200456,Lindsay Creek (Burnt Stump Ln) - fish passage improvement,2003,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+705319,7208382,Salmon in the Classroom Program,2003,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+705322,7200549,Terwer Creek - riparian restoration/bank stabilization,2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+705323,7201607,Del Norte/Humboldt/Mendocino/Siskiyou/Trinity Counties (coastal watersheds) - organizational support (Redding Centerpoint),2003,71218,0671218,Shasta,Shasta CDP,57,U1,28325227,11513
+705328,7201612,Salt River Watershed - public involvement/restoration planning,2003,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+705334,7201536,Topanga Creek Watershed (Lower) - steelhead monitoring,2003,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+705335,7200457,Soldiers Creek - Dutch Bill Rd Crossings 1-2 (fish passage improvements),2003,37596,0637596,Junction City,Junction City CDP,57,U1,68728396,87697
+705344,7200477,Trinity River (Poker Bar north bridge) - bridge replacement,2003,19724,0619724,Douglas City,Douglas City CDP,57,U1,78799839,32384
+705344,7200476,Trinity River (Bucktail Bridge) - road/culvert upgrade,2003,19724,0619724,Douglas City,Douglas City CDP,57,U1,78799839,32384
+705344,7200478,Trinity River (Poker Bar south bridge) - bridge replacement,2003,19724,0619724,Douglas City,Douglas City CDP,57,U1,78799839,32384
+705349,7200441,San Luis Obispo and Santa Barbara Counties - salmonid education,2003,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+705350,7201709,Rincon Creek Watershed - organizational support,2003,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+705376,7201624,San Luis Obispo-Santa Barbara-Ventura Counties (within ESU) - restoration training/planning,2003,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+705389,7201540,"Felta Creek - fish and habitat monitoring, coho reintroduction",2003,24960,0624960,Forestville,Forestville CDP,57,U1,13615411,0
+705389,7201546,"Ward Creek - fish and habitat monitoring, coho reintroduction",2003,24960,0624960,Forestville,Forestville CDP,57,U1,13615411,0
+705389,7201544,"Willow Creek (Russian River) - fish and habitat monitoring, coho reintroduction",2003,24960,0624960,Forestville,Forestville CDP,57,U1,13615411,0
+705389,7202048,Dutch Bill Creek - fish and habitat monitoring (control stream),2003,24960,0624960,Forestville,Forestville CDP,57,U1,13615411,0
+705389,7201548,Olema Creek - fish and habitat monitoring (control stream),2003,24960,0624960,Forestville,Forestville CDP,57,U1,13615411,0
+705389,7201541,"Mill Creek (Dry Cr.) - fish and habitat monitoring, coho reintroduction",2003,24960,0624960,Forestville,Forestville CDP,57,U1,13615411,0
+705389,7201545,"Sheephouse Creek - fish and habitat monitoring, coho reintroduction",2003,24960,0624960,Forestville,Forestville CDP,57,U1,13615411,0
+705389,7201547,Green Valley Creek - fish and habitat monitoring (control stream),2003,24960,0624960,Forestville,Forestville CDP,57,U1,13615411,0
+705389,7201542,"Freezeout Creek - fish and habitat monitoring, coho reintroduction",2003,24960,0624960,Forestville,Forestville CDP,57,U1,13615411,0
+705397,7200465,Janes Creek - dam removal/crossing upgrade (fish passage improvement),2003,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+705406,7201552,South-Central and Southern California Steelhead ESU's - steelhead genetic study,2003,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+705410,7200558,San Geronimo Creek - Site ST-3 (bank stabilization),2003,86216,0686216,Woodacre,Woodacre CDP,57,U1,4653150,0
+705410,7200557,San Geronimo Creek - Site ST-8 (bank stabilization),2003,86216,0686216,Woodacre,Woodacre CDP,57,U1,4653150,0
+705416,7201769,Coastal California Watersheds - salmonid restoration project database,2003,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+705419,7201655,California Coastal Anadromous Watersheds - scientific and technical support (centerpoint),2003,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+705422,7006600,California Coastal Anadromous Watersheds - salmonid monitoring plan (centerpoint),2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+705426,7006611,California Coastal Anadromous Watersheds - monitoring protocol development (Centerpoint),2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+706346,7006446,California Coastal Anadromous Watersheds - scientific aides (centerpoint),2000,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+706348,7006450,California Coastal Anadromous Watersheds - restoration effectiveness monitoring development (centerpoint),2000,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+706349,7007485,San Pablo Bay (location estimated) - Chinook acclimation/release,2002,16000,0616000,Concord,Concord city,25,C1,79130630,0
+706350,7203522,San Pablo Bay - site Acclimation Pens (Chinook acclimation and release),2003,16000,0616000,Concord,Concord city,25,C1,79130630,0
+706357,7203527,Update/Reprint Salmon Stamp Brochure and Web Pages,1998,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+706358,7203528,Genetic Analysis of Tissue Sample Collection,1998,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+706360,7203529,Spring-run Chinook Salmon Workgroup Program,1998,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+706361,7203530,Winter-run Captive Broodstock Program,1997,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+706363,7203531,Gear Selectivity Study (Coho Incidence),1996,25058,0625058,Fort Bragg,Fort Bragg city,25,C1,7508182,86606
+706364,7203532,Winter-run Captive Broodstock Program,1996,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+706365,7203533,Salmonid Stream Habitat Restoration Field School,1996,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+706367,7203534,Salmonid Stream Habitat Restoration Field School,1995,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+706368,7203535,Coastal Salmon Natural Community Initiative Meetings,1995,77805,0677805,Tamalpais-Homestead Valley,Tamalpais-Homestead Valley CDP,57,U2,12135246,159394
+706369,7203536,Winter-run Captive Broodstock Program,1995,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+706370,7203537,Bodega Marine Laboratory,1994,07260,0607260,Bodega Bay,Bodega Bay CDP,57,U1,21612540,10823439
+706372,7203539,Spring Run Chinook Recovery Workgroup Meetings,1994,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+706373,7203540,Mobile Net Pen Holding of Salvaged Salmon,1993,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+706374,7203541,Bodega Marine Laboratory,1993,07260,0607260,Bodega Bay,Bodega Bay CDP,57,U1,21612540,10823439
+706375,7203542,Sacramento River,1992,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+706377,7203544,Decals to Label Salmon Stamp Equipment,1992,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+720003,7207664,West Weaver Creek Watershed - China Gulch Sites 1-6 (upland erosion control) and planting,2000,83794,0683794,Weaverville,Weaverville CDP,57,U1,33363065,0
+720006,7201092,Turwar Creek - riparian planting,2000,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720006,7201095,Blue Creek - riparian planting,2000,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720006,7201093,McGarvey Creek - riparian planting,2000,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720006,7200181,Hunter Creek - riparian planting,2000,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720006,7201097,Rowdy Creek - riparian planting,2000,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720006,7201096,Ah Pah Creek - riparian planting,2000,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720006,7201098,Little Mill Creek - riparian planting,2000,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720009,7200182,Barker Creek - bank stabilization/riparian plantings,2000,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+720010,7200183,Carr Creek - riparian enhancement,2000,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+720027,7201424,Southern California Counties - outreach/education,2000,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+720061,7200306,Mynot Creek - Mynot Creek Road (fish passage improvement),2002,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720064,7200308,Napa River - restoration planning,2002,63400,0663400,Rutherford,Rutherford CDP,57,U1,4350420,10389
+720065,7200309,Miller Creek Watershed (Lucas Valley Road) - culvert upgrade,2002,68364,0668364,San Rafael,San Rafael city,25,C1,42960192,15426850
+720068,7202372,California Coast Coho Salmon ESU - population genetic analysis,2002,67000,0667000,San Francisco,San Francisco city,25,C1,121507089,479146790
+720068,7200315,Southwest Fisheries Science Center - population genetic analysis,2002,67000,0667000,San Francisco,San Francisco city,25,C1,121507089,479146790
+720070,7200362,Sonoma Creek Watershed - Jack London State Historical Park (instream restoration planning),2002,30028,0630028,Glen Ellen,Glen Ellen CDP,57,U1,5438518,2744
+720085,7200330,Topanga Canyon - bank stabilization planning,2002,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+720086,7200331,Carpinteria Creek - culvert upgrade/fish passage improvement,2002,11446,0611446,Carpinteria,Carpinteria city,25,C1,6704026,17313119
+720108,7200129,Mendocino RCD Watershed Program Coordinator,2001,81134,0681134,Ukiah,Ukiah city,25,C1,12390978,116878
+720110,7200132,Tomales Bay Watershed (additional subwatersheds) - organizational support,2001,36616,0636616,Inverness,Inverness CDP,57,U1,16575450,1130139
+720113,7200246,San Geronimo Creek - Roy's Pools (riparian plantings),2001,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+720116,7200138,Northern and Central Regions Coastal Counties - archaeological and rare plant surveys,2001,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+720125,7200257,Rocky Gulch - unnamed tributary (culvert removal/bank stabilization),2001,36420,0636420,Indianola,Indianola CDP,57,U1,3656939,483
+720137,7200270,Barker Creek - pump installation/irrigation improvements,2001,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+720148,7200282,Topanga Creek Watershed - watershed assessment,2001,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+720149,7202146,CDFG Fortuna Office - education/training,2001,60620,0660620,Richmond,Richmond city,25,C1,77840004,58164107
+720149,7201764,Los Osos Creek Watershed - watershed assessment/restoration monitoring,2001,60620,0660620,Richmond,Richmond city,25,C1,77840004,58164107
+720149,7201762,Chorro Creek Watershed - watershed assessment/restoration monitoring,2001,60620,0660620,Richmond,Richmond city,25,C1,77840004,58164107
+720151,7200284,San Antonio Creek - Soule Park (stream survey/assessment),2001,53476,0653476,Ojai,Ojai city,25,C1,11281691,39811
+720152,7200285,Ventura River Watershed (Ventura River portion) - steelhead suitability index,2001,53182,0653182,Oak View,Oak View CDP,57,U1,8822791,0
+720152,7201757,Ventura River Watershed (Matilija Creek portion) - steelhead suitability index,2001,53182,0653182,Oak View,Oak View CDP,57,U1,8822791,0
+720153,7200287,Southwest Fisheries Science Center - population genetic analysis,2001,67000,0667000,San Francisco,San Francisco city,25,C1,121507089,479146790
+720153,7202220,California Coast Coho Salmon ESU - population genetic analysis,2001,67000,0667000,San Francisco,San Francisco city,25,C1,121507089,479146790
+720161,7201765,Lagunitas Creek Watershed - native plant collection,2001,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+720161,7200374,San Geronimo Creek Watershed - riparian plantings,2001,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+720163,7200375,Browns Creek - Browns #1 crossing (fish passage design),2001,16434,0616434,Corralitos,Corralitos CDP,57,U1,23273553,37138
+720177,7203613,Topanga Creek - Topanga State Park reach (steelhead monitoring),2004,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+720184,7204924,"SLO, Santa Barbara, & Ventura Counties (coastal watersheds) - steelhead recovery support",2004,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+720195,7203564,North and Bay Area Counties (coastal watersheds) - (watershed stewardship),2004,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+720199,7203710,San Geronimo Creek Watershed - Bates Canyon Creek (fish passage improvement),2004,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+720203,7203815,California Coastal Anadromous Watersheds - CHRPD data collection & management (centerpoint),2004,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+720207,7203810,Redwood Creek - Lower Rotary screw trap (juvenile salmonid downstream migration study),2004,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+720208,7203565,Adaptive Watershed Improvement Projects 2004 (centerpoint),2004,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+720209,7203806,California Coastal Anadramous Watersheds - coho & steelhead data and information node development (centerpoint),2004,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+720212,7203761,California Coastal Anadramous Watersheds - fish passage data collection & management (centerpoint),2004,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+720222,7203617,Freshwater Creek - Tidal portions (salmonid estuary use/residence monitoring),2004,50188,0650188,Myrtletown,Myrtletown CDP,57,U1,5436579,212721
+720222,7203616,Freshwater Creek - Tidal portions (salmonid estuary use/residence monitoring),2004,50188,0650188,Myrtletown,Myrtletown CDP,57,U1,5436579,212721
+720245,7203732,Scott River Restoration / Education Project,2004,22972,0622972,Etna,Etna city,25,C1,1967952,2444
+720262,7205978,Trinity River Watershed - salmonid habitat education,2004,36098,0636098,Hyampom,Hyampom CDP,57,U1,52507399,0
+720269,7203570,Solstice Creek - Corral Canyon Road (fish passage improvement),2004,45246,0645246,Malibu,Malibu city,25,C1,51403234,205274315
+720270,7210221,Wolverton Gulch,2004,36126,0636126,Hydesville,Hydesville CDP,57,U1,19424163,0
+720273,7203612,Pescadero Creek - Sequoia Flat Crossing (road crossing upgrade),2004,42384,0642384,Loma Mar,Loma Mar CDP,57,U1,4487609,0
+720273,7203611,Pescadero Creek - dam barrier removal,2004,42384,0642384,Loma Mar,Loma Mar CDP,57,U1,4487609,0
+720279,7203566,Turwar Creek - bank stabilization and riparian restoration,2004,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720352,7208268,Napa County RCD - Center Point (City of Napa),2004,50258,0650258,Napa,Napa city,25,C1,46740284,792174
+720354,7205610,Smith River Watershed - watershed coordinator support,2004,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+720372,7203662,"Eel River Watershed, Lower - organizational support",2004,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+720378,7205973,Lindsay Creek Watershed - watershed organizational support,2004,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+720383,7203649,North Coast Watersheds - Shasta Valley RCD anadramous watersheds (fisheries program support),2004,71218,0671218,Shasta,Shasta CDP,57,U1,28325227,11513
+720387,7203579,California Coastal Anadramous Watersheds - CCC fish habitat specialists (centerpoint),2004,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+720394,7203610,Humboldt Bay Watershed - coho recovery technical support,2004,50188,0650188,Myrtletown,Myrtletown CDP,57,U1,5436579,212721
+720411,7203618,San Geronimo Creek Watershed - upland erosion inventory & assessment,2004,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+720419,7203619,Salt Creek Watershed - geomorphic and hydrologic assessment,2004,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720430,7203670,Jacoby Creek Watershed - Lower Jacoby Creek restoration site (restoration planning),2004,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+720442,7205981,Camp and Tryon Creek Watersheds - sediment inventory/restoration planning,2004,25086,0625086,Fort Dick,Fort Dick CDP,57,U1,8331464,662
+720442,7205980,"Little Mill, Sultan, and Peacock Creek watersheds - sediment inventory/restoration planning",2004,25086,0625086,Fort Dick,Fort Dick CDP,57,U1,8331464,662
+720453,7203817,Dutch Bill Creek - Market St. culvert (fish passage improvement design),2004,53266,0653266,Occidental,Occidental CDP,57,U1,12862112,0
+720458,7202156,Indian Creek Watershed - Indian Creek Ranch (decommission diversion ditch),2003,19724,0619724,Douglas City,Douglas City CDP,57,U1,78799839,32384
+720460,7202166,Salt River Watershed - public involvement/restoration planning,2002,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+720463,7203553,Indian Creek - Indian Creek Ranch Diversion (water rights change application),2002,19724,0619724,Douglas City,Douglas City CDP,57,U1,78799839,32384
+720471,7202236,Northern and Central Regions Coastal Counties - archaeological and rare plant surveys,2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+720473,7202252,Rowdy Creek - Rowdy Creek Fish Hatchery (streambank stabilization/riparian plantings),2002,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+720480,7202291,Hunter Creek - bank stabilization/riparian plantings,2002,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720498,7202394,Salt Creek - instream structures/riparian restoration/planning,2002,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+720499,7202395,Belleview Creek - fish barrier removal planning,2002,60900,0660900,Rio Dell,Rio Dell city,25,C1,5907972,350987
+720512,7203555,California Coastal Anadromous Watersheds - DFG habitat manual printing,2000,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+720513,7203556,California Coastal Anadromous Watersheds - printing of Habitat Manual Part X,2001,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+721471,7206740,Mill Creek - Phase 6 (channel restoration),2005,16728,0616728,Covelo,Covelo CDP,57,U1,18377116,111658
+721478,7206729,California Coastal Watersheds - archeological and rare plant surveys (centerpoint),2005,52582,0652582,Novato,Novato city,25,C1,71159604,1320903
+721489,7206744,California Coastal Watersheds - fish passage assessment database (centerpoint),2005,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+721494,7206745,California North and Central Coast Watersheds - fisheries data consolidation and distribution,2005,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+721498,7207485,Smith River Watershed - 2006 Coho Confab,2005,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+721500,7206737,California Coastal Watersheds - salmonid restoration project database (centerpoint),2005,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+721515,7208763,South Coast Streams - Santa Barbara County (watersheds within county),2005,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+721516,7206825,Lindsay Creek/Roney Creek Culvert,2005,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+721525,7206827,"Eel Watershed, S Fk/Van Duzen/Eel River Watershed (lower) - watershed coordinators/organizational support",2005,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+721552,7206813,San Luis Obispo and Santa Barbara Counties - salmonid education,2005,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+721556,7206922,Rocky Gulch - Old Arcata Rd. crossing (fish passage improvement),2005,36420,0636420,Indianola,Indianola CDP,57,U1,3656939,483
+721565,7206834,San Lorenzo River Watershed - historical steelhead genetic monitoring,2005,53000,0653000,Oakland,Oakland city,25,C1,144861286,57244212
+721565,7206835,Salinas River Watershed - historical steelhead genetic monitoring,2005,53000,0653000,Oakland,Oakland city,25,C1,144861286,57244212
+721565,7206832,Coyote Creek Watershed - historical steelhead genetic monitoring,2005,53000,0653000,Oakland,Oakland city,25,C1,144861286,57244212
+721565,7206831,"Eel River, S. Fk. Watershed - historical steelhead genetic monitoring",2005,53000,0653000,Oakland,Oakland city,25,C1,144861286,57244212
+721565,7206833,Lagunitas Creek Watershed - historical steelhead genetic monitoring,2005,53000,0653000,Oakland,Oakland city,25,C1,144861286,57244212
+721566,7208479,FishNet 4C - Fishery Network of the Central California Coastal Counties,2005,52582,0652582,Novato,Novato city,25,C1,71159604,1320903
+721569,7207175,Oregon Slough - Meamber Site (riparian planting),2005,48690,0648690,Montague,Montague city,25,C1,4604513,39458
+721572,7206848,Southern California Watersheds (select) - fish habitat specialists (restoration support),2005,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+721573,7206845,Humboldt County - Salmon in the Classroom Program (salmonid education),2005,50188,0650188,Myrtletown,Myrtletown CDP,57,U1,5436579,212721
+721580,7206852,Smith River Watershed - watershed restoration coordination,2005,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+721590,7207716,Monterey Bay release of Mokelume Chinook smolts (Chinnok salmon recovery project),2005,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+721591,7206978,Trinity River - Indian Creek Area RM 93.77-96.5 (flow rehabilitation project),2005,19724,0619724,Douglas City,Douglas City CDP,57,U1,78799839,32384
+721595,7206863,Northern Humboldt Bay organizational support/conservation easement planning (center point),2005,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+721599,7207007,Redwood Creek Watershed - Big Lagoon Wetland (wetland and channel restoration),2005,49950,0649950,Muir Beach,Muir Beach CDP,57,U1,1276408,0
+721604,7206994,Salmon & Riparian Habitat Education Project,2005,83794,0683794,Weaverville,Weaverville CDP,57,U1,33363065,0
+721620,7206866,Arroyo Grande Creek - stream gage (barrier modification planning),2005,02868,0602868,Arroyo Grande,Arroyo Grande city,25,C1,15382200,0
+721623,7207079,Santa Rosa Creek - bank stabilization and instream habitat structures,2005,10074,0610074,Cambria,Cambria CDP,57,U1,21803724,0
+721634,7206870,Terwer Creek - Site 1 (bank stabilization and riparian restoration),2005,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+721646,7207040,Scott River Watershed - Etna Elementary School (environmental education),2005,22972,0622972,Etna,Etna city,25,C1,1967952,2444
+721657,7207050,Calabazas Creek - Dunbar Rd. crossing (fish passage improvement planning),2005,30028,0630028,Glen Ellen,Glen Ellen CDP,57,U1,5438518,2744
+721657,7207049,Carriger Creek - Grove St. crossing (fish passage improvement planning),2005,30028,0630028,Glen Ellen,Glen Ellen CDP,57,U1,5438518,2744
+721657,7207048,Yulupa Creek - Warm Springs Rd. crossing (fish passage improvement planning),2005,30028,0630028,Glen Ellen,Glen Ellen CDP,57,U1,5438518,2744
+721673,7207052,Northern California Coastal Watersheds - salmonid monitoring sample frame development,2005,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+721697,7206935,Chadd Creek - Hwy 101 culvert (fish passage improvement),2005,59906,0659906,Redcrest,Redcrest CDP,57,U1,1549190,0
+721701,7206937,Redwood Creek Watershed - Lower Smolt Trap Site (juvenile salmonid monitoring,2005,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+721725,7206955,"Bear Creek Watershed, S. Fk. - King Peak Road (road upgrades)",2005,71372,0671372,Shelter Cove,Shelter Cove CDP,57,U1,15098010,0
+721727,7206945,Jacoby Creek - Jacoby Creek/Gannon Slough Wildlife Area (water rights purchase),2005,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+721751,7204971,"Eel River, S. Fk., E. Br. - bank stabilization",2004,05262,0605262,Benbow,Benbow CDP,57,U1,12641980,0
+721776,7205064,Salt Creek Watershed - riparian fencing and restoration,2004,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+721790,7205082,Salmon Creek - Osmosis site (bank stabilization),2004,53266,0653266,Occidental,Occidental CDP,57,U1,12862112,0
+721801,7205121,Shasta and Scott River Watersheds - coho recovery team facilitation,2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+721802,7205122,Coastal California Watersheds - salmonid restoration project database,2002,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+721805,7205123,City of Sacramento - Alpine Ave Office (salmonid tissue archive assistants),2003,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+721820,7205488,Central Valley - steelhead genetic and population study,2003,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+721823,7205490,Rowdy Creek - Rowdy Creek Fish Hatchery (steelhead fin clipping),2003,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+721829,7205495,Woodacre Creek - Crescent Drive crossing (fish passage improvement/daylighting),2003,86216,0686216,Woodacre,Woodacre CDP,57,U1,4653150,0
+721830,7205496,Salmon Creek Watershed - Salmon Creek School (salmonid/watershed education),2003,53266,0653266,Occidental,Occidental CDP,57,U1,12862112,0
+721841,7205513,Campbell Creek/Gannon Slough - riparian fencing and plantings,2003,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+721842,7205514,California Coastal Anadramous Watersheds - Fish Passage Success Stories DVD,2003,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+721871,7205535,Carpinteria Creek - Hwy 101 to Mouth (arundo removal and riparian restoration),2003,11446,0611446,Carpinteria,Carpinteria city,25,C1,6704026,17313119
+721875,7205539,San Geronimo Creek - San Geronimo Golf Course (bank stabilization and riparian plantings),2004,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+721877,7205541,Santa Rosa Creek - Burton Bridge crossing (fish passage improvement),2004,10074,0610074,Cambria,Cambria CDP,57,U1,21803724,0
+721878,7205542,City of Santa Barbara - Santa Barbara Veteran's Memorial Center (salmonid restoration conference),2004,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+721879,7205543,Terwer Creek - lower Terwer Creek site (bioengineering bank stabilization),2004,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+721881,7205546,Various streams (Humboldt Bay to northern Del Norte County),2004,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+721922,7206135,Sulphur Canyon Creek - Sulphur Canyon bridge ladder (weir modification),2003,64140,0664140,St. Helena,St. Helena city,25,C1,12832970,325922
+721942,7206159,Barker Creek - instream structures and stabilization,2002,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+721943,7206164,"Eel River, S. Fk., E. Br. - bank stabilization",2002,05262,0605262,Benbow,Benbow CDP,57,U1,12641980,0
+721945,7206197,Arroyo Trabuco Creek - I-5 crossing (fish passage study/planning),2002,68028,0668028,San Juan Capistrano,San Juan Capistrano city,25,C1,37374655,0
+721949,7206201,City of Camarillo (city center) - fish passage barrier assessment workshop,2002,10046,0610046,Camarillo,Camarillo city,25,C1,50986168,42884
+721962,7206267,"Eel River (lower), Van Duzen (lower) and Bear River Watersheds - solar riparian irrigation system",2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+721963,7206268,California Coastal Anadramous Watersheds - Fish Passage Success Stories DVD - Phase I,2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+721967,7207689,North Coast and Central Coast DFG Regions - archeological and rare plant surveys,2004,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+721972,7206343,City of Santa Barbara - Santa Barbara County Art Commission (steelhead education/outreach),2003,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+721982,7206434,Strawberry Creek - Reed Canary grass removal (instream and fish passage restoration),2004,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+721983,7206435,City of Santa Barbara - art walk (steelhead festival and education),2004,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+722023,7206706,City of Ukiah - Ukiah Conference Center (fish passage workshop video production),2004,81134,0681134,Ukiah,Ukiah city,25,C1,12390978,116878
+722025,7206721,Terwer Creek - stream bank stabilization,2003,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+722060,7206838,San Juan Creek and San Mateo Creek Watersheds - steelhead interpretive signs,2004,59503,0659503,Rancho Mission Viejo,Rancho Mission Viejo CDP,57,U1,97918365,0
+722063,7206846,Humboldt Bay - large wood acquisition,2003,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+722076,7207080,North Coast and Central Coast Regions - Archeological and rare plant surveys on sediment reduction,2004,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+722092,7207121,San Pablo Bay - Floating Net Pen (Chinook salmon acclimation and release),2004,16000,0616000,Concord,Concord city,25,C1,79130630,0
+722107,7207292,"Eel River, E. Br., S. Fk. - Kinsey Ranch site (bank stabilization)",2005,05262,0605262,Benbow,Benbow CDP,57,U1,12641980,0
+722124,7207795,California Coastal Anadromous Watersheds - Fish passage videos,2002,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+722125,7207793,California Coastal Anadromous Watersheds - printing of 2005 PSN,2002,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+722126,7207796,California Coastal Anadromous Watersheds - Printing of Effectiveness Monitoring Protocol,2002,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+722127,7207794,California Coastal Anadromous Watersheds - printing of Habitat Manual,2002,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+722137,7207977,California Coastal Anadromous Watersheds - CHRPD management (centerpoint),2006,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+722143,7207979,California watersheds - fish passage assessment database (PAD) (centerpoint),2006,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+722156,7207981,Topanga Creek - southern steelhead monitoring,2006,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+722159,7207936,Topanga Creek - berm removal,2006,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+722191,7207986,California Coastal Watersheds - 26th annual Salmonid Restoration Conference (2008) - central point,2006,17918,0617918,Daly City,Daly City city,25,C1,19783516,0
+722192,7207987,Humboldt Bay Watershed - juvenile salmonid monitoring,2006,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+722239,7208001,Coastal California Watersheds - Adaptive Watershed Improvement Projects 2006-07,2006,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+722242,7207945,Woodacre Creek - Site 1 (fish passage improvement),2006,86216,0686216,Woodacre,Woodacre CDP,57,U1,4653150,0
+722242,7208837,Woodacre Creek - Site 3 (fish passage improvement),2006,86216,0686216,Woodacre,Woodacre CDP,57,U1,4653150,0
+722245,7207994,Mission Creek - fish passage,2006,48147,0648147,Mission Canyon,Mission Canyon CDP,57,U1,4662212,77753
+722250,7207995,Lower Terwer Creek - riparian restoration & bank stabilization,2006,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+722271,7207996,Del Norte County - Raising Salmon in the Classroom,2006,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+722325,7208328,Lindsay Creek Watershed,2006,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+722327,7208008,Coastal California watersheds - fish habitat specialists,2006,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+722328,7208009,Scott and Shasta Rivers - implementation of permitting programs,2006,22972,0622972,Etna,Etna city,25,C1,1967952,2444
+722356,7207518,Arroyo Trabuco Creek - Metrolink crossing (fish passage design),2004,68028,0668028,San Juan Capistrano,San Juan Capistrano city,25,C1,37374655,0
+722360,7207668,Jacoby Creek - Jacoby Creek/Gannon Slough Wildlife Area (water rights appraisal),2004,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+722362,7207670,San Juan Creek - Cow Camp Crossing (fish passage imporvement planning),2004,59503,0659503,Rancho Mission Viejo,Rancho Mission Viejo CDP,57,U1,97918365,0
+722363,7207671,"Humboldt Bay - Water Control structure Inventory, Assessment and Mapping",2005,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+722364,7207672,North Coast and Central Coast DFG Regions - paleontological surveys,2005,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+722365,7207673,San Antonio Creek - Ojai Valley Trail crossing (fish passage planning),2005,53182,0653182,Oak View,Oak View CDP,57,U1,8822791,0
+722367,7207696,Marin County coastal watersheds - out-migrant trapping and juvenile surveys,2004,51280,0651280,Nicasio,Nicasio CDP,57,U1,3379839,0
+722398,7207699,Jacoby Creek - Old Arcata Road (bed elevation and topographic hgh flow condition study),2005,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+722401,7207702,South Anker Creek - Fieldbrook road crossing (bank stabilization),2005,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+722483,7207711,Mill Creek - trib to Outlet Creek in Mendocino Cty (bank restoration),2004,85600,0685600,Willits,Willits city,25,C1,7296486,1546
+722486,7207718,California Steelhead Distribution Review,2006,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+722487,7207753,CSUS Foundation Student Assistant Contract,2005,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+722488,7207754,Steelhead Trout Report Restoration Card Student Assistant,2003,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+722489,7209516,Sacramento Center point - Kelly Services assistant,2005,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+722490,7207755,CSUS Foundation Student Assistant Contract,2006,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+722502,7208595,Trinity River - Dark Gulch Reach (instream and riparian restoration),2006,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+722502,7208810,Trinity River - Lewiston Reach (instream and riparian restoration),2006,41278,0641278,Lewiston,Lewiston CDP,57,U1,51843522,0
+722538,7207726,Froom Creek - road decommissioning,2005,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+722540,7207738,"Southern California steelhead - Santa Barbara, Ventura, Los Angeles, Orange, and San Diego Counties (gentic analysis)",2005,44000,0644000,Los Angeles,Los Angeles city,25,C1,1215978552,83031312
+722546,7207740,Sturgeon Creek (instream habitat restoration),2005,53266,0653266,Occidental,Occidental CDP,57,U1,12862112,0
+722547,7207741,California Northern Coastal Watersheds - organizational support,2001,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+722548,7207742,California Northern Coastal Watersheds - organizational support,2002,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+722618,7208441,Archeological and Rare Plant Survey - coastal center point,2005,67000,0667000,San Francisco,San Francisco city,25,C1,121507089,479146790
+722663,7207884,Santa Monica Bay watershed - Malibu Creek,2005,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+722663,7207885,Santa Monica Bay watershed - Topanga Creek,2005,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+722663,7207883,Santa Monica Bay watershed - Arroyo Sequit Creek,2005,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+722708,7208020,North and Central Coast regions - Coho Confab,2005,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+722717,7208127,Sonoma Creek Watershed - watershed education,2007,07848,0607848,Boyes Hot Springs,Boyes Hot Springs CDP,57,U1,2746385,0
+722718,7208183,City of Santa Cruz - Salmonid Restoration Conference,2007,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+722721,7208122,Select Northern California Areas - AmeriCorps Watershed Stewards Project,2007,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+722725,7208061,Dutch Bill Creek - Market St and Hwy 1 Crossing (fish passage improvement) features 1-15,2007,53266,0653266,Occidental,Occidental CDP,57,U1,12862112,0
+722727,7208184,Topanga Creek - steelhead monitoring,2007,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+722728,7208480,FishNet 4C-Fishery Network of Central California Coastal Counties,2007,67000,0667000,San Francisco,San Francisco city,25,C1,121507089,479146790
+722759,7208181,Redwood Creek - Downstream Migrant Trap (juvenile salmonid monitoring),2007,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+722770,7208161,California Coastal Watersheds - Fish Passage Assessment Database,2007,23168,0623168,Fairfax,Fairfax town,43,C1,5770768,0
+722771,7208121,California North Coast Hydrologic Region - restoration project monitoring and evaluation,2007,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+722772,7208247,Candalero Road - Sites 106.1-117,2007,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+722772,7208248,"Contour Road, sites 45-62",2007,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+722772,7208249,"East Sylvestris Fire Road, sites 22-28",2007,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+722780,7208138,Sunny Brae Forest (watershed assessment and planning),2007,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+722795,7208129,Mission Creek Watershed- Hwy 192 Bridge (fish passage planning),2007,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+722796,7208131,Mission Creek - Tallant Road Bridge (fish passage planning),2007,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+722804,7208250,Conner Creek Road - crossing #1,2007,37596,0637596,Junction City,Junction City CDP,57,U1,68728396,87697
+722804,7208251,Red Hill Road - crossing #2,2007,37596,0637596,Junction City,Junction City CDP,57,U1,68728396,87697
+722825,7208083,Terwer Creek - sediment reduction treatments and training,2007,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+722834,7208179,Solstice Creek - instream habitat enhancement (Site 4 only),2007,45246,0645246,Malibu,Malibu city,25,C1,51403234,205274315
+722846,7208156,Smith River Watershed - watershed coordination and organizational support,2007,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+722855,7208139,Lindsay Creek Watershed - sediment source assessment and planning,2007,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+722881,7208162,"Lagunitas, Olema and Redwood Creek watersheds - salmon and steelhead monitoring",2007,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+722882,7208065,Salmon Creek Estuary - instream habitat structures,2007,64252,0664252,Salmon Creek,Salmon Creek CDP,57,U1,2885757,0
+722935,7208024,Coastal California Watersheds - AmeriCorps 14th Year of WSP,2006,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+722962,7208027,Centerpoint for 2007 Salmonid Habitat Improvement,2005,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+722968,7208033,Strawberry Creek (local name),2006,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+722977,7208051,Humboldt Redwoods State Park,2005,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+722979,7208053,Humboldt and Del Norte Counties,2006,50188,0650188,Myrtletown,Myrtletown CDP,57,U1,5436579,212721
+722987,7208055,Montecito Creek - Pool Water Transfer,2006,48844,0648844,Montecito,Montecito CDP,57,U1,23768259,20675380
+723033,7208226,Ventura River Floodplain,2005,46702,0646702,Meiners Oaks,Meiners Oaks CDP,57,U1,6315365,0
+723035,7208228,Rowdy Creek Hatchery,2005,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+723036,7208484,"Archeological, Paleontological and Rare Plant Surveys",2006,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723049,7208930,Adaptive Watershed Improvement Projects 2008,2008,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723052,7208931,"AmeriCorps Watershed Stewards Project, Service year 16",2008,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723066,7208941,Passage Assessment Database - Sacramento Centerpoint,2008,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723068,7208942,CHRPD_Database - Sacramento Centerpoint,2008,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723071,7208943,Fish Habitat Specialist,2008,43000,0643000,Long Beach,Long Beach city,25,C1,131345808,70260174
+723073,7208944,Green Gulch Farm,2008,49950,0649950,Muir Beach,Muir Beach CDP,57,U1,1276408,0
+723085,7208986,Centerpoint - FishNet 4C - Fishery Network of Central CA Coastal Counties,2008,68364,0668364,San Rafael,San Rafael city,25,C1,42960192,15426850
+723096,7209912,DIDSON Steelhead Population Viability Monitoring - Santa Ynez and Ventura Rivers,2008,79529,0679529,Toro Canyon,Toro Canyon CDP,57,U1,24312959,11403119
+723100,7209910,Sonoma County Coast 'Salmon Skills' Workshop Series - Freestone cp,2008,53266,0653266,Occidental,Occidental CDP,57,U1,12862112,0
+723111,7208989,"Archeological, Paleontological and Rare Plant Surveys",2008,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723119,7208995,Community Involvement - Center point,2008,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+723143,7209909,Salmonid Habitat Enhancement and Outreach Program - Petaluma cp,2008,56784,0656784,Petaluma,Petaluma city,25,C1,37333943,277684
+723144,7209097,Lower Redwood Creek smolt trap,2008,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+723183,7208976,Noyo Watershed Alliance - Org Support Center Point,2008,25058,0625058,Fort Bragg,Fort Bragg city,25,C1,7508182,86606
+723189,7209089,Salmon and Riparian Habitat Eduction - center point,2008,83794,0683794,Weaverville,Weaverville CDP,57,U1,33363065,0
+723207,7209104,Del Norte County Salmon in the Classroom - center point,2008,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+723213,7208526,Arroyo Creek fish passage restoration site,2008,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723216,7209103,DIDSON Location,2008,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+723222,7208979,Mission Creek Watershed- Fish Passage Phase II,2008,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+723223,7208256,Rowdy Creek - Rowdy Creek Fish Hatchery (steelhead marking),2006,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+723236,7209517,South Coast Distribution and Status of Steelhead - centerpoint,2006,53000,0653000,Oakland,Oakland city,25,C1,144861286,57244212
+723238,7209254,CCC Technical Advisors,2006,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723240,7209518,"Annual Steelhead Catch Report - Restoration Card Data, and Comparison of the Smith River Data - centerpoint",2002,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723241,7209519,Occurance of wild and hatchery steelhead in the Klamath-Trinity River System - Hoopa Valley Centerpoint,2004,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+723272,7208506,"Eel, S. Fk. Eel, Elk Creek Watersheds (Humboldt Co. portions) - technical advisors",2007,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723275,7208509,Powers Creek Bank Stabilization & Habitat Enhancement Site,2007,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+723289,7208717,Martin Slough - Pikeminnow removal site,2007,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+723291,7208723,Emma Wood State Beach - steelhead interpretive panels,2006,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+723291,7208721,El Capitan State Beach - steelhead interpretive panels,2006,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+723291,7208720,Refugio State Beach - steelhead interpretive panels,2006,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+723291,7208722,Carpinteria State Beach - steelhead interpretive panels,2006,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+723291,7209514,Gaviota State Beach - steelhead interpretive panels,2006,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+723291,7208724,McGrath State Beach - steelhead interpretive panels,2006,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+723296,7208919,riparian restoration and sediment reduction sites - Woodacre Creek,2006,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723296,7208918,riparian restoration and sediment reduction sites - Lagunitas Creek,2006,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723296,7208761,riparian restoration and sediment reduction sites - San Geronimo Creek,2006,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723299,7208981,Steelhead Fishing Report Card,2008,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723300,7208971,Rowdy Creek Hatchery,2007,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+723301,7208982,Trinity River,2007,19724,0619724,Douglas City,Douglas City CDP,57,U1,78799839,32384
+723303,7208795,Project Area - Central California Coastal Counties,2006,48760,0648760,Montara,Montara CDP,57,U1,10040503,0
+723306,7208798,Shasta River Watershed - tailwater reduction study,2006,86944,0686944,Yreka,Yreka city,25,C1,25861889,188154
+723319,7209136,Tannery Creek - LWD site,2009,07246,0607246,Bodega,Bodega CDP,57,U1,7515783,0
+723323,7209278,Adaptive Watershed Improvement Projects 2009,2009,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723326,7209280,AmeriCorps Watershed Stewards Project - Service Year 17,2009,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723327,7209117,Tallant Road Bridge,2009,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+723348,7209297,Genetic Analysis of Oncorhynchus mykiss populations in South Coast California Rivers and Creeks,2009,15044,0615044,Compton,Compton city,25,C1,25974517,230555
+723349,7209298,Topanga Creek (Garaptio Creek Watershed),2009,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+723358,7209301,Trabuco Creek Fishway at 1-5 and Camino Capostrano,2009,68028,0668028,San Juan Capistrano,San Juan Capistrano city,25,C1,37374655,0
+723362,7209303,North Bay Delta Region Planning and Coho Data Project,2009,07848,0607848,Boyes Hot Springs,Boyes Hot Springs CDP,57,U1,2746385,0
+723384,7209151,San Geronimo Valley: Sediment Reduction features 16 and 21 (Rosario and Aztec),2009,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723384,7209147,"San Geronimo Valley: Sediment Reduction features 4-6, and 19-20 (Arroyo [Alamo], John Lerch and Debra Amerson)",2009,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723384,7209149,San Geronimo Valley: Sediment Reduction features 1-3 (East Cintura),2009,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723384,7209194,San Geronimo Valley: Sediment Reduction (Salix),2009,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723384,7209193,San Geronimo Valley: Sediment Reduction feature 32 (Hill Avenue),2009,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723384,7209150,San Geronimo Valley: Sediment Reduction features 14-15 (Two Park and Spring Ave),2009,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723384,7209153,San Geronimo Valley: Sediment Reduction features 8-13 (Conifer Way),2009,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723384,7209154,San Geronimo Valley: Sediment Reduction features 25-30 (Flanders Road),2009,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723384,7209155,San Geronimo Valley: Sediment Reduction features 22-24 (Flanders Road),2009,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723392,7209359,Fisheries Special Corps Member,2009,54652,0654652,Oxnard,Oxnard city,25,C1,68707177,32677585
+723408,7209367,2010 and 2011 Coho Confabs,2009,60088,0660088,Redway,Redway CDP,57,U1,3239490,55629
+723420,7209375,Ventura HUC8 - Monitoring below Matilija Dam,2009,48046,0648046,Mira Monte,Mira Monte CDP,57,U1,12470598,44675
+723450,7209394,Ventura River Confluence Acquisition,2009,53182,0653182,Oak View,Oak View CDP,57,U1,8822791,0
+723480,7209427,Telegraph Creek barrier removal (design phase),2009,71372,0671372,Shelter Cove,Shelter Cove CDP,57,U1,15098010,0
+723494,7209179,San Geronimo Valley - Site 2 [Golf course],2009,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+723494,7209180,San Geronimo Valley - Site 3 [White Property],2009,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+723494,7209178,San Geronimo Valley - Site 1 [TIRN Property],2009,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+723501,7209446,Five Counties Salmonid Conservation Program (5C) - Weaverville centerpoint,2009,83794,0683794,Weaverville,Weaverville CDP,57,U1,33363065,0
+723511,7209068,Sacramento Fish Engineering Student Summer Intern,2003,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723513,7209061,California Coho Salmon Presence Confirmed/Presence Not Confirmed Survey - Final Phase Completion Supplement,2003,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723514,7209062,Mendocino-Sonoma Coast Streams,2003,41026,0641026,Leggett,Leggett CDP,57,U1,7003204,0
+723521,7209003,Training for J Kleinfelter,2003,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723523,7209058,Fish Passage Videos,2003,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723535,7209232,Classroom Aquarium Education Program 2010 - centerpoint,2007,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723542,7209236,Arroyo Grande Creek Stream Gage Modification,2007,02868,0602868,Arroyo Grande,Arroyo Grande city,25,C1,15382200,0
+723543,7209237,Arroyo Grande Creek - stream gage modification,2007,02868,0602868,Arroyo Grande,Arroyo Grande city,25,C1,15382200,0
+723548,7209262,2010 Salmonid Restoration Annual Conference,2007,71218,0671218,Shasta,Shasta CDP,57,U1,28325227,11513
+723549,7209450,Redding - Shasta Scott Recovery Team (SSRT) Meeting Facilitation,2007,71218,0671218,Shasta,Shasta CDP,57,U1,28325227,11513
+723556,7209898,AmeriCorps Watershed Stewards Project: Service Year 18,2010,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723568,7209551,Dutch Bill Creek: site 511,2010,53266,0653266,Occidental,Occidental CDP,57,U1,12862112,0
+723575,7209887,CalFish Pilot Project - So Cal Centerpoint,2010,44000,0644000,Los Angeles,Los Angeles city,25,C1,1215978552,83031312
+723577,7209448,Creek Days Environmental Education Fair - Fortuna centerpoint,2007,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723586,7209553,Muir Beach: Off-Channel Habitat Creation,2010,49950,0649950,Muir Beach,Muir Beach CDP,57,U1,1276408,0
+723591,7209593,San Jose Creek Capacity Improvement and Fish Passage project location,2010,30378,0630378,Goleta,Goleta city,25,C1,20339515,187022
+723593,7209883,Pine Gulch Creek - New Land Trust,2010,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+723593,7209884,Pine Gulch Creek - Star Route Farms,2010,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+723593,7209882,Pine Gulch Creek - Fresh Run Farms,2010,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+723594,7209881,5 Counties Salmonid Conservation Program (5C) - Fortuna cp,2010,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723596,7209618,Gilardi Road: features 72-85,2010,07246,0607246,Bodega,Bodega CDP,57,U1,7515783,0
+723597,7209880,San Geronimo Watershed - salmon enhancement plan,2010,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723619,7209836,Beith Creek road features 1-15,2010,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+723647,7209558,San Vicente Creek - LWD reach,2010,18086,0618086,Davenport,Davenport CDP,57,U1,7367925,0
+723655,7209803,San Geronimo HUC12 watershed - trail assessments,2010,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723677,7209735,Topanga Creek Watershed Steelhead Monitoring (Garapito Creek HUC12),2010,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+723697,7209634,Sleepy Hollow Ford Removal Site (Bridge replacement site),2010,11324,0611324,Carmel Valley Village,Carmel Valley Village CDP,57,U1,49166228,507112
+723722,7209713,Alameda Creek Diversion Pipelines - Design Phase,2010,26000,0626000,Fremont,Fremont city,25,C1,202832449,26274304
+723724,7209589,Lansdale Fish Passage Improvement site,2010,64434,0664434,San Anselmo,San Anselmo town,43,C1,6928816,0
+723725,7209490,Fish Passage Assessment Training - Fortuna CP,2007,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723731,7209523,C.V. Rainbow Trout Genetic Population Structure Evaluation,2004,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723733,7209525,Rowdy Creek Fish Hatchery SH Fin Clipping,2004,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+723734,7209526,CSUS Student Assistants,2005,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723736,7209528,Steelhead Scale Reading,2004,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723737,7209529,Acoustic Tag Study (American River),2007,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723744,7209536,Dry Creek - Sacramento CP,1997,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723749,7209541,Trinity Klamath 1/2 Pounder,2001,83906,0683906,Weitchpec,Weitchpec CDP,57,U1,9919744,145898
+723752,7209543,Steelhead Report Card data entry - Sacramento CP,2010,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723753,7209547,DIDSON Purchase - Sacramento Centerpoint,2005,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723761,7209623,Petaluma Watershed - org support,2008,56784,0656784,Petaluma,Petaluma city,25,C1,37333943,277684
+723762,7209627,Student Contract for Fisheries Data Entry - Sacramento centerpoint,2009,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723763,7210039,Hooking Mortality Report - HSU CP,1995,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+723764,7209994,Junction City Weir,2009,37596,0637596,Junction City,Junction City CDP,57,U1,68728396,87697
+723765,7210040,Summer Steelhead Monitoring: Hooking Mortality,1995,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+723771,7209675,San Geronimo Creek Parcel 169-012-10,2007,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723777,7209709,Creek Days Environmental Education Fair - Fortuna centerpoint,2008,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723778,7209711,North American Salmon Stronghold Partnership,2008,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723790,7210351,Marine survival of coho (monitoring) Arcata CP,2011,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+723791,7210164,Lower West Barranca - riparian restoration,2011,53476,0653476,Ojai,Ojai city,25,C1,11281691,39811
+723792,7210352,CalFish Data Tools - Sacramento CP,2011,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723798,7210340,California Habitat Restoration Project Database (CHRPD) 2012-2013,2011,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723802,7210341,PAD: Barrier Inventory for Anadromous Passage Restoration 2012-2013,2011,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+723809,7210298,San Vincente Creek - catch/release reach,2011,07470,0607470,Bonny Doon,Bonny Doon CDP,57,U1,42898133,0
+723809,7210300,Kingfisher Flat Hatchery location,2011,07470,0607470,Bonny Doon,Bonny Doon CDP,57,U1,42898133,0
+723809,7210293,Scott Creek - catch/release reach,2011,07470,0607470,Bonny Doon,Bonny Doon CDP,57,U1,42898133,0
+723809,7210297,San Gregorio Creek - catch/release reach,2011,07470,0607470,Bonny Doon,Bonny Doon CDP,57,U1,42898133,0
+723809,7210299,San Lorenzo River - catch/release reach,2011,07470,0607470,Bonny Doon,Bonny Doon CDP,57,U1,42898133,0
+723809,7210294,Waddell Creek - catch/release reach,2011,07470,0607470,Bonny Doon,Bonny Doon CDP,57,U1,42898133,0
+723820,7210347,San Vicente Creek watershed - restoration plan (planning),2011,07470,0607470,Bonny Doon,Bonny Doon CDP,57,U1,42898133,0
+723824,7210358,Coho Salmon and Steelhead Trout Life Cycle Monitoring Station - Capitola CP,2011,11040,0611040,Capitola,Capitola city,25,C1,4129576,213680
+723829,7210172,Lagunitas Creek - LWD enhancement project,2011,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723841,7210159,Francis Creek - instream structures,2011,23910,0623910,Ferndale,Ferndale city,25,C1,3105843,0
+723843,7210165,Connick Creek - habitat enhancement (LWD),2011,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+723848,7210167,Strawberry Creek - riparian treatments,2011,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+723848,7210166,Strawberry Creek - RNSP Reach,2011,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+723848,7210225,Strawberry Creek - upslope crossing 25,2011,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+723848,7210226,Strawberry Creek - upslope crossing 24,2011,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+723848,7210227,Strawberry Creek - upslope crossing 13,2011,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+723851,7210531,San Clemente Dam - removal,2011,11324,0611324,Carmel Valley Village,Carmel Valley Village CDP,57,U1,49166228,507112
+723855,7210367,California Coastal Watershed Planning and Assessment Program (2012-13),2011,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723868,7210475,"2012 Coho Confab - Trinity River, Indian Creek Lodge",2011,83794,0683794,Weaverville,Weaverville CDP,57,U1,33363065,0
+723871,7210171,Strawberry Creek riparian restoration,2011,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+723874,7210093,Salmon Creek -  Water Conservation Implementation,2011,07246,0607246,Bodega,Bodega CDP,57,U1,7515783,0
+723875,7210370,Fisheries Special Corpsmember,2011,43000,0643000,Long Beach,Long Beach city,25,C1,131345808,70260174
+723880,7210371,2013  Salmonid Restoration Annual Conference - Fortuna,2011,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723880,7210476,2014 Salmonid Restoration Annual Conference - Ventura,2011,65042,0665042,San Buenaventura (Ventura),San Buenaventura (Ventura) city,25,C1,56681176,26953060
+723884,7210373,Redwood Creek Estuary - restoration planning,2011,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+723885,7210374,Trabuco Creek - fishway at Metrolink RR - design,2011,68028,0668028,San Juan Capistrano,San Juan Capistrano city,25,C1,37374655,0
+723891,7210363,South Coast Streams Fisheries Restoration - Carpinteria CP,2011,11446,0611446,Carpinteria,Carpinteria city,25,C1,6704026,17313119
+723895,7210375,Terwer Creek  - Off-channel Habitat Restoration Feasibility Study,2011,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+723910,7210380,San Geronimo Golf Course - coho habitat restoration planning,2011,86216,0686216,Woodacre,Woodacre CDP,57,U1,4653150,0
+723912,7210381,San Geronimo Creek watershed - population monitoring,2011,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723914,7210382,Marin Slough - enhancement design,2011,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+723925,7210163,Mission Creek - fish passage improvements,2011,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+723930,7210143,Pine Gulch Creek - pond 3B,2011,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+723930,7210144,Pine Gulch Creek - pond 3A,2011,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+723930,7210137,Pine Gulch Creek - pond 1B,2011,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+723930,7210136,Pine Gulch Creek - pond 1A,2011,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+723930,7210141,Pine Gulch Creek - pond 2,2011,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+723932,7210384,Navarro River - capacity building to support coho recovery,2011,56868,0656868,Philo,Philo CDP,57,U1,5353556,0
+723938,7210385,AmeriCorps Watershed Stewards Project - Service Year 19,2011,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723940,7210386,South-Southern California Steelhead Watershed Coalition,2011,66000,0666000,San Diego,San Diego city,25,C1,844036546,120533495
+723944,7210364,Zuma Creek County Beach - arizona crossing replacement design,2011,45246,0645246,Malibu,Malibu city,25,C1,51403234,205274315
+723951,7209999,ERWIG Technical Advisors,2008,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723974,7210035,Pilarcitos Creek Stream Gage Support,2008,31708,0631708,Half Moon Bay,Half Moon Bay city,25,C1,16167307,27799
+723978,7210045,Janes Creek Watershed - assessment,2008,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+723983,7210320,White Property - LWD,2008,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+723990,7210328,Ojai Valley Trail Bridge,2008,53182,0653182,Oak View,Oak View CDP,57,U1,8822791,0
+723991,7210329,Snorkel Shoe Support - Santa Monica Bay,2008,44000,0644000,Los Angeles,Los Angeles city,25,C1,1215978552,83031312
+723993,7210334,"Yreak, CA - Upper Klamath River Coho Salmon Workshop",2009,86944,0686944,Yreka,Yreka city,25,C1,25861889,188154
+723996,7210330,Mission Creek watershed (HUC12) - high flow monitoring,2009,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+723997,7210557,California Habitat Restoration Project Database (CHRPD) 2013-2014,2012,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+724015,7210441,McNell Creek - non native plant removal area,2012,53476,0653476,Ojai,Ojai city,25,C1,11281691,39811
+724028,7210561,Fish Passage Design and Engineering Workshop - Santa Maria,2012,69196,0669196,Santa Maria,Santa Maria city,25,C1,59078451,1575636
+724029,7210452,Larson Creek (San Geronimo Golf Course) bank stabilization,2012,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+724045,7210566,Muir Beach - monitoring of Redwood Creek restoration,2012,49950,0649950,Muir Beach,Muir Beach CDP,57,U1,1276408,0
+724046,7210567,Redwood Creek basin - distribution and abundance monitoring,2012,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+724047,7210569,Lower Redwood Creek - adundance monitoring,2012,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+724048,7210570,Topanga Creek watershed (Garapito HUC 12) adult and juvenile steelhead monitoring,2012,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+724055,7210572,Fortuna Boulevard's Strongs Creek Culvert Replacement Design,2012,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+724058,7210580,Trancas Lagoon Restoration Conceptual Design Plan,2012,45246,0645246,Malibu,Malibu city,25,C1,51403234,205274315
+724065,7210582,Salmonid Restoration Federation Steelhead Summit - Ventura River,2012,65042,0665042,San Buenaventura (Ventura),San Buenaventura (Ventura) city,25,C1,56681176,26953060
+724066,7210511,Thurston Creek - LWD reach,2012,07246,0607246,Bodega,Bodega CDP,57,U1,7515783,0
+724068,7210584,Mad Redwood HUC 8 - salmonid monitoring,2012,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+724071,7210585,Dominie Creek and Rowdy Creek Fish Passage Feasibility Study location,2012,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+724079,7210587,Fish Habitat Specialist - Los Alamitos center point,2012,17750,0617750,Cypress,Cypress city,25,C1,17127354,22003
+724085,7210592,Conception Coast  watershed - So CA Steelhead Monitoring,2012,48844,0648844,Montecito,Montecito CDP,57,U1,23768259,20675380
+724091,7210601,Mission Creek bank stabilization and fish passage design,2012,69070,0669070,Santa Barbara,Santa Barbara city,25,C1,50523520,58265316
+724096,7210596,NMFS Genetic Laboratory - Santa Cruz,2012,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+724101,7210597,"Bale slough: 314-317, 329-331",2012,63400,0663400,Rutherford,Rutherford CDP,57,U1,4350420,10389
+724109,7210598,Santa Ynez and Ventura Rivers Technical Training and Education,2012,02868,0602868,Arroyo Grande,Arroyo Grande city,25,C1,15382200,0
+724111,7210600,Central and South Coast Restoration Monitoring and Evaluation Program,2012,02868,0602868,Arroyo Grande,Arroyo Grande city,25,C1,15382200,0
+724112,7210556,PAD Database Management - Sacramento CP,2012,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+724119,7210606,Big Basin Salmonid Monitoring,2012,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+724127,7210955,Bear Creek at Fox Hollow Rd (BCFH),2012,86440,0686440,Woodside,Woodside town,43,C1,29697449,0
+724127,7210954,Los Trancos Creek at fire road (LTFR),2012,58380,0658380,Portola Valley,Portola Valley town,43,C1,23524913,3741
+724127,7210607,Los Trancos Rd (LTLT),2012,58380,0658380,Portola Valley,Portola Valley town,43,C1,23524913,3741
+724144,7210474,Strawberry Creek - coho passage improvement,2012,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+724161,7210473,Ryan Creek sediment reduction sites 405-438,2012,57204,0657204,Pine Hills,Pine Hills CDP,57,U1,26200979,107370
+724192,7210389,Lower Terwer Creek - LWD placement,2009,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+724194,7210398,Strawberry Creek - riparian restoration,2009,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+724196,7210402,Woodacre Bank Stabilization Project,2009,86216,0686216,Woodacre,Woodacre CDP,57,U1,4653150,0
+724204,7210522,Ryan Creek wateshed - erosion prevention planning,2009,57204,0657204,Pine Hills,Pine Hills CDP,57,U1,26200979,107370
+724213,7210541,Rowdy Creek Fish Hatchery,2012,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+724225,7210551,Hill Avenue post storm repair,2009,86216,0686216,Woodacre,Woodacre CDP,57,U1,4653150,0
+724228,7210709,Central Coast Salmon and Steelhead Program - 1994 Moneterey CP,1994,48872,0648872,Monterey,Monterey city,25,C1,22390414,9365025
+724231,7210713,Trout and Trout Fishing in the Classroom - Arroyo Grande CP,2013,02868,0602868,Arroyo Grande,Arroyo Grande city,25,C1,15382200,0
+724233,7210702,NOAA Southwest Science Center - NOAA coho captive broodstock,2013,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+724237,7210719,Humboldt Bay tribs - juvenile salmonid use in tidal regions.,2013,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+724243,7210714,Del Norte County Raising Salmon & Steelhead in the Classroom,2013,17022,0617022,Crescent City,Crescent City city,25,C1,5085115,1169624
+724248,7210628,Maria Ygnatio Creek barrier removal- Aijian Barrier,2013,20574,0620574,Eastern Goleta Valley,Eastern Goleta Valley CDP,57,U2,42981068,755513
+724253,7210725,CCC Camarillo SH support,2013,44000,0644000,Los Angeles,Los Angeles city,25,C1,1215978552,83031312
+724254,7210727,2015 Coho Confab - Westminster Woods,2013,48928,0648928,Monte Rio,Monte Rio CDP,57,U1,4934760,208218
+724255,7210728,Redwood Creek - water conservation project (Garberville CP),2013,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+724257,7210729,Temporal monitoring of steelhead and coho - Santa Cruz CP,2013,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+724258,7210953,Old Swim Dam,2013,42384,0642384,Loma Mar,Loma Mar CDP,57,U1,4487609,0
+724258,7210631,Sequoia Flat Road Crossing - fish passage improvements,2013,42384,0642384,Loma Mar,Loma Mar CDP,57,U1,4487609,0
+724259,7210632,Stream gauge modification - Arroyo Grande Creek,2013,02868,0602868,Arroyo Grande,Arroyo Grande city,25,C1,15382200,0
+724260,7210730,Orrs Creek - fish passage design project,2013,81134,0681134,Ukiah,Ukiah city,25,C1,12390978,116878
+724262,7210731,Topanga Creek watershed - life cycle monitoring,2013,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+724263,7210732,San Luis Obispo Creek - fish passage feasibility study,2013,68154,0668154,San Luis Obispo,San Luis Obispo city,25,C1,34458922,379316
+724265,7210734,34th SRF Conference - River Lodge,2013,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+724265,7210733,33rd SRF Conference - Wells Fargo Center for the Arts,2013,40426,0640426,Larkfield-Wikiup,Larkfield-Wikiup CDP,57,U2,13747228,0
+724273,7210735,South Coast Streams Fisheries Restoration - Carpinteria CP,2013,11446,0611446,Carpinteria,Carpinteria city,25,C1,6704026,17313119
+724276,7210736,Watershed Stewards Project - Year 21,2013,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+724286,7210650,"Driscoll Ranch sediment reduction - Road 30 and 32, features 21-23, 26, and 34",2013,39318,0639318,La Honda,La Honda CDP,57,U1,11022981,20735
+724292,7210738,Passage Assessment Database - Sacramento Centerpoint,2013,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+724311,7210742,Lower Klamath watershed - adult coho redd surveys and abundance estimates,2013,38702,0638702,Klamath,Klamath CDP,57,U1,44592620,0
+724316,7210745,Roy's Pools - fish passage design,2013,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+724322,7210747,Fish Habitat Specialist,2013,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+724333,7210748,San Geronimo Creek - enhancement planning project,2013,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+724334,7210698,Stewart Canyon - riparian restoration,2013,53476,0653476,Ojai,Ojai city,25,C1,11281691,39811
+724349,7210752,Napa River Watershed - fish passage design project,2013,09892,0609892,Calistoga,Calistoga city,25,C1,6673845,46827
+724363,7210756,Santa Clara River estuary - habitat enhancement design,2013,54652,0654652,Oxnard,Oxnard city,25,C1,68707177,32677585
+724365,7210708,Salmon acclimation pens - Pillar Point Harbor,2013,49446,0649446,Moss Beach,Moss Beach CDP,57,U1,5815200,0
+724381,7210697,Malibu Creek watershed - non native cray fish removal,2013,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+724383,7210757,South Fork Trinity - watershed assessment,2013,32562,0632562,Hayfork,Hayfork CDP,57,U1,186854161,58222
+724418,7210578,Redwood Creek DIDSON,2012,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+724437,7210841,CalTrout Regional Office,2014,65042,0665042,San Buenaventura (Ventura),San Buenaventura (Ventura) city,25,C1,56681176,26953060
+724438,7210939,Doheny State Beach,2014,53322,0653322,Oceanside,Oceanside city,25,C1,106889690,2296235
+724449,7210795,Mill Creek Line Features,2014,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+724449,7210793,Mill Creek,2014,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+724449,7210794,Mill Creek Polygon Features,2014,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+724454,7210923,Topanga Creek,2014,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+724485,7210863,Mill Creek,2014,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+724501,7210919,Cahto Creek - stream enhancement reach,2014,40928,0640928,Laytonville,Laytonville CDP,57,U1,13908641,163478
+724508,7210864,Mad River Estuary,2014,44910,0644910,McKinleyville,McKinleyville CDP,57,U1,54083206,657148
+724518,7210878,Passage Assessment Database 2015- 2016,2014,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+724522,7210883,Las Flores Creek,2014,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+724522,7210879,Big Sycamore Creek,2014,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+724522,7210880,Trancas Creek,2014,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+724522,7210881,Zuma Creek,2014,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+724522,7210882,Solstice Creek,2014,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+724522,7210884,Topanga Creek,2014,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+724530,7210932,San Geronimo Floodplain PD,2014,86216,0686216,Woodacre,Woodacre CDP,57,U1,4653150,0
+724531,7210772,Sharber-Peckham,2014,64378,0664378,Salyer,Salyer CDP,57,U1,13662482,113638
+724542,7210856,Redwood Creek trib to SF Eel watershed,2014,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+724544,7210845,Redwood Creek,2014,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+724553,7210766,Lindsay Creek,2014,44910,0644910,McKinleyville,McKinleyville CDP,57,U1,54083206,657148
+724605,7210857,North Coast - 5 Counties,2015,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+724617,7210870,DroughtBusters,2014,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+724628,7210872,Bodega Water Company Treatment Facility,2014,07246,0607246,Bodega,Bodega CDP,57,U1,7515783,0
+724631,7210927,York Creek Stream Gage,2014,64140,0664140,St. Helena,St. Helena city,25,C1,12832970,325922
+724688,7211046,Topanga Creek,2015,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+724707,7211052,Rohner Creek,2015,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+724711,7211078,Sacramento,2015,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+724723,7211058,Sandia Creek Barrier,2015,23462,0623462,Fallbrook,Fallbrook CDP,57,U1,45429891,47337
+724729,7211074,Site 1,2015,33056,0633056,Healdsburg,Healdsburg city,25,C1,11448706,0
+724738,7211006,Null_Legacy,2015,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+724758,7211051,Strawberry Creek,2015,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+724760,7211054,Ventura River Watershed,2015,46702,0646702,Meiners Oaks,Meiners Oaks CDP,57,U1,6315365,0
+724765,7211037,WSP Main Office,2015,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+724796,7210983,Off-channel habitat design location,2015,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+724809,7211077,SYRCL Headquaters,2015,50874,0650874,Nevada City,Nevada City city,25,C1,5661517,9642
+725028,7211080,Site 1,2015,57288,0657288,Pinole,Pinole city,25,C1,13218372,17242736
+725045,7210973,Null_Legacy,2014,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+725215,7211371,Rohnerville Road Crossing,2016,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+725225,7211379,Powers Creek,2016,07162,0607162,Blue Lake,Blue Lake city,25,C1,1537386,75886
+725229,7211430,WSP Main Office,2016,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+725235,7211415,Sonoma Creek Watershed,2016,72646,0672646,Sonoma,Sonoma city,25,C1,7105863,0
+725241,7211429,SRF Office,2016,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+725243,7211420,City of Ventura,2016,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+725503,7211104,Program Wide,2017,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+723007,7208909,Lindsay Creek - center point,2007,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+724686,7211029,Big Basin / San Mateo,2015,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+724725,7210975,CCC Ukiah,2015,77784,0677784,Talmage,Talmage CDP,57,U1,4117638,4089
+724782,7211071,Myers Flat,2015,50146,0650146,Myers Flat,Myers Flat CDP,57,U1,1119279,141837
+724782,7211011,Redway,2015,60088,0660088,Redway,Redway CDP,57,U1,3239490,55629
+724782,7211016,Garberville,2015,28154,0628154,Garberville,Garberville CDP,57,U1,6940712,148102
+724785,7210977,Lower Mill Creek Phase 2,2015,34540,0634540,Hoopa,Hoopa CDP,57,U1,52865786,2013972
+725189,7211423,Topanga Creek,2016,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+725196,7211399,DIDSON,2016,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+725196,7211401,Smolt Trap,2016,54218,0654218,Orick,Orick CDP,57,U1,12290818,270118
+725202,7211409,Pine Gulch Creek,2016,07316,0607316,Bolinas,Bolinas CDP,57,U1,15090532,0
+725228,7211373,Lindsay Creek Oxbow,2016,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+725239,7211411,NOAA Fisheries Southwest Fisheries Science Center,2016,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+725245,7211385,Below Dwinnel Dam,2016,39728,0639728,Lake Shastina,Lake Shastina CDP,57,U1,10393370,2563420
+725511,7211113,MESHR Offices,2017,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+725512,7211114,Roy's Pools,2017,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+725554,7211197,San Geronimo Golf Course,2017,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+725561,7211212,Fish Barrier #1,2017,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+725561,7211213,Fish Barrier #2,2017,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+725575,7211232,Michael Snyder and Carol Stanger,2017,39283,0639283,Lagunitas-Forest Knolls,Lagunitas-Forest Knolls CDP,57,U2,10998147,0
+725581,7211246,Headquarters,2017,66000,0666000,San Diego,San Diego city,25,C1,844036546,120533495
+725591,7211279,Dempster Vineyard Dam,2017,24960,0624960,Forestville,Forestville CDP,57,U1,13615411,0
+725597,7211290,Alpine Creek Fish Passage Barrier,2017,39318,0639318,La Honda,La Honda CDP,57,U1,11022981,20735
+725597,7211291,DELETED: Only worksite above is needed,2017,39318,0639318,La Honda,La Honda CDP,57,U1,11022981,20735
+725621,7211436,Project Sites,2017,02476,0602476,Arcata,Arcata city,25,C1,24399923,5229392
+725625,7211440,"Mill Creek Subbasin, Smith River, Del Norte County, California",2017,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+725626,7211438,Ventura River basin,2017,65042,0665042,San Buenaventura (Ventura),San Buenaventura (Ventura) city,25,C1,56681176,26953060
+1551969001612,1551969001827,Data/Project Management Site,2018,64000,0664000,Sacramento,Sacramento city,25,C1,255399993,5413141
+1551969005905,1551969006076,Salmonid Restoration Federation headquarters,2018,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+1551969007196,1551969007375,Salmonid Restoration Federation headquarters,2018,23042,0623042,Eureka,Eureka city,25,C1,24698637,13130764
+1551969008672,1551969008899,"CalTrout office, Ventura",2018,65042,0665042,San Buenaventura (Ventura),San Buenaventura (Ventura) city,25,C1,56681176,26953060
+1551969009919,1551969011011,The Watershed Stewards Program Fortuna Office,2018,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+1551969060505,1551969060781,Ventura River Watershed (centralized location),2018,46702,0646702,Meiners Oaks,Meiners Oaks CDP,57,U1,6315365,0
+1551969286862,1551969287034,Dempster Vineyard frost protection diversion,2018,24960,0624960,Forestville,Forestville CDP,57,U1,13615411,0
+1551969292898,1551969293071,Lindsay Creek Project Reach,2018,24008,0624008,Fieldbrook,Fieldbrook CDP,57,U1,27111305,9982
+1551969297197,1551969297624,Elk Creek,2018,32030,0632030,Happy Camp,Happy Camp CDP,57,U1,31357295,618829
+1551969297197,1551969297644,Indian Creek (Mid Klamath tributary),2018,32030,0632030,Happy Camp,Happy Camp CDP,57,U1,31357295,618829
+1551969297197,1551969297653,Little Grider Creek,2018,32030,0632030,Happy Camp,Happy Camp CDP,57,U1,31357295,618829
+1551969305657,1551969305827,San Geronimo Large Woody Debris & Riparian Project,2018,67070,0667070,San Geronimo,San Geronimo CDP,57,U1,3906938,0
+1551969314261,1551969314431,Cooper Mill Creek,2018,36126,0636126,Hydesville,Hydesville CDP,57,U1,19424163,0
+1551969322654,1551969322831,Rohner Creek at 12th Street,2018,25296,0625296,Fortuna,Fortuna city,25,C1,13592673,4768
+1551969323876,1551969324048,Stanley Wakefield Wildnerness Area,2018,20907,0620907,East Oakdale,East Oakdale CDP,57,U1,13966924,386258
+1569882829450,1591648352969,Topanga Creek watershed,2018,78960,0678960,Topanga,Topanga CDP,57,U1,49538336,19528
+1578344378778,1578344378974,Sandia Creek Bridge,2019,23462,0623462,Fallbrook,Fallbrook CDP,57,U1,45429891,47337
+1578344973729,1578344973947,Upper Delilah,2019,72380,0672380,Smith River,Smith River CDP,57,U1,11461740,38079
+1578344975976,1578344976179,Willits Creek,2019,08530,0608530,Brooktrails,Brooktrails CDP,57,U1,18835634,122096
+1578345922402,1578345922603,South Coast Steelhead Coalition project area,2019,66000,0666000,San Diego,San Diego city,25,C1,844036546,120533495
+1588190032469,1588190032736,"NOAA Fisheries, Southwest Fisheries Science Center",2019,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
+1588190033558,1588190033804,NOAA Fisheries Southwest Fisheries Science Center,2019,69112,0669112,Santa Cruz,Santa Cruz city,25,C1,32996599,7998548
