@@ -5,6 +5,9 @@ date: "9/27/2021"
 output: html_document
 ---
 
+# Set up
+
+## Packages, options, and functions
 
 ```{r setup}
 # set up packages, options, and functions
@@ -13,21 +16,30 @@ output: html_document
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(magrittr))
 suppressPackageStartupMessages(library(janitor))
+suppressPackageStartupMessages(library(foreach))
+suppressPackageStartupMessages(library(doParallel))
 suppressPackageStartupMessages(library(here))
 suppressPackageStartupMessages(library(readxl))
 suppressPackageStartupMessages(library(readr))
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(sf))
+suppressPackageStartupMessages(library(raster))
+suppressPackageStartupMessages(library(elevatr))
 suppressPackageStartupMessages(library(rgdal))
 suppressPackageStartupMessages(library(tigris))
 suppressPackageStartupMessages(library(tidycensus))
 suppressPackageStartupMessages(library(rmapshaper))
 suppressPackageStartupMessages(library(ggnewscale))
+suppressPackageStartupMessages(library(nhdR))
+suppressPackageStartupMessages(library(nhdplusTools))
 
 # set global options
 options(stringsAsFactors = FALSE)
 options(tigris_use_cache = TRUE)
 global_crs <- st_crs(4269)
+options(scipen = 999)
+options(timeout = 3000)
+rasterOptions(memfrac = .3)
 
 # build custom functions and operators
 # %notin%: operator that returns the negation of %in%
@@ -49,7 +61,7 @@ get_ca_boundary <- function(crs) {
     states() %>%
       filter(NAME == "California") %>%
       rename(name = NAME) %>%
-      select(name) %>%
+      dplyr::select(name) %>%
       st_transform(crs = crs)
 }
 
@@ -59,6 +71,10 @@ view_flat <- function(sf_obj) {
     View(.)
 }
 ```
+
+# Import restoration data
+
+## DS734 - restoration focus watersheds
 
 ```{r}
 # create directories
@@ -89,6 +105,8 @@ ds168 <- readOGR(dsn = here("raw_data", "cdfw_ds168", "ds168.gdb"), layer = "ds1
   st_transform(crs = global_crs)
 ```
 
+## DS734 - restoration project sites
+
 ```{r}
 # clean data
 ds734 <- ds734 %>%
@@ -117,10 +135,12 @@ ds168 <- ds168 %>%
          worksite_id = WorksiteID,
          worksite_name = WorksiteNa,
          award_year = Award_Year) %>%
-  select(-WorksiteLa, - WorksiteLo)
+  dplyr::select(-WorksiteLa, - WorksiteLo)
 ```
 
-# Classification
+# Classify projects
+
+## Quick look
 
 ```{r}
 # quickly visualize all the restoration sites
@@ -132,6 +152,8 @@ ggplot() +
   geom_sf(data = ds168, aes(color = award_year)) +
   theme_minimal()
 ```
+## Urban area association - incorporated and census-designated places
+
 ```{r}
 # load census bureau "places" sf polygon objects
 incorp_cdp <- places(state = "CA", year = 2020) %>%
@@ -143,8 +165,8 @@ incorp_cdp <- places(state = "CA", year = 2020) %>%
          fips_code = CLASSFP,
          area_land = ALAND,
          area_water = AWATER) %>%
-  select(place_fip, geo_id, name, name_w_type, type_code,
-         fips_code, area_land, area_water)
+  dplyr::select(place_fip, geo_id, name, name_w_type, type_code,
+                fips_code, area_land, area_water)
 
 # visualize census places by type code
 # which roughly aligns with incorporation status
@@ -155,6 +177,8 @@ ggplot() +
           lwd = 0) +
   theme_minimal()
 ```
+
+## Filter project for intersection with urban areas
 
 ```{r}
 # filter restoration project sites to only those within census place boundaries
@@ -168,79 +192,278 @@ ggplot() +
   theme_minimal()
 ```
 
+## Check out project worksite names (project types a la NRRSS)
+
 ```{r}
 # identify and tally unique words in worksite names
-desc_word_counts <- ds168_incorp_cdp %>%
-  pull(worksite_name) %>%
-  paste(collapse = " ") %>% # create a single string of all worksite names
-  gsub("[^[:alpha:][:space:]]", " ", .) %>% # drop all non-alphabetic characters
-  str_squish() %>% # remove multiple spaces
-  str_to_lower() %>% # convert everything to lowercase
-  str_split(" ") %>% # split string on spaces to isolate single words
-  as_tibble(.name_repair = "minimal") %>% # convert to tibble
-  set_colnames("word") %>%
-  group_by(word) %>%
-  tally() %>% # count occurrences of each word
-  filter(word %notin% stopwords("en")) %>% # drop common stop words that don't have value
-  arrange(desc(n)) # arrange descending by frequency
+if(FALSE) {
+  desc_word_counts <- ds168_incorp_cdp %>%
+    pull(worksite_name) %>%
+    paste(collapse = " ") %>% # create a single string of all worksite names
+    gsub("[^[:alpha:][:space:]]", " ", .) %>% # drop all non-alphabetic characters
+    str_squish() %>% # remove multiple spaces
+    str_to_lower() %>% # convert everything to lowercase
+    str_split(" ") %>% # split string on spaces to isolate single words
+    as_tibble(.name_repair = "minimal") %>% # convert to tibble
+    set_colnames("word") %>%
+    group_by(word) %>%
+    tally() %>% # count occurrences of each word
+    filter(word %notin% stopwords("en")) %>% # drop common stop words that don't have value
+    arrange(desc(n)) # arrange descending by frequency
 
-### EVERYTHING BELOW HERE IS IN PROGRESS / EXPERIMENTAL!
-
-# list out nrrss categorization words
-bank_stabilization <- c("stabilization", "stabilize")
-
-stormwater_mgmt <- c("road", "detention", "erosion", "sediment")
-
-flow_mod <- c("tailwater", "irrigation")
-
-channel_reconfig <- c("ditch", "bioengineering", "realignment")
-
-fish_passage <- c("passage", "fishway", "ladder", "tidegate")
-
-riparian_mgmt <- c("planting","bamboo", "fencing", "fence", "vegetation",
-                   "plants", "donax", "riparian", "upslope")
-
-species_mgmt <- c()
-
-barrier_removal_retrofit <- c("culvert", "barrier", "dam", "bridge", "diversion")
-
-floodplain_reconnect <- c()
-
-hab_improvement <- c("habitat", "boulder", "log", "microcover", "berm", "cover",
-                     "riffle", "logjam", "gravel", "reef", "lagoon", "instream")
-
-pub_access <- c("trail")
-
-water_quality <- c()
-
-land_acq <- c("acquisition")
-
-# list out words to potentially exclude
-exclude <- c("planning", "assessment", "monitoring", "survey", "organization",
-             "inventory", "outreach", "education", "training", "festival",
-             "analysis", "symposium", "conference", "design", "permitting",
-             "coordinator", "publication", "protocol", "mapping", "workgroup")
+  ### EVERYTHING BELOW HERE IS IN PROGRESS / EXPERIMENTAL!
+  
+  # list out nrrss categorization words
+  bank_stabilization <- c("stabilization", "stabilize")
+  
+  stormwater_mgmt <- c("road", "detention", "erosion", "sediment")
+  
+  flow_mod <- c("tailwater", "irrigation")
+  
+  channel_reconfig <- c("ditch", "bioengineering", "realignment")
+  
+  fish_passage <- c("passage", "fishway", "ladder", "tidegate")
+  
+  riparian_mgmt <- c("planting","bamboo", "fencing", "fence", "vegetation",
+                     "plants", "donax", "riparian", "upslope")
+  
+  species_mgmt <- c()
+  
+  barrier_removal_retrofit <- c("culvert", "barrier", "dam", "bridge", "diversion")
+  
+  floodplain_reconnect <- c()
+  
+  hab_improvement <- c("habitat", "boulder", "log", "microcover", "berm", "cover",
+                       "riffle", "logjam", "gravel", "reef", "lagoon", "instream")
+  
+  pub_access <- c("trail")
+  
+  water_quality <- c()
+  
+  land_acq <- c("acquisition")
+  
+  # list out words to potentially exclude
+  exclude <- c("planning", "assessment", "monitoring", "survey", "organization",
+               "inventory", "outreach", "education", "training", "festival",
+               "analysis", "symposium", "conference", "design", "permitting",
+               "coordinator", "publication", "protocol", "mapping", "workgroup")
+}
 ```
 
-Patterns that might appear mid-word:
-- log
-- dam
+## Clean up
 
-rearing
-conference
-release
-enhancement
-training
-plantings
-education
-structures
-stabilization
-planning
-inventory
-analysis
-fencing
-passage
-pen
-shelters
+```{r}
+# clean up
+rm(ds168, ds734, incorp_cdp)
+```
 
+# Import enriching data
+
+## Watershed boundaries
+
+### HUC8
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "wbd"))) {
+  dir.create(here("raw_data", "wbd"))
+}
+
+# download WBD
+if(!file.exists(here("raw_data", "wbd", "WBD_National_GDB.zip"))) {
+  download_wbd(outdir = here("raw_data", "wbd"), progress = TRUE) 
+}
+
+# read in HUC8 watersheds
+if(TRUE) {
+  huc8 <- readOGR(dsn = here("raw_data", "wbd", "WBD_National_GDB.gdb"),
+                  layer = "WBDHU8") %>%
+    st_as_sf(crs = global_crs) %>%
+    mutate(california = grepl("CA", states, fixed = TRUE)) %>%
+    filter(california) %>%
+    ms_simplify(keep = 0.05) %>%
+    st_intersection(y = ca_boundary) %>%
+    rename(huc8_area_sqkm = areasqkm,
+           huc8_name = name) %>%
+    dplyr::select(huc8, huc8_name, huc8_area_sqkm)
+}
+```
+
+### HUC12 and ACE
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "ace"))) {
+  dir.create(here("raw_data", "ace"))
+}
+
+# specify url
+ace_url <- "https://filelib.wildlife.ca.gov/Public/BDB/ACE/ACE_Summary_Datasets.zip"
+
+# download file
+if(!file.exists(here("raw_data", "ace", "ace_summary_datasets.zip"))) {
+  download.file(url = ace_url,
+                destfile = here("raw_data", "ace", "ACE_Summary_Datasets.zip"))
+}
+
+# unzip file
+unzip(here("raw_data", "ace", "ACE_Summary_Datasets.zip"),
+      exdir = here("raw_data", "ace"))
+
+# read in and clean ACE dataset
+huc12 <- readOGR(dsn = here("raw_data", "ace", "ACE_Summary_Datasets", "ds2743.gdb")) %>%
+  st_as_sf() %>%
+  st_transform(crs = global_crs) %>%
+  ms_simplify(keep = 0.05) %>%
+  st_intersection(y = ca_boundary) %>%
+  rename(huc12 = HUC12,
+         huc12_name = Name,
+         native_aquatic_rank = NtvAqRankSW,
+         native_aquatic_index = NtvAqSumSW,
+         native_fish_count = NtvFish,
+         native_aquatic_invert_count = NtvAqInvt,
+         native_aquatic_amphib_count = NtvAqAmph,
+         native_aquatic_reptile_count = NtvAqRept) %>%
+  mutate(huc12_area_sqkm = drop_units(set_units(st_area(geometry), "km^2"))) %>%
+  dplyr::select(huc12, huc12_name, huc12_area_sqkm,
+                native_aquatic_rank, native_aquatic_index, native_fish_count,
+                native_aquatic_invert_count, native_aquatic_amphib_count,
+                native_aquatic_reptile_count)
+
+# clean up
+rm(ace_url)
+```
+
+## Slope
+
+```{r}
+# set this up to rasterize and run parallel
+# https://newbedev.com/increasing-speed-of-crop-mask-extract-raster-by-many-polygons-in-r
+if(FALSE) {
+  
+  elevation <- get_elev_raster(as(ca_boundary, "Spatial"),
+                               z = 9,
+                               prj = global_crs$proj4string,
+                               serial = TRUE)
+  
+  slope_aspect <- terrain(elevation,
+                          opt = c("slope", "aspect"),
+                          unit = "degrees")
+  
+  
+  slope_aspect_extracted <- extract(slope_aspect,
+                                    as(huc12, "Spatial"),
+                                    fun = mean,
+                                    na.rm = TRUE)
+
+}
+```
+
+## California Stream Condition Index
+
+```{r}
+if(!dir.exists(here("raw_data", "csci"))) {
+  dir.create(here("raw_data", "csci"))
+}
+
+csci_url <- "https://indicators.ucdavis.edu/cwip/sites/default/files/data/indicator_59452/data_59452_all.csv"
+
+# download file
+if(!file.exists(here("raw_data", "csci", "csci_all.csv"))) {
+  download.file(url = csci_url,
+                destfile = here("raw_data", "csci", "csci_all.csv"))
+}
+
+csci <- read_csv(here("raw_data", "csci", "csci_all.csv"),
+                     col_names = TRUE) %>%
+  rename(index = "...1") %>%
+  group_by(station_code) %>%
+  summarize(worst_csci_score = min(csci_score, na.rm = TRUE),
+            cwip_score = cwip_score[which.min(csci_score)],
+            stream_name = stream_name[which.min(csci_score)],
+            station_code = station_code[which.min(csci_score)],
+            sample_date = sample_date[which.min(csci_score)],
+            latitude = latitude[which.min(csci_score)],
+            longitude = longitude[which.min(csci_score)]) %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = global_crs)
+
+# clean up
+rm(csci_url)
+```
+
+## Nitrates
+
+```{r}
+if(!dir.exists(here("raw_data", "nitrates"))) {
+  dir.create(here("raw_data", "nitrates"))
+}
+
+nitrates_url <- "https://indicators.ucdavis.edu/cwip/sites/default/files/data/indicator_32232/data_32232_all.csv"
+
+# download file
+if(!file.exists(here("raw_data", "nitrates", "nitrates_all.csv"))) {
+  download.file(url = nitrates_url,
+                destfile = here("raw_data", "nitrates", "nitrates_all.csv"))
+}
+
+nitrates <- read_csv(here("raw_data", "nitrates", "nitrates_all.csv"),
+                     col_names = TRUE) %>%
+  rename(index = "...1") %>%
+  group_by(code) %>%
+  summarize(worst_nitrate_score = min(score, na.rm = TRUE),
+            name = name[which.min(score)],
+            code = code[which.min(score)],
+            date = date[which.min(score)],
+            lat = lat[which.min(score)],
+            lon = lon[which.min(score)]) %>%
+  st_as_sf(coords = c("lon", "lat"), crs = global_crs)
+
+# clean up
+rm(nitrates_url)
+```
+
+## 303d Listed Waterbodies
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "303d"))) {
+  dir.create(here("raw_data", "303d"))
+}
+
+# specify url
+waterbodies_303d_lines_url <- "https://gispublic.waterboards.ca.gov/webmap/303d_2014_2016/files/IR_1416_Impaired_Lines.zip"
+
+# download file
+if(!file.exists(here("raw_data", "303d", "IR_1416_Impaired_Lines.zip"))) {
+  download.file(url = waterbodies_303d_lines_url,
+                destfile = here("raw_data", "303d", "IR_1416_Impaired_Lines.zip"))
+}
+
+# unzip file
+unzip(here("raw_data", "303d", "IR_1416_Impaired_Lines.zip"),
+      exdir = here("raw_data", "303d"))
+
+# specify url
+waterbodies_303d_polygons_url <- "https://gispublic.waterboards.ca.gov/webmap/303d_2014_2016/files/IR_1416_Impaired_Polys.zip"
+
+# download file
+if(!file.exists(here("raw_data", "303d", "IR_1416_Impaired_Polys.zip"))) {
+  download.file(url = waterbodies_303d_polygons_url,
+                destfile = here("raw_data", "303d", "IR_1416_Impaired_Polys.zip"))
+}
+
+# unzip file
+unzip(here("raw_data", "303d", "IR_1416_Impaired_Polys.zip"),
+      exdir = here("raw_data", "303d"))
+
+# read in
+waterbodies_303d_lines <- st_read(here("raw_data", "303d", "IR_1416_Impaired_Lines")) %>%
+  st_transform(crs = global_crs)
+
+waterbodies_303d_polygons <- st_read(here("raw_data", "303d", "IR_1416_Impaired_Polys")) %>%
+  st_transform(crs = global_crs)
+
+# clean up
+rm(waterbodies_303d_lines_url, waterbodies_303d_polygons_url)
+```
 
