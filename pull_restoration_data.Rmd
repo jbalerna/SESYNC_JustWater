@@ -5,6 +5,11 @@ date: "7/23/2021"
 output: html_document
 ---
 
+```{r}
+library(tmap)
+```
+
+
 ```{r California data}
 # California Department of Fish and Wildlife (CDFW) Fisheries Restoration Grant Program (FRGP) 
 # I need to read more about the difference between these 2 downloads. The first is a gdb and the second contains shp files.
@@ -17,6 +22,7 @@ unzip(zipfile = "raw_data/cdfw_ds168.zip")
 cdfw_part1 <- st_read(dsn = "ds168.gdb") 
 glimpse(cdfw_part1) # Contains "center lat" and "center long"
 summary(cdfw_part1) 
+st_crs(cdfw_part1)
 
 # Check what layers exist
 part1_layers <- st_layers(dsn = "ds168.gdb")
@@ -33,14 +39,43 @@ download.file(url = "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_
 unzip(zipfile = "raw_data/cdfw_ds734.zip")
 cdfw_part2 <- st_read(dsn = "ds734.shp")
 glimpse(cdfw_part2)
+summary(cdfw_part2)
 st_crs(cdfw_part2)
 ```
 
-```{r Quick exploration}
-plot(cdfw_part2)
+
+```{r California data - filtering}
+temp <- lapply(cdfw_part1, unique)
+cdfw_part1 %>% count(Grant_Status)
+
+# Filter on select project types -- Lucy will propose a list
+cdfw_part1 %>% filter(Project_Type == "Public Involvement and Capacity Building") %>% View()
+
+# Select projects that actually happened
+work_status_eliminate <- c("Notstarted", "TerminateCancel", "Terminated/Cancelled", "NA")
+cdfw_part1_filtered <- cdfw_part1 %>% filter(Grant_Status %notin% work_status_eliminate) # THIS MAY NOT BE WORKING
+cdfw_part1_filtered <- cdfw_part1_filtered %>% filter(Grant_Status != c("Cancelnofundsspent",
+  "Execfworknotstarted", "Fcontractpending"))
+
+# Spatial intersect with urban boundaries -- Lucy will pull urban areas file for CA 
+# ADD
+```
+
+```{r Exploration, cont.}
+# Keep looking at cdfw_part2 and see if there's actually any data here
+cdfw_part2
+```
+
+
+```{r Mapping, quick exploration}
+ggplot() + geom_sf(data = cdfw_part2)
+
+tmap_mode('plot')
+tm_shape(cdfw_part2) + tm_polygons()
 ```
 
 
 ```{r Minnesota data}
 # for later: https://solr.legacy.mn.gov/v2/export/download/bc29d464bec222dba9523a7ccfc0abfc
+# https://www.gis.leg.mn/metadata/legacy.htm
 ```
