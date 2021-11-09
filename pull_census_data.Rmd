@@ -69,7 +69,7 @@ acs_cleaner <- acs_5y_vars %>%
 tic()
 ca_census_pop_blkgrp <- get_decennial(state = "CA",
                                            # county = "SET", # set county
-                                           geography = "block group", # pull block group-level data
+                                           geography = "tract", # pull block group-level data
                                               # Note: we could go to block level
                                            variables = "P001001", # variable code for total population
                                            geometry = TRUE) %>% # include vector geometry %>%
@@ -81,14 +81,14 @@ toc()
 
 # save that data
 tic()
-saveRDS(ca_census_pop_blkgrp, "intermediate_data/ca_census_pop_blkgrp.rds") # or could save a gpkg, gdb, or shapefiles (look into Arc options)
+saveRDS(ca_census_pop_blkgrp, "intermediate_data/ca_census_pop_tract.rds") # or could save a gpkg, gdb, or shapefiles (look into Arc options)
 toc()
 
 # get MN block-group-level population estimates from the 2010 census
 tic()
 mn_census_pop_blkgrp <- get_decennial(state = "MN",
                                            # county = "SET", # set county
-                                           geography = "block group", # pull block group-level data
+                                           geography = "tract", # pull block group-level data
                                            variables = "P001001", # variable code for total population
                                            geometry = TRUE) %>% # include vector geometry %>%
   select(-variable) %>% # drop variable column
@@ -98,7 +98,7 @@ toc()
 
 # save that data
 tic()
-saveRDS(mn_census_pop_blkgrp, "intermediate_data/mn_census_pop_blkgrp.rds") # or could save a gpkg
+saveRDS(mn_census_pop_blkgrp, "intermediate_data/mn_census_pop_tract.rds") # or could save a gpkg
 toc()
 
 # Pull ACS data on MHI, % of population with a college education, % of population that is non-Hispanic white
