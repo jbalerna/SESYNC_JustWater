@@ -1,0 +1,315 @@
+---
+title: "clean_dwr_usrp"
+author: "Lucy Andrews"
+date: "9/21/2021"
+output: html_document
+---
+
+```{r setup}
+# set up packages, options, and functions
+
+# load packages
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(janitor))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(readxl))
+suppressPackageStartupMessages(library(sf))
+suppressPackageStartupMessages(library(tigris))
+suppressPackageStartupMessages(library(rmapshaper))
+suppressPackageStartupMessages(library(ggnewscale))
+
+# set global options
+options(stringsAsFactors = FALSE)
+options(tigris_use_cache = TRUE)
+global_crs <- st_crs(4269)
+
+# build custom functions and operators
+# %notin%: operator that returns the negation of %in%
+`%notin%` <- Negate(`%in%`)
+
+# paste_na_rm(): function that pastes values together while dropping NAs
+paste_na_rm <- function(x, collapse = ", ") {
+  
+  paste(x[!is.na(x)], collapse = collapse)
+  
+}
+
+# build is.nan() method for data.frame objects
+is.nan.data.frame <- function(x)
+do.call(cbind, lapply(x, is.nan))
+
+# build function that pulls CA boundary into global environment as sf object
+get_ca_boundary <- function(crs) {
+    states() %>%
+      filter(NAME == "California") %>%
+      rename(name = NAME) %>%
+      select(name) %>%
+      st_transform(crs = crs)
+}
+
+# build function that quickly pulls up sf object attribute tables
+view_flat <- function(sf_obj) {
+  st_drop_geometry(sf_obj) %>%
+    View(.)
+}
+```
+
+```{r}
+# import all data
+
+# specify column names for attribute data sheet import
+attr_colnames <- c("project_num", "project_name", "year_awarded",
+                   "funding_source", "sponsor", "co_sponsor", "project_desc",
+                   "funding_amount", "total_project_cost", "county", "latitude",
+                   "longitude")
+
+# import data - usrp_all_projects.xlsx --> All Projects sheet
+# and do an initial clean up pass by fixing typos and duplicates
+usrp_all_projects_attr <- read_excel(here("raw_data", "usrp_all_projects.xlsx"),
+                                     sheet = "All Projects",
+                                     col_names = attr_colnames,
+                                     col_types = "text",
+                                     skip = 1) %>%
+  mutate(project_name = str_replace(gsub("\\s+", " ", str_trim(project_name)), "B", "b"),
+         project_name = sub("Deveroux", "Devereux", project_name),
+         project_name = sub("Farmerville", "Farmersville", project_name),
+         project_name = sub("Dennet Dam", "Dennett Dam", project_name),
+         project_name = sub("Resoration", "Restoration", project_name),
+         project_name = sub("Ynacio", "Ygnacio", project_name),
+         year_awarded = substr(year_awarded, 1, 4),
+         funding_amount = as.numeric(funding_amount),
+         total_project_cost = as.numeric(total_project_cost),
+         latitude = as.numeric(latitude),
+         longitude = as.numeric(longitude)) %>%
+  remove_empty(which = "cols") %>%
+  # clean up duplicate records where the duplicates each contain partial information
+  # duplicates identified by matching project names and funding amounts
+  group_by(project_name, funding_amount) %>%
+  fill(project_num, year_awarded, funding_source, sponsor, co_sponsor,
+       project_desc, total_project_cost, county, latitude, longitude,
+       .direction = "updown") %>%
+  ungroup() %>%
+  distinct(project_num, project_name, .keep_all = TRUE)
+
+# deal with two random rows with project_num in project_name col
+usrp_all_projects_attr$project_num[usrp_all_projects_attr$project_name ==
+                                     "San Luis Obispo Creek (DWR #Z60000)"] <- "Z60000"
+
+usrp_all_projects_attr$project_num[usrp_all_projects_attr$project_name ==
+                                    "Little Chico / Dead Horse Creeks (DWR #Z60001)"] <- "Z60001"
+
+# specify column names for location data sheet import
+loc_colnames <- c("project_num", "project_name", "project_address_desc", "city",
+                  "zip_code", "county", "huc8", "lat", "long", "latitude",
+                  "longitude", "restored_length")
+
+# import data - usrp_all_projects.xlsx --> Location sheet
+# and do an initial clean up pass by fixing typos and duplicates
+usrp_all_projects_loc <- read_excel(here("raw_data", "usrp_all_projects.xlsx"),
+                                    sheet = "Location",
+                                    col_names = loc_colnames,
+                                    col_types = "text",
+                                    skip = 1) %>%
+  remove_empty(which = "cols") %>%
+  distinct()
+
+# deal with two random rows with project_num in project_name col
+usrp_all_projects_loc$project_num[usrp_all_projects_loc$project_name ==
+                                    "San Luis Obispo Creek (DWR #Z60000)"] <- "Z60000"
+
+usrp_all_projects_loc$project_num[usrp_all_projects_loc$project_name ==
+                                    "Little Chico / Dead Horse Creeks (DWR #Z60001)"] <- "Z60001"
+
+# clean up duplicate records where the duplicates each contain partial information
+# duplicates identified by matching project numbers
+usrp_all_projects_loc <- usrp_all_projects_loc %>%
+  group_by(project_num) %>%
+  fill(project_address_desc, city, zip_code, county, latitude, longitude, restored_length) %>%
+  ungroup() %>%
+  distinct(project_num, .keep_all = TRUE)
+
+# clean up environment
+rm(attr_colnames, loc_colnames)
+```
+
+```{r}
+# clean the attributes dataframe
+
+# deal with projects without a project ID number
+# so that the location table can be joined without NA record duplication issues
+# first create a sequence of incrementing ID numbers with the prefix X
+seq_fill_na <- paste0("X-attr-", seq(from = 1,
+                                     to = sum(is.na(usrp_all_projects_attr$project_num)),
+                                     by = 1))
+
+# grab records with NA project numbers
+# and replace NAs with incremental project numbers
+usrp_all_projects_attr_na <- usrp_all_projects_attr %>%
+  filter(is.na(project_num)) %>%
+  mutate(project_num = seq_fill_na)
+
+# rebind fixed records to original dataframe
+usrp_all_projects_attr <- usrp_all_projects_attr %>%
+  filter(!is.na(project_num)) %>%
+  rbind(usrp_all_projects_attr_na)
+
+# clean duplicate records
+# duplicates identified as records sharing a project number
+usrp_all_projects_attr <- usrp_all_projects_attr %>%
+  group_by(project_num) %>%
+  summarize(project_name = paste_na_rm(project_name, collapse = ", "),
+            year_awarded = min(year_awarded),
+            funding_source = paste_na_rm(funding_source, collapse = ", "),
+            sponsor = paste_na_rm(sponsor, collapse = ", "),
+            co_sponsor = paste_na_rm(co_sponsor, collapse = ", "),
+            project_desc = paste_na_rm(project_desc, collapse = "; "),
+            funding_amount = sum(funding_amount, na.rm = TRUE),
+            total_project_cost = sum(funding_amount, na.rm = TRUE),
+            county = paste_na_rm(county, collapse = ", "),
+            latitude = mean(latitude, na.rm = TRUE),
+            longitude = mean(longitude, na.rm = TRUE))
+
+# clean up NA and NaN values
+usrp_all_projects_attr[usrp_all_projects_attr == ""] <- NA
+usrp_all_projects_attr[is.nan(usrp_all_projects_attr)] <- NA
+
+# clean up environment
+rm(seq_fill_na, usrp_all_projects_attr_na)
+```
+
+```{r warning = FALSE}
+# clean the locations dataframe
+
+# grab records with NA project numbers
+usrp_all_projects_loc_na <- usrp_all_projects_loc %>%
+  filter(is.na(project_num))
+
+# create sequence of ID numbers to fill NA values
+seq_fill_na <- paste0("X-loc-", seq(from = 1,
+                                    to = sum(is.na(usrp_all_projects_loc_na$project_num)),
+                                    by = 1))
+
+# replace NAs with incremental project numbers
+usrp_all_projects_loc_na <- usrp_all_projects_loc_na %>%
+  mutate(project_num = seq_fill_na)
+
+# remove records with NA project numbers
+usrp_all_projects_loc <- usrp_all_projects_loc %>%
+  filter(!is.na(project_num))
+
+# drop duplicate records - most attributes are NA so going with quick !duplicated
+usrp_all_projects_loc <- usrp_all_projects_loc %>%
+  distinct(project_num, .keep_all = TRUE)
+
+# clean latitude data
+usrp_all_projects_loc <- usrp_all_projects_loc %>%
+  # separate latitude column into two columns on "," and ";" delimiters
+  # for elements with both latitude and longitude listed in the latitude field
+  separate(col = latitude, into = c("latitude_cleaned", "longitude_working"), sep = "[,;]") %>%
+  # drop all non-numeric characters
+  mutate(latitude_cleaned = gsub(pattern = "\\D+", replacement = "", latitude_cleaned),
+         # insert period after second character
+         latitude_cleaned = case_when(is.na(latitude_cleaned) ~ NA_character_,
+                                      str_length(latitude_cleaned) > 2 ~
+                                        paste0(str_sub(latitude_cleaned, 1, 2),
+                                               ".",
+                                               str_sub(latitude_cleaned, 3, -1))),
+         # convert to numeric
+         latitude_cleaned = as.numeric(latitude_cleaned),
+         # replace out-of-bbox values with NA
+         latitude_cleaned = case_when(latitude_cleaned > 42.1 ~ NA_real_,
+                                      TRUE ~ latitude_cleaned))
+
+
+# clean longitude data
+usrp_all_projects_loc <- usrp_all_projects_loc %>%
+  # merge longitude and longitude_working fields into single field
+  mutate(longitude_cleaned = case_when(!is.na(longitude_working) ~ longitude_working,
+                                       !is.na(longitude) ~ longitude,
+                                       TRUE ~ NA_character_),
+         # drop all non-numeric characters
+         longitude_cleaned = gsub(pattern = "\\D+", replacement = "", longitude_cleaned),
+         # insert period after third character
+         longitude_cleaned = case_when(is.na(longitude_cleaned) ~ NA_character_,
+                                      str_length(longitude_cleaned) > 2 ~
+                                        paste0(str_sub(longitude_cleaned, 1, 3),
+                                               ".",
+                                               str_sub(longitude_cleaned, 4, -1))),
+         # convert to integer and format direction of longitude coordinate
+         longitude_cleaned = -1 * as.numeric(longitude_cleaned),
+         # drop longitude coordinates without paired latitude coordinate
+         longitude_cleaned = case_when(is.na(latitude_cleaned) ~ NA_real_,
+                                       TRUE ~ longitude_cleaned)) %>%
+  # clean up column order
+  select(everything(), -latitude_cleaned, -longitude_cleaned, -longitude, -longitude_working,
+         latitude_cleaned, longitude_cleaned) %>%
+  # clean up column names
+  rename(latitude = latitude_cleaned,
+         longitude = longitude_cleaned)
+
+# clean up records with data in wrong fields
+usrp_all_projects_loc_na <- usrp_all_projects_loc_na %>%
+  mutate(latitude = as.numeric(city),
+         longitude = as.numeric(zip_code),
+         restored_length = county,
+         city = NA_character_,
+         zip_code = NA_character_,
+         county = NA_character_) %>%
+  select(everything(), -latitude, -longitude, latitude, longitude)
+
+# create single dataframe
+usrp_all_projects_loc <- rbind(usrp_all_projects_loc, usrp_all_projects_loc_na)
+
+# clean up
+rm(usrp_all_projects_loc_na, seq_fill_na)
+```
+
+```{r}
+# create a single dataframe with all attributes
+usrp_all_projects_df <- full_join(x = usrp_all_projects_attr,
+                               y = usrp_all_projects_loc,
+                               by = c("project_num", "project_name"),
+                               suffix = c("_attr", "_loc")) %>%
+  unite(col = latitude, latitude_attr, latitude_loc, na.rm = TRUE) %>%
+  unite(col = longitude, longitude_attr, longitude_loc, na.rm = TRUE) %>%
+  arrange(desc(funding_amount)) %>%
+  distinct(project_num, .keep_all = TRUE)
+
+# replace empty strings with NA
+usrp_all_projects_df[usrp_all_projects_df == ""] <- NA
+
+# fix and eliminate duplicates with autopopulated project ID numbers
+usrp_all_projects_df$project_num[usrp_all_projects_df$project_num == "X-loc-1"] <- "X-attr-1"
+usrp_all_projects_df$project_num[usrp_all_projects_df$project_num == "X-attr-5"] <- "P13-047"
+
+# deal with remaining duplicates from join and initial missing project ID numbers
+usrp_all_projects_df <- usrp_all_projects_df %>%
+  group_by(project_num) %>%
+  fill(everything(), .direction = "updown") %>%
+  distinct(project_num, .keep_all = TRUE) %>%
+  mutate(latitude = sub("_.*", "", latitude),
+         longitude = sub("_.*", "", longitude))
+
+# clean up
+rm(usrp_all_projects_attr, usrp_all_projects_loc)
+```
+
+```{r}
+# extract records with spatial attributes and create sf object
+usrp_all_projects_sf <- usrp_all_projects_df %>%
+  filter(!is.na(latitude)) %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = global_crs)
+```
+
+```{r}
+# import California state boundary
+ca_boundary <- get_ca_boundary(crs = global_crs)
+
+# check it all on a map
+ggplot() +
+  geom_sf(data = ca_boundary, fill = "grey93") +
+  geom_sf(data = usrp_all_projects_sf) +
+  theme_minimal()
+```
+

@@ -1,0 +1,246 @@
+---
+title: "clean_cdfw"
+author: "Lucy Andrews"
+date: "9/27/2021"
+output: html_document
+---
+
+
+```{r setup}
+# set up packages, options, and functions
+
+# load packages
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(janitor))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(readxl))
+suppressPackageStartupMessages(library(readr))
+suppressPackageStartupMessages(library(stringr))
+suppressPackageStartupMessages(library(sf))
+suppressPackageStartupMessages(library(rgdal))
+suppressPackageStartupMessages(library(tigris))
+suppressPackageStartupMessages(library(tidycensus))
+suppressPackageStartupMessages(library(rmapshaper))
+suppressPackageStartupMessages(library(ggnewscale))
+
+# set global options
+options(stringsAsFactors = FALSE)
+options(tigris_use_cache = TRUE)
+global_crs <- st_crs(4269)
+
+# build custom functions and operators
+# %notin%: operator that returns the negation of %in%
+`%notin%` <- Negate(`%in%`)
+
+# paste_na_rm(): function that pastes values together while dropping NAs
+paste_na_rm <- function(x, collapse = ", ") {
+  
+  paste(x[!is.na(x)], collapse = collapse)
+  
+}
+
+# build is.nan() method for data.frame objects
+is.nan.data.frame <- function(x)
+do.call(cbind, lapply(x, is.nan))
+
+# build function that pulls CA boundary into global environment as sf object
+get_ca_boundary <- function(crs) {
+    states() %>%
+      filter(NAME == "California") %>%
+      rename(name = NAME) %>%
+      select(name) %>%
+      st_transform(crs = crs)
+}
+
+# build function that quickly pulls up sf object attribute tables
+view_flat <- function(sf_obj) {
+  st_drop_geometry(sf_obj) %>%
+    View(.)
+}
+```
+
+```{r}
+# create directories
+if(!dir.exists(here("raw_data", "cdfw_ds734"))) {
+  dir.create(here("raw_data", "cdfw_ds734"))
+}
+
+if(!dir.exists(here("raw_data", "cdfw_ds168"))) {
+  dir.create(here("raw_data", "cdfw_ds168"))
+}
+
+# unzip zipped spatial files
+unzip(zipfile = here("raw_data", "cdfw_ds734.zip"), overwrite = TRUE,
+      exdir = here("raw_data", "cdfw_ds734"))
+
+unzip(zipfile = here("raw_data", "cdfw_ds168.zip"), overwrite = TRUE,
+      exdir = here("raw_data", "cdfw_ds168"))
+
+# read in files as sf objects
+# ds734: boundary regions for fisheries restoration grant program
+# multipolygon
+ds734 <- st_read(dsn = here("raw_data", "cdfw_ds734", "ds734.shp")) %>%
+  st_transform(crs = global_crs)
+
+# ds168: locations of fisheries restoration grant program projects
+ds168 <- readOGR(dsn = here("raw_data", "cdfw_ds168", "ds168.gdb"), layer = "ds168") %>%
+  st_as_sf() %>%
+  st_transform(crs = global_crs)
+```
+
+```{r}
+# clean data
+ds734 <- ds734 %>%
+  rename(region = REGION,
+         sub_region = SUBREGION,
+         basin = BASIN,
+         sub_basin = SUBBASIN,
+         huc2 = HUC_2,
+         huc4 = HUC_4,
+         huc6 = HUC_6,
+         huc8 = HUC_8,
+         acres = ACRES,
+         sq_miles = SQ_MILES,
+         state_huc8 = HU_8_STATE,
+         fips = FIPS_C,
+         huc10_name = HU_10_NAME,
+         huc10_sq_miles = HUC10_SqMi,
+         llid = LLID,
+         name = NAME,
+         length_ft = LENGTH_FT,
+         mouth = MOUTH,
+         area_sq_miles = AREA_sq_mi)
+
+ds168 <- ds168 %>%
+  rename(project_id = ProjectID,
+         worksite_id = WorksiteID,
+         worksite_name = WorksiteNa,
+         award_year = Award_Year) %>%
+  select(-WorksiteLa, - WorksiteLo)
+```
+
+# Classification
+
+```{r}
+# quickly visualize all the restoration sites
+ca_boundary <- get_ca_boundary(crs = global_crs)
+
+ggplot() +
+  geom_sf(data = ca_boundary, fill = "lightgrey") +
+  geom_sf(data = ms_simplify(ds734, keep = 0.05), fill = "lightblue") +
+  geom_sf(data = ds168, aes(color = award_year)) +
+  theme_minimal()
+```
+```{r}
+# load census bureau "places" sf polygon objects
+incorp_cdp <- places(state = "CA", year = 2020) %>%
+  rename(place_fip = PLACEFP,
+         geo_id = GEOID,
+         name = NAME,
+         name_w_type = NAMELSAD,
+         type_code = LSAD,
+         fips_code = CLASSFP,
+         area_land = ALAND,
+         area_water = AWATER) %>%
+  select(place_fip, geo_id, name, name_w_type, type_code,
+         fips_code, area_land, area_water)
+
+# visualize census places by type code
+# which roughly aligns with incorporation status
+ggplot() +
+  geom_sf(data = ca_boundary, fill = "lightgrey") +
+  geom_sf(data = ms_simplify(incorp_cdp, keep = 0.05),
+          aes(fill = type_code),
+          lwd = 0) +
+  theme_minimal()
+```
+
+```{r}
+# filter restoration project sites to only those within census place boundaries
+ds168_incorp_cdp <- st_join(x = ds168, y = incorp_cdp, join = st_intersects, left = FALSE)
+
+# quickly visualize restoration sites falling with census place boundaries
+ggplot() +
+  geom_sf(data = ca_boundary, fill = "lightgrey") +
+  geom_sf(data = ms_simplify(ds734, keep = 0.05), fill = "lightblue") +
+  geom_sf(data = ds168_incorp_cdp, aes(color = award_year)) +
+  theme_minimal()
+```
+
+```{r}
+# identify and tally unique words in worksite names
+desc_word_counts <- ds168_incorp_cdp %>%
+  pull(worksite_name) %>%
+  paste(collapse = " ") %>% # create a single string of all worksite names
+  gsub("[^[:alpha:][:space:]]", " ", .) %>% # drop all non-alphabetic characters
+  str_squish() %>% # remove multiple spaces
+  str_to_lower() %>% # convert everything to lowercase
+  str_split(" ") %>% # split string on spaces to isolate single words
+  as_tibble(.name_repair = "minimal") %>% # convert to tibble
+  set_colnames("word") %>%
+  group_by(word) %>%
+  tally() %>% # count occurrences of each word
+  filter(word %notin% stopwords("en")) %>% # drop common stop words that don't have value
+  arrange(desc(n)) # arrange descending by frequency
+
+### EVERYTHING BELOW HERE IS IN PROGRESS / EXPERIMENTAL!
+
+# list out nrrss categorization words
+bank_stabilization <- c("stabilization", "stabilize")
+
+stormwater_mgmt <- c("road", "detention", "erosion", "sediment")
+
+flow_mod <- c("tailwater", "irrigation")
+
+channel_reconfig <- c("ditch", "bioengineering", "realignment")
+
+fish_passage <- c("passage", "fishway", "ladder", "tidegate")
+
+riparian_mgmt <- c("planting","bamboo", "fencing", "fence", "vegetation",
+                   "plants", "donax", "riparian", "upslope")
+
+species_mgmt <- c()
+
+barrier_removal_retrofit <- c("culvert", "barrier", "dam", "bridge", "diversion")
+
+floodplain_reconnect <- c()
+
+hab_improvement <- c("habitat", "boulder", "log", "microcover", "berm", "cover",
+                     "riffle", "logjam", "gravel", "reef", "lagoon", "instream")
+
+pub_access <- c("trail")
+
+water_quality <- c()
+
+land_acq <- c("acquisition")
+
+# list out words to potentially exclude
+exclude <- c("planning", "assessment", "monitoring", "survey", "organization",
+             "inventory", "outreach", "education", "training", "festival",
+             "analysis", "symposium", "conference", "design", "permitting",
+             "coordinator", "publication", "protocol", "mapping", "workgroup")
+```
+
+Patterns that might appear mid-word:
+- log
+- dam
+
+rearing
+conference
+release
+enhancement
+training
+plantings
+education
+structures
+stabilization
+planning
+inventory
+analysis
+fencing
+passage
+pen
+shelters
+
+

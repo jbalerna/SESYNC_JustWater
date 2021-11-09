@@ -14,7 +14,7 @@ library(tmap)
 # California Department of Fish and Wildlife (CDFW) Fisheries Restoration Grant Program (FRGP) 
 # I need to read more about the difference between these 2 downloads. The first is a gdb and the second contains shp files.
 
-# Download data from first link
+# Download data from first link - This data includes the locations of projects. More research is needed to understand the differences between the two layers within this gdb.
   # Info & metadata: https://map.dfg.ca.gov/metadata/ds0168.html
 download.file(url = "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/100_199/ds168.zip", 
   destfile = "raw_data/cdfw_ds168.zip")
@@ -32,7 +32,7 @@ part1_layers
 part1_point <- st_read("ds168.gdb", layer = "ds168")
 glimpse(part1_point) 
 
-# Download data from the 2nd link
+# Download data from the 2nd link -- This data includes the areas in which the CDFW FRGP funds grants, but not the locations of projects.
   # Info and metadata: https://map.dfg.ca.gov/metadata/ds0734.html
 download.file(url = "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/700_799/ds734.zip", 
   destfile = "raw_data/cdfw_ds734.zip")
@@ -77,5 +77,6 @@ tm_shape(cdfw_part2) + tm_polygons()
 
 ```{r Minnesota data}
 # for later: https://solr.legacy.mn.gov/v2/export/download/bc29d464bec222dba9523a7ccfc0abfc
+
 # https://www.gis.leg.mn/metadata/legacy.htm
 ```
