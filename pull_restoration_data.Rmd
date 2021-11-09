@@ -43,6 +43,11 @@ summary(cdfw_part2)
 st_crs(cdfw_part2)
 ```
 
+```{r Quick look}
+cdfw_part1 %>% count(Project_Type) %>% arrange(desc(n))
+```
+
+
 
 ```{r California data - filtering}
 temp <- lapply(cdfw_part1, unique)
@@ -73,6 +78,30 @@ ggplot() + geom_sf(data = cdfw_part2)
 tmap_mode('plot')
 tm_shape(cdfw_part2) + tm_polygons()
 ```
+
+
+```{r Upload semi-coded data}
+# Load semi-coded file
+semi_coded <- read_excel("intermediate_data/semi_coded.xlsx")
+
+# Create slim version of cdfw_part1 with relevant info
+#cdfw_slim <- cdfw_par1 %>%
+ # select(ProjectID, Gra)
+
+# 
+# Join to project names to semi_coded file
+semi_coded2 <- semi_coded %>%
+  left_join(cdfw_part1, by = c("project_id" = "ProjectID"))
+
+glimpse(semi_coded)
+glimpse(cdfw_part1)
+
+```
+
+```{r}
+
+```
+
 
 
 ```{r Minnesota data}
