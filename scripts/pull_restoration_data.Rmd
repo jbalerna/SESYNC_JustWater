@@ -9,7 +9,6 @@ output: html_document
 library(tmap)
 ```
 
-
 ```{r California data}
 # California Department of Fish and Wildlife (CDFW) Fisheries Restoration Grant Program (FRGP) 
 # I need to read more about the difference between these 2 downloads. The first is a gdb and the second contains shp files.
@@ -47,8 +46,6 @@ st_crs(cdfw_part2)
 cdfw_part1 %>% count(Project_Type) %>% arrange(desc(n))
 ```
 
-
-
 ```{r California data - filtering}
 temp <- lapply(cdfw_part1, unique)
 cdfw_part1 %>% count(Grant_Status)
@@ -71,14 +68,12 @@ cdfw_part1_filtered <- cdfw_part1_filtered %>% filter(Grant_Status != c("Canceln
 cdfw_part2
 ```
 
-
 ```{r Mapping, quick exploration}
 ggplot() + geom_sf(data = cdfw_part2)
 
 tmap_mode('plot')
 tm_shape(cdfw_part2) + tm_polygons()
 ```
-
 
 ```{r Upload semi-coded data}
 # Load semi-coded file
@@ -97,11 +92,6 @@ glimpse(semi_coded)
 glimpse(cdfw_part1)
 
 ```
-
-```{r}
-
-```
-
 
 
 ```{r Minnesota data}
