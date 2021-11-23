@@ -7,9 +7,8 @@ output: html_document
 
 A few notes
 * It will take some time to create statewide, block-group-level population & ACS estimates with spatial data. (See ~line 80.)
-* 
 
-```{r include = FALSE}
+```{r packages & setup, include = FALSE}
 # set knitr options
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -24,6 +23,11 @@ library(tigris) # for state and county boundaries
 library(tidycensus) # for census data access
 library(here) # for relative file paths
 library(tictoc) # for timing how long code chunks take
+library(mapview)# for quick mapping
+library(terra) # for raster work
+library(raster) # for raster work
+library(areal) # for areal weighted interpolation
+library(tmap) # for mapping
 library(praise) # for positivity boosts :)
 
 # define functions and global options
@@ -33,6 +37,15 @@ options(tigris_use_cache = TRUE)
 options(stringsAsFactors = FALSE)
 census_api_key("69b2a9fd058d6fdd18c67f3688ba9e909fb21f50") # my census API key
 # to get your own, go to https://api.census.gov/data/key_signup.html
+
+# build function that pulls CA boundary into global environment as sf object
+get_ca_boundary <- function(crs) {
+    states() %>%
+      filter(NAME == "California") %>%
+      rename(name = NAME) %>%
+      dplyr::select(name) %>%
+      st_transform(crs = crs)
+}
 ```
 
 ```{r import california and minnesota, message = FALSE}
@@ -51,13 +64,51 @@ mn_st_bound <- tigris::states() %>% # import all states
 # confirm spatial objects are selected and projected correctly
 ggplot() +
   geom_sf(data = ca_st_bound) +
-  geom_sf(data = mn_st_bound) +
+  #geom_sf(data = mn_st_bound) +
   theme_minimal()
 ```
 
-```{r message = FALSE, cache = TRUE}
+```{r load tigerline shapefiles}
+## add block group info for mapping
+block_group <- st_read("raw_data/tl_2010_06_bg10/tl_2010_06_bg10.shp")
+block_group_orig <- block_group
+
+# transform
+block_group_t <- block_group %>%
+  st_transform(global_crs)
+
+# double check
+st_crs(block_group_t)
+```
+
+
+```{r load dasymmetric map layer}
+da_map = system.file("raw_data/capopgrid2020_100m_unrounded.tif", package = "spDataLarge")
+das_map <- raster("raw_data/capopgrid2020_100m_unrounded.tif")
+glimpse(das_map)
+das_map
+das_map <- setMinMax(das_map)
+das_map@crs
+image(das_map)
+bb <- extent(-381105,540895, -400000, 520000)
+r <- setExtent(das_map, bb, keepres=TRUE)
+plot(r)
+ggplot() + 
+  geom_raster(data = r, aes(x=x,y=y))
+
+plot(das_map)
+
+tmap_leaflet(
+  tm_shape(das_map) +
+    tm_raster() +
+    tmap_options(max.raster = c(plot = 97455400, view = 97455400)))
+
+```
+
+
+```{r pull census data, message = FALSE, cache = TRUE}
 # pull census data variable tables
-census_vars <- load_variables(year = 2010, dataset = "sf1") # 2010 census is most current right now; 2020 coming soon
+census_vars <- load_variables(year = 2020, dataset = "sf1") # 2010 census is most current right now; 2020 coming soon
 acs_5y_vars <- load_variables(year = 2019, dataset = "acs5") # 2014-2019 5-year ACS estimates, down to the block group level
 acs_1y_vars <- load_variables(year = 2019, dataset = "acs1") # 2019 1-yr ACS estimates
 
@@ -65,25 +116,142 @@ acs_1y_vars <- load_variables(year = 2019, dataset = "acs1") # 2019 1-yr ACS est
 acs_cleaner <- acs_5y_vars %>% 
   count(concept) 
 
+census_cleaner <- census_vars %>% 
+  count(concept) 
+
+#old delete
+ca_census_pop_tract <- ca_census_pop_blkgrp
+saveRDS(ca_census_pop_tract, "intermediate_data/ca_census_pop_tract.rds")
+rm(ca_census_pop_blkgrp)
+
+
 # get CA block-group-level population estimates from the 2010 census
 tic()
 ca_census_pop_blkgrp <- get_decennial(state = "CA",
                                            # county = "SET", # set county
-                                           geography = "tract", # pull block group-level data
+                                           geography = "block group", # pull block group-level data
                                               # Note: we could go to block level
-                                           variables = "P001001", # variable code for total population
-                                           geometry = TRUE) %>% # include vector geometry %>%
-  select(-variable) %>% # drop variable column
-  rename(tot_pop_census = value) %>% # rename value column to indicate what it captures
-  rename_with(tolower) # rename columns to lowercase
+                                           variables = c(total_popn = "P001001"), # variable code for total population
+                                           geometry = FALSE # include vector geometry %>%
+                                          ) 
 toc()
   # Note: Attempting this statewide crashed R for me, so we may want to run this on Savio, iterate through by county, or use a pre-made block group file (blasphemy, I know)
 
 # save that data
 tic()
-saveRDS(ca_census_pop_blkgrp, "intermediate_data/ca_census_pop_tract.rds") # or could save a gpkg, gdb, or shapefiles (look into Arc options)
+saveRDS(ca_census_pop_blkgrp, "intermediate_data/ca_census_pop_blkgrp.rds") # or could save a gpkg, gdb, or shapefiles (look into Arc options)
 toc()
 
+
+# get additional CA block-group-level population estimates from the 2010 census
+tic()
+ca_census_nh_white_pop_blkgrp <- get_decennial(state = "CA",
+                                           # county = "SET", # set county
+                                           geography = "block group", # pull block group-level data
+                                              # Note: we could go to block level
+                                           variables = c(white_alone = "P005003"), # # Total!!Not Hispanic or Latino!!White alone	
+
+                                           geometry = FALSE # include vector geometry %>%
+                                          ) 
+toc()
+
+# save that data
+tic()
+saveRDS(ca_census_nh_white_pop_blkgrp, "intermediate_data/ca_census_nh_white_pop_blkgrp.rds") # or could save a gpkg, gdb, or shapefiles (look into Arc options)
+toc()
+```
+
+
+```{r join tabular census data to spatial files}
+
+# reformat tabular data on pop
+ca_census_pop_blkgrp <- ca_census_pop_blkgrp %>%
+  rename(GEOID10 = GEOID,
+    total_pop = value) %>%
+  dplyr::select(-c(variable, NAME))
+
+# reformat tabular data on race
+ca_census_nh_white_pop_blkgrp <- ca_census_nh_white_pop_blkgrp %>%
+  rename(GEOID10 = GEOID,
+    nh_white_pop = value) %>%
+  dplyr::select(-c(variable, NAME))
+
+# join data
+block_group_t_1 <- block_group_t %>%
+  merge(ca_census_pop_blkgrp, by = "GEOID10")
+
+block_group_t_2 <- block_group_t_1 %>%
+  merge(ca_census_nh_white_pop_blkgrp, by = "GEOID10")
+
+# check
+glimpse(block_group_t_2)
+
+# backup
+saveRDS(block_group_t_2, "intermediate_data/block_group_t_2.rds")
+
+# calculate % BIPOC
+block_group_t_2 <- block_group_t_2 %>%
+  mutate(pct_bipoc = ((total_pop - nh_white_pop)/total_pop))
+
+# flag if block group is majority BIPOC
+block_group_t_2 <- block_group_t_2 %>%
+  mutate(maj_bipoc = ifelse(pct_bipoc >= 0.5, "YES", "NO"))
+
+```
+
+```{r which block groups do restoration sites fall within?}
+
+# load restoration data
+cdfw <- readRDS("intermediate_data/part1_point.rds")
+
+# convert cdfw data frame to sf object
+cdfw_sf <- cdfw %>%
+  st_as_sf(
+    coords = c("WorksiteLo", "WorksiteLa"),
+    agr = "constant",
+    crs = global_crs, # JMLR: why isn't this working???
+    stringsAsFactors = FALSE,
+    remove = TRUE
+  )
+
+# transform CRS for consistency
+cdfw_sf_t <- cdfw_sf %>%
+  st_transform(global_crs)
+
+# find points within polygons
+site_in_blkgrp <- st_join(cdfw_sf_t, block_group_t_2, join = st_within)
+
+# check
+glimpse(site_in_blkgrp)
+
+# save that
+saveRDS(site_in_blkgrp, "site_in_blkgrp.rds")
+```
+
+```{r quick map}
+# quickly visualize all the restoration sites
+ca_boundary <- get_ca_boundary(crs = global_crs)
+
+# double check
+st_crs(ca_boundary)
+
+# plot
+ggplot() +
+  geom_sf(data = ca_boundary, fill = "lightgrey") +
+  geom_sf(data = site_in_blkgrp, aes(color = maj_bipoc)) +
+  theme_minimal()
+```
+
+
+
+
+
+
+
+
+
+
+```{r MN pull census data, message = FALSE, cache = TRUE}
 # get MN block-group-level population estimates from the 2010 census
 tic()
 mn_census_pop_blkgrp <- get_decennial(state = "MN",
@@ -101,12 +269,17 @@ tic()
 saveRDS(mn_census_pop_blkgrp, "intermediate_data/mn_census_pop_tract.rds") # or could save a gpkg
 toc()
 
+
+
+
+
+
 # Pull ACS data on MHI, % of population with a college education, % of population that is non-Hispanic white
 ca_acs_blkgrp <- get_acs(state = "CA",
                                   #county = "SET", # set county
                                   geography = "block group", # pull block group-level data
                                     # for acs, we can only go to block group or place (ie. not block)
-                                  variables = c("B01003_001" # total population
+                                  variables = c("B01003_001", # total population
                                     "B02008_001" # white population (alone or in combination with other race)
                                     # add more
                                     ), 
@@ -121,3 +294,32 @@ ca_acs_blkgrp <- get_acs(state = "CA",
   mutate(white_prop_acs = white_pop_acs / tot_pop_acs,
          nonwhite_prop_acs = 1 - white_prop_acs) # add column giving proportion of population that is white
 ```
+
+```{r buffer point for intersecting layers}
+# Fresno, CA, is at 36.7338° N, 119.7846° W
+
+```
+
+```{r to do}
+# 1. Pull sample census file (Eg. population)
+# 2. 
+```
+
+*To Do*
+/1. Pull sample census file (eg. population)
+/1b. merge tabular to spatial data
+2. Create a sample point (eg. Fresno)
+3. Pull the relevant census block group stats for the block group that point falls into
+4. automate for all points & all desired infos
+
+laterr
+3. Create a polygon that represents a 1km buffer around the sample point 
+4. Do aerial weighted interpolation (ie. mean vallue) of the relevant data layer for that buffer
+5. Set it up to automate step 3 (ie. iterate through all points in a list and create buffered files)
+6. Set it up to automate step 4 (ie. iterate through aerial weighted interpolation)
+
+7. Read more about race variable - % [non?] non-Hispanic white?
+8. Check crs & any needed transformations with Lucy (ie. Nick's layer & census layers are different)
+
+
+

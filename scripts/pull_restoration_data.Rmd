@@ -31,6 +31,9 @@ part1_layers
 part1_point <- st_read("ds168.gdb", layer = "ds168")
 glimpse(part1_point) 
 
+# backup
+saveRDS(part1_point, "intermediate_data/part1_point.rds")
+
 # Download data from the 2nd link -- This data includes the areas in which the CDFW FRGP funds grants, but not the locations of projects.
   # Info and metadata: https://map.dfg.ca.gov/metadata/ds0734.html
 download.file(url = "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/700_799/ds734.zip", 
