@@ -26,6 +26,7 @@ suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(sf))
 suppressPackageStartupMessages(library(raster))
 suppressPackageStartupMessages(library(elevatr))
+suppressPackageStartupMessages(library(esri2sf))
 suppressPackageStartupMessages(library(exactextractr))
 suppressPackageStartupMessages(library(fst))
 suppressPackageStartupMessages(library(rgdal))
@@ -44,7 +45,7 @@ options(tigris_use_cache = TRUE)
 global_crs <- st_crs(4269)
 global_crs_proj4 <- global_crs$proj4string
 options(scipen = 999)
-options(timeout = 3000)
+options(timeout = 30000)
 rasterOptions(memfrac = .3)
 parallel <- FALSE
 
@@ -510,23 +511,30 @@ csci <- read_csv(here("raw_data", "csci", "csci_all.csv"),
                      col_names = TRUE) %>%
   rename(index = "...1") %>%
   group_by(station_code) %>%
-  summarize(worst_csci_score = min(csci_score, na.rm = TRUE),
+  summarize(csci_score = min(csci_score, na.rm = TRUE),
             cwip_score = cwip_score[which.min(csci_score)],
             stream_name = stream_name[which.min(csci_score)],
             station_code = station_code[which.min(csci_score)],
             sample_date = sample_date[which.min(csci_score)],
             latitude = latitude[which.min(csci_score)],
             longitude = longitude[which.min(csci_score)]) %>%
+  rowid_to_column(var = "csci_index") %>%
   st_as_sf(coords = c("longitude", "latitude"), crs = global_crs)
 
-# clean up
-rm(csci_url)
-```
+# calculate the average CSCI score for all restoration sites
+# using all CSCI observations within 50km of a restoration site
+# aka intersecting a 50km buffer
+csci_agg <- aggregate(dplyr::select(csci, csci_score, cwip_score),
+                      dplyr::select(restoration_projects, index),
+                      FUN = mean, 
+                      join = function(x, y) st_is_within_distance(x, y, dist = set_units(50, "km"))) %>%
+  st_drop_geometry()
 
-```{r}
-ggplot() +
-  geom_sf(data = ca_boundary) +
-  geom_sf(data = csci, aes(color = worst_csci_score))
+# bind CSCI aggregated values to restoration projects
+restoration_projects <- cbind(restoration_projects, csci_agg)
+
+# clean up
+rm(csci_url, csci_agg)
 ```
 
 ## Nitrates
@@ -548,7 +556,7 @@ nitrates <- read_csv(here("raw_data", "nitrates", "nitrates_all.csv"),
                      col_names = TRUE) %>%
   rename(index = "...1") %>%
   group_by(code) %>%
-  summarize(worst_nitrate_score = min(score, na.rm = TRUE),
+  summarize(nitrate_score = min(score, na.rm = TRUE),
             name = name[which.min(score)],
             code = code[which.min(score)],
             date = date[which.min(score)],
@@ -556,14 +564,21 @@ nitrates <- read_csv(here("raw_data", "nitrates", "nitrates_all.csv"),
             lon = lon[which.min(score)]) %>%
   st_as_sf(coords = c("lon", "lat"), crs = global_crs)
 
-# clean up
-rm(nitrates_url)
-```
 
-```{r}
-ggplot() +
-  geom_sf(data = ca_boundary) +
-  geom_sf(data = nitrates, aes(color = worst_nitrate_score))
+# calculate the average nitrates score for all restoration sites
+# using all nitrates observations within 50km of a restoration site
+# aka intersecting a 50km buffer
+nitrates_agg <- aggregate(dplyr::select(nitrates, nitrate_score),
+                          dplyr::select(restoration_projects, index),
+                          FUN = mean, 
+                          join = function(x, y) st_is_within_distance(x, y, dist = set_units(50, "km"))) %>%
+  st_drop_geometry()
+
+# bind CSCI aggregated values to restoration projects
+restoration_projects <- cbind(restoration_projects, nitrates_agg)
+
+# clean up
+rm(nitrates_url, nitrates_agg)
 ```
 
 ## 303d Listed Waterbodies
@@ -602,11 +617,46 @@ unzip(here("raw_data", "303d", "IR_1416_Impaired_Polys.zip"),
 
 # read in
 waterbodies_303d_lines <- st_read(here("raw_data", "303d", "IR_1416_Impaired_Lines")) %>%
-  st_transform(crs = global_crs)
+  st_transform(crs = global_crs) %>%
+  ms_simplify(keep = 0.05) %>%
+  mutate(waterbody_303d = TRUE) %>%
+  dplyr::select(waterbody_303d)
 
 waterbodies_303d_polygons <- st_read(here("raw_data", "303d", "IR_1416_Impaired_Polys")) %>%
-  st_transform(crs = global_crs)
+  st_transform(crs = global_crs) %>%
+  ms_simplify(keep = 0.05) %>%
+  mutate(waterbody_303d = TRUE,
+         is_valid = st_is_valid(geometry)) %>%
+  filter(is_valid) %>%
+  dplyr::select(waterbody_303d)
+
+# buffer restoration sites for intersection with 303d listed waterbodies
+restoration_buffered <- st_buffer(restoration_projects, dist = set_units(10, "km")) %>%
+  dplyr::select(index)
+
+# intersect buffered restoration sites with 303d listed waterbodies
+restoration_buffered <- restoration_buffered %>%
+  st_join(y = waterbodies_303d_lines) %>%
+  st_join(y = waterbodies_303d_polygons) %>%
+  st_drop_geometry() %>%
+  group_by(index) %>%
+  summarize(streams_303d = max(waterbody_303d.x, na.rm = TRUE),
+            lakes_ponds_303d = max(waterbody_303d.x, na.rm = TRUE))
+
+# clean results
+restoration_buffered <- do.call(data.frame,
+                                lapply(restoration_buffered,
+                                       function(x) replace(x, is.infinite(x), NA)))
+
+# join to restoration projects dataframe
+restoration_projects <- left_join(restoration_projects, restoration_buffered,
+                                  by = "index")
 
 # clean up
-rm(waterbodies_303d_lines_url, waterbodies_303d_polygons_url)
+rm(waterbodies_303d_lines_url, waterbodies_303d_polygons_url,
+   waterbodies_303d_lines, waterbodies_303d_polygons)
 ```
+
+
+
+
