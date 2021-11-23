@@ -20,16 +20,21 @@ suppressPackageStartupMessages(library(foreach))
 suppressPackageStartupMessages(library(doParallel))
 suppressPackageStartupMessages(library(here))
 suppressPackageStartupMessages(library(readxl))
+suppressPackageStartupMessages(library(googledrive))
 suppressPackageStartupMessages(library(readr))
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(sf))
 suppressPackageStartupMessages(library(raster))
 suppressPackageStartupMessages(library(elevatr))
+suppressPackageStartupMessages(library(exactextractr))
+suppressPackageStartupMessages(library(fst))
 suppressPackageStartupMessages(library(rgdal))
+suppressPackageStartupMessages(library(units))
 suppressPackageStartupMessages(library(tigris))
 suppressPackageStartupMessages(library(tidycensus))
 suppressPackageStartupMessages(library(rmapshaper))
 suppressPackageStartupMessages(library(ggnewscale))
+suppressPackageStartupMessages(library(caladaptr))
 suppressPackageStartupMessages(library(nhdR))
 suppressPackageStartupMessages(library(nhdplusTools))
 
@@ -37,9 +42,18 @@ suppressPackageStartupMessages(library(nhdplusTools))
 options(stringsAsFactors = FALSE)
 options(tigris_use_cache = TRUE)
 global_crs <- st_crs(4269)
+global_crs_proj4 <- global_crs$proj4string
 options(scipen = 999)
 options(timeout = 3000)
 rasterOptions(memfrac = .3)
+parallel <- FALSE
+
+# set up parallel computation
+if(parallel) {
+  num_cores <- detectCores()
+  cl <- makeCluster(num_cores, output = "")
+  registerDoParallel(cl)
+}
 
 # build custom functions and operators
 # %notin%: operator that returns the negation of %in%
@@ -70,11 +84,26 @@ view_flat <- function(sf_obj) {
   st_drop_geometry(sf_obj) %>%
     View(.)
 }
+
+# build a function that computes total stream length upstream of a segment
+get_upstream_length <- function(comid, ut_network_df) {
+  
+  try(upstream_comids <- get_UT(ut_network_df, comid, distance = NULL))
+  
+  upstream_length_km <- ut_network_df %>%
+    filter(COMID %in% upstream_comids) %>%
+    summarize(total_length_km = sum(LENGTHKM)) %>%
+    pull(total_length_km)
+  
+  return(upstream_length_km)
+  
+}
 ```
 
 # Import restoration data
 
 ## DS734 - restoration focus watersheds
+## DS168 - restoration project sites
 
 ```{r}
 # create directories
@@ -85,6 +114,9 @@ if(!dir.exists(here("raw_data", "cdfw_ds734"))) {
 if(!dir.exists(here("raw_data", "cdfw_ds168"))) {
   dir.create(here("raw_data", "cdfw_ds168"))
 }
+
+# download spatial files from CDFW
+######### ---> url and download here
 
 # unzip zipped spatial files
 unzip(zipfile = here("raw_data", "cdfw_ds734.zip"), overwrite = TRUE,
@@ -100,12 +132,18 @@ ds734 <- st_read(dsn = here("raw_data", "cdfw_ds734", "ds734.shp")) %>%
   st_transform(crs = global_crs)
 
 # ds168: locations of fisheries restoration grant program projects
-ds168 <- readOGR(dsn = here("raw_data", "cdfw_ds168", "ds168.gdb"), layer = "ds168") %>%
+ds168 <- readOGR(dsn = here("raw_data", "cdfw_ds168", "ds168.gdb"),
+                 layer = "ds168") %>%
   st_as_sf() %>%
   st_transform(crs = global_crs)
-```
 
-## DS734 - restoration project sites
+# ds168_ex: ???
+# ds168: locations of fisheries restoration grant program projects
+ds168_ex <- st_read(dsn = here("raw_data", "cdfw_ds168", "ds168.gdb"),
+                    layer = "ds168_ex") %>%
+  rename(project_id = ProjectID) %>%
+  rename_with(tolower)
+```
 
 ```{r}
 # clean data
@@ -135,7 +173,11 @@ ds168 <- ds168 %>%
          worksite_id = WorksiteID,
          worksite_name = WorksiteNa,
          award_year = Award_Year) %>%
-  dplyr::select(-WorksiteLa, - WorksiteLo)
+  dplyr::select(-WorksiteLa, - WorksiteLo) %>%
+  left_join(ds168_ex, by = c("project_id", "award_year"))
+
+# clean up
+rm(ds168_ex)
 ```
 
 # Classify projects
@@ -152,6 +194,7 @@ ggplot() +
   geom_sf(data = ds168, aes(color = award_year)) +
   theme_minimal()
 ```
+
 ## Urban area association - incorporated and census-designated places
 
 ```{r}
@@ -182,72 +225,14 @@ ggplot() +
 
 ```{r}
 # filter restoration project sites to only those within census place boundaries
-ds168_incorp_cdp <- st_join(x = ds168, y = incorp_cdp, join = st_intersects, left = FALSE)
+restoration_projects <- st_join(x = ds168, y = incorp_cdp, join = st_intersects, left = FALSE)
 
 # quickly visualize restoration sites falling with census place boundaries
 ggplot() +
   geom_sf(data = ca_boundary, fill = "lightgrey") +
   geom_sf(data = ms_simplify(ds734, keep = 0.05), fill = "lightblue") +
-  geom_sf(data = ds168_incorp_cdp, aes(color = award_year)) +
+  geom_sf(data = restoration_projects, aes(color = award_year)) +
   theme_minimal()
-```
-
-## Check out project worksite names (project types a la NRRSS)
-
-```{r}
-# identify and tally unique words in worksite names
-if(FALSE) {
-  desc_word_counts <- ds168_incorp_cdp %>%
-    pull(worksite_name) %>%
-    paste(collapse = " ") %>% # create a single string of all worksite names
-    gsub("[^[:alpha:][:space:]]", " ", .) %>% # drop all non-alphabetic characters
-    str_squish() %>% # remove multiple spaces
-    str_to_lower() %>% # convert everything to lowercase
-    str_split(" ") %>% # split string on spaces to isolate single words
-    as_tibble(.name_repair = "minimal") %>% # convert to tibble
-    set_colnames("word") %>%
-    group_by(word) %>%
-    tally() %>% # count occurrences of each word
-    filter(word %notin% stopwords("en")) %>% # drop common stop words that don't have value
-    arrange(desc(n)) # arrange descending by frequency
-
-  ### EVERYTHING BELOW HERE IS IN PROGRESS / EXPERIMENTAL!
-  
-  # list out nrrss categorization words
-  bank_stabilization <- c("stabilization", "stabilize")
-  
-  stormwater_mgmt <- c("road", "detention", "erosion", "sediment")
-  
-  flow_mod <- c("tailwater", "irrigation")
-  
-  channel_reconfig <- c("ditch", "bioengineering", "realignment")
-  
-  fish_passage <- c("passage", "fishway", "ladder", "tidegate")
-  
-  riparian_mgmt <- c("planting","bamboo", "fencing", "fence", "vegetation",
-                     "plants", "donax", "riparian", "upslope")
-  
-  species_mgmt <- c()
-  
-  barrier_removal_retrofit <- c("culvert", "barrier", "dam", "bridge", "diversion")
-  
-  floodplain_reconnect <- c()
-  
-  hab_improvement <- c("habitat", "boulder", "log", "microcover", "berm", "cover",
-                       "riffle", "logjam", "gravel", "reef", "lagoon", "instream")
-  
-  pub_access <- c("trail")
-  
-  water_quality <- c()
-  
-  land_acq <- c("acquisition")
-  
-  # list out words to potentially exclude
-  exclude <- c("planning", "assessment", "monitoring", "survey", "organization",
-               "inventory", "outreach", "education", "training", "festival",
-               "analysis", "symposium", "conference", "design", "permitting",
-               "coordinator", "publication", "protocol", "mapping", "workgroup")
-}
 ```
 
 ## Clean up
@@ -287,6 +272,9 @@ if(TRUE) {
            huc8_name = name) %>%
     dplyr::select(huc8, huc8_name, huc8_area_sqkm)
 }
+
+# enrich restoration projects with HUC8
+restoration_projects <- st_join(restoration_projects, huc8)
 ```
 
 ### HUC12 and ACE
@@ -330,32 +318,176 @@ huc12 <- readOGR(dsn = here("raw_data", "ace", "ACE_Summary_Datasets", "ds2743.g
                 native_aquatic_invert_count, native_aquatic_amphib_count,
                 native_aquatic_reptile_count)
 
+# enrich restoration projects with HUC12 and ACE
+restoration_projects <- st_join(restoration_projects, huc12) 
+
 # clean up
 rm(ace_url)
 ```
 
-## Slope
+```{r}
+# take a quick look at ACE data
+ggplot() +
+  geom_sf(data = huc12, aes(fill = native_aquatic_index), lwd = 0) +
+  theme_minimal()
+```
+
+## NHD Flowlines
 
 ```{r}
-# set this up to rasterize and run parallel
-# https://newbedev.com/increasing-speed-of-crop-mask-extract-raster-by-many-polygons-in-r
-if(FALSE) {
-  
-  elevation <- get_elev_raster(as(ca_boundary, "Spatial"),
-                               z = 9,
-                               prj = global_crs$proj4string,
-                               serial = TRUE)
-  
-  slope_aspect <- terrain(elevation,
-                          opt = c("slope", "aspect"),
-                          unit = "degrees")
-  
-  
-  slope_aspect_extracted <- extract(slope_aspect,
-                                    as(huc12, "Spatial"),
-                                    fun = mean,
-                                    na.rm = TRUE)
+# create directory
+if(!dir.exists(here("raw_data", "nhd_flowlines"))) {
+  dir.create(here("raw_data", "nhd_flowlines"))
+}
 
+# set nhdR download and directory paths
+Sys.setenv(nhdR_path = here("raw_data", "nhd_flowlines"))
+
+# download flowlines and attribute data for VPUs 17 (PNW) and 18 (CA)
+suppressMessages(nhd_plus_get(vpu = 17, component = "NHDSnapshot"))
+suppressMessages(nhd_plus_get(vpu = 18, component = "NHDSnapshot"))
+suppressMessages(nhd_plus_get(vpu = 17, "NHDPlusAttributes"))
+suppressMessages(nhd_plus_get(vpu = 18, "NHDPlusAttributes"))
+
+# read in flowlines
+flowlines_17 <- nhd_plus_load(vpu = 17,
+                              component = "NHDSnapshot",
+                              dsn = "NHDFlowline")
+
+flowlines_18 <- nhd_plus_load(vpu = 18,
+                              component = "NHDSnapshot",
+                              dsn = "NHDFlowline")
+
+flowlines <- rbind(flowlines_17, flowlines_18) %>%
+  rename(length_km = LENGTHKM) %>%
+  rename_with(.fn = tolower) %>%
+  dplyr::select(comid, gnis_id, gnis_name, length_km, ftype) %>%
+  st_join(y = ca_boundary, join = st_intersects, left = FALSE) %>%
+  dplyr::select(-name) %>%
+  filter(!ftype == "Coastline")
+
+# download value-added attributes (original source: Hydroshare)
+drive_download(file = as_id("1tpMnQDXD50jYQ5EtZJthOAKPc5squEn0"),
+               path = here("raw_data", "nhd_flowlines", "vaa.zip"),
+               overwrite = TRUE)
+
+# unzip value-added attributes
+unzip(zipfile = here("raw_data", "nhd_flowlines", "vaa.zip"),
+      exdir = here("raw_data", "nhd_flowlines"))
+
+# read in value-added attributes and filter for CA
+vaa <- read_fst(path = here("raw_data", "nhd_flowlines", "nhdplusVAA.fst", "nhdplusVAA.fst")) %>%
+  filter(comid %in% flowlines$comid)
+
+# create vaa dataframe with specific column headings for upstream calcs
+ut_network <- vaa %>%
+  rename(COMID = comid,
+         Pathlength = pathlength,
+         LENGTHKM = lengthkm,
+         Hydroseq = hydroseq,
+         LevelPathI = levelpathi,
+         DnHydroseq = dnhydroseq) %>%
+  dplyr::select(COMID, Pathlength, LENGTHKM, Hydroseq, LevelPathI, DnHydroseq)
+
+# clean vaa
+vaa <- vaa %>%
+  rename(stream_order = streamorde,
+         length_km = lengthkm,
+         tot_da_sqkm = totdasqkm) %>%
+  dplyr::select(comid, stream_order,
+                fcode, tot_da_sqkm, slope, roughness)
+
+# add drainage area from value-added attributes to flowlines
+flowlines <- left_join(x = flowlines, y = vaa, by = "comid")
+
+# snap restoration projects to flowlines
+restoration_projects <- st_join(restoration_projects, flowlines, st_nearest_feature)
+
+# clean up
+rm(flowlines_17, flowlines_18, vaa)
+```
+
+### Upstream drainage area and length attributes
+
+```{r}
+# compute upstream stream length (including tributaries) for each restoration project
+restoration_projects <- restoration_projects %>%
+  rowwise() %>%
+  mutate(upstream_length_km = get_upstream_length(comid = comid,
+                                                  ut_network_df = ut_network),
+         drainage_density = upstream_length_km / tot_da_sqkm) %>%
+  ungroup() %>%
+  rowid_to_column(var = "index")
+
+# clean up
+rm(ut_network)
+```
+
+## Environmental flows
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "eflows"))) {
+  dir.create(here("raw_data", "eflows"))
+}
+
+# specify eflows url
+eflows_url <- "https://s3-us-west-1.amazonaws.com/funcflow/resources/eflow_geodatabase.zip"
+
+if(!file.exists(here("raw_data", "eflows", "eflows.zip"))) {
+  download.file(url = eflows_url,
+                destfile = here("raw_data", "eflows", "eflows.zip"))
+}
+
+# unzip eflows data
+unzip(zipfile = here("raw_data", "eflows", "eflows.zip"),
+      exdir = here("raw_data", "eflows"))
+
+# read in eflows data
+eflows <- st_read(here("raw_data", "eflows", "Final_Classification_9CLASS",
+                       "Final_Classification_9CLASS.shp")) %>%
+  st_transform(crs = global_crs) %>%
+  rename(eflows_class = CLASS,
+         comid = COMID) %>%
+  dplyr::select(eflows_class, comid)
+
+# add eflows to restoration projects
+restoration_projects <- left_join(restoration_projects, st_drop_geometry(eflows),
+                                  by = "comid")
+
+# clean up
+rm(eflows, eflows_url)
+```
+
+## Precipitation - ERRORS, asked Andy to resolve in package
+
+```{r}
+if(FALSE) {
+  # get grid of precip data coverage
+  loca <- ca_locagrid_geom() %>%
+    st_transform(crs = global_crs)
+  
+  # trim restoration projects dataset and
+  # specify coordinates of restoration projects for API call
+  restoration_coords <- st_join(restoration_projects, loca, left = FALSE) %>%
+    st_drop_geometry() %>%
+    dplyr::select(center_longitude, center_latitude, index) %>%
+    rename(x = center_longitude,
+           y = center_latitude)
+  
+  # generate a precip API call
+  precip_api_call <- ca_loc_pt(x = ca_apireq(),
+                               dplyr::select(restoration_coords, x, y),
+                               id = restoration_coords$index) %>%
+    ca_gcm("ens32avg") %>%
+    ca_scenario("historical") %>%
+    ca_cvar("pr") %>%
+    ca_period("year") %>%
+    ca_years(start = 1980, end = 2005)
+  
+  # make API call for precip data
+  precip <- precip_api_call %>%
+    ca_getvals_tbl(quiet = TRUE)
 }
 ```
 
@@ -391,6 +523,12 @@ csci <- read_csv(here("raw_data", "csci", "csci_all.csv"),
 rm(csci_url)
 ```
 
+```{r}
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = csci, aes(color = worst_csci_score))
+```
+
 ## Nitrates
 
 ```{r}
@@ -420,6 +558,12 @@ nitrates <- read_csv(here("raw_data", "nitrates", "nitrates_all.csv"),
 
 # clean up
 rm(nitrates_url)
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = nitrates, aes(color = worst_nitrate_score))
 ```
 
 ## 303d Listed Waterbodies
@@ -466,4 +610,3 @@ waterbodies_303d_polygons <- st_read(here("raw_data", "303d", "IR_1416_Impaired_
 # clean up
 rm(waterbodies_303d_lines_url, waterbodies_303d_polygons_url)
 ```
-
