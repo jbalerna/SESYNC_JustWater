@@ -240,6 +240,12 @@ ggplot() +
   geom_sf(data = ca_boundary, fill = "lightgrey") +
   geom_sf(data = site_in_blkgrp, aes(color = maj_bipoc)) +
   theme_minimal()
+
+# plot
+ggplot() +
+  geom_sf(data = ca_boundary, fill = "lightgrey") +
+  geom_sf(data = site_in_blkgrp, aes(color = total_pop)) +
+  theme_minimal()
 ```
 
 
