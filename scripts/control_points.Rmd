@@ -1,0 +1,481 @@
+---
+title: "build_restoration_and_controls"
+author: "Lucy Andrews"
+date: "11/29/2021"
+output: html_document
+---
+
+# Set up
+
+## Load packages
+
+```{r}
+# load packages
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(janitor))
+suppressPackageStartupMessages(library(foreach))
+suppressPackageStartupMessages(library(doParallel))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(readxl))
+suppressPackageStartupMessages(library(googledrive))
+suppressPackageStartupMessages(library(readr))
+suppressPackageStartupMessages(library(stringr))
+suppressPackageStartupMessages(library(sf))
+suppressPackageStartupMessages(library(raster))
+suppressPackageStartupMessages(library(elevatr))
+suppressPackageStartupMessages(library(esri2sf))
+suppressPackageStartupMessages(library(exactextractr))
+suppressPackageStartupMessages(library(fst))
+suppressPackageStartupMessages(library(rgdal))
+suppressPackageStartupMessages(library(units))
+suppressPackageStartupMessages(library(tigris))
+suppressPackageStartupMessages(library(tidycensus))
+suppressPackageStartupMessages(library(rmapshaper))
+suppressPackageStartupMessages(library(ggnewscale))
+suppressPackageStartupMessages(library(caladaptr))
+suppressPackageStartupMessages(library(nhdR))
+suppressPackageStartupMessages(library(nhdplusTools))
+```
+
+## Set global options
+
+```{r}
+# set global options
+options(stringsAsFactors = FALSE)
+options(tigris_use_cache = TRUE)
+global_crs <- st_crs(4269)
+options(scipen = 999)
+options(timeout = 30000)
+drop_ftypes <- c("Coastline", "Pipeline", "Connector")
+```
+
+## Build custom functions
+
+```{r}
+# build custom functions and operators
+# %notin%: operator that returns the negation of %in%
+`%notin%` <- Negate(`%in%`)
+
+# build function that pulls CA boundary into global environment as sf object
+get_ca_boundary <- function(crs) {
+    states() %>%
+      filter(NAME == "California") %>%
+      rename(name = NAME) %>%
+      dplyr::select(name) %>%
+      st_transform(crs = crs)
+}
+
+# build function that quickly pulls up sf object attribute tables
+view_flat <- function(sf_obj) {
+  st_drop_geometry(sf_obj) %>%
+    View(.)
+}
+
+# build function that returns the midpoint of a given sf line object
+st_line_midpoints <- function(sf_lines = NULL) {
+  
+  g <- st_geometry(sf_lines)
+  
+  g_mids <- lapply(g, function(x) {
+    
+    coords <- as.matrix(x)
+    
+    get_mids <- function (coords) {
+      dist <- sqrt((diff(coords[, 1])^2 + (diff(coords[, 2]))^2))
+      dist_mid <- sum(dist)/2
+      dist_cum <- c(0, cumsum(dist))
+      end_index <- which(dist_cum > dist_mid)[1]
+      start_index <- end_index - 1
+      start <- coords[start_index, ]
+      end <- coords[end_index, ]
+      dist_remaining <- dist_mid - dist_cum[start_index]
+      mid <- start + (end - start) * (dist_remaining/dist[start_index])
+      return(mid)
+    
+    }
+    
+    mids <- st_point(get_mids(coords))
+    
+    })
+  
+  geometry <- st_sfc(g_mids, crs = st_crs(sf_lines))
+  
+  geometry <- st_sf(geometry)
+  
+}
+```
+
+## Load California state boundary
+
+```{r}
+# load California state boundary
+ca_boundary <- get_ca_boundary(crs = global_crs)
+```
+
+
+
+# Load restoration data
+
+## Create directories
+
+```{r}
+# create directories
+if(!dir.exists(here("raw_data", "restoration_areas"))) {
+  dir.create(here("raw_data", "restoration_areas"))
+}
+
+if(!dir.exists(here("raw_data", "restoration_projects"))) {
+  dir.create(here("raw_data", "restoration_projects"))
+}
+```
+
+## Download restoration files
+
+```{r}
+# specify urls
+restoration_areas_url <- "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/700_799/ds734.zip"
+
+restoration_projects_url <- "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/100_199/ds168.zip"
+
+# download files
+if(!file.exists(here("raw_data", "restoration_areas", "cdfw_restoration_areas.zip"))) {
+  download.file(url = restoration_areas_url,
+                destfile = here("raw_data", "restoration_areas", "cdfw_restoration_areas.zip"))
+}
+
+if(!file.exists(here("raw_data", "restoration_projects", "cdfw_restoration_projects.zip"))) {
+  download.file(url = restoration_projects_url,
+                destfile = here("raw_data", "restoration_projects", "cdfw_restoration_projects.zip"))
+}
+
+# unzip files
+unzip(zipfile = here("raw_data", "restoration_areas", "cdfw_restoration_areas.zip"),
+      overwrite = TRUE,
+      exdir = here("raw_data", "restoration_areas", "cdfw_restoration_areas"))
+
+unzip(zipfile = here("raw_data", "restoration_projects", "cdfw_restoration_projects.zip"),
+      overwrite = TRUE,
+      exdir = here("raw_data", "restoration_projects", "cdfw_restoration_projects"))
+
+# clean up
+rm(restoration_areas_url, restoration_projects_url)
+```
+
+## Read in restoration data
+
+### Read in restoration areas
+
+```{r}
+# read in and clean restoration areas sf object - multipolygon geometry
+restoration_areas <- st_read(dsn = here("raw_data", "restoration_areas", "cdfw_restoration_areas")) %>%
+  st_transform(crs = global_crs) %>%
+  rename(huc2 = HUC_2,
+         huc4 = HUC_4,
+         huc6 = HUC_6,
+         huc8 = HUC_8,
+         huc8_state = HU_8_STATE,
+         fips_code = FIPS_C,
+         huc10_name = HU_10_NAME) %>%
+  rename_with(tolower) %>%
+  ms_simplify(keep = 0.05) %>%
+  mutate(is_valid = st_is_valid(geometry)) %>%
+  filter(is_valid) %>%
+  dplyr::select(-is_valid)
+
+restoration_areas_diss <- st_union(x = restoration_areas) %>%
+  st_as_sf()
+
+# check out map of project areas
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = restoration_areas_diss, fill = "yellowgreen") +
+  theme_minimal()
+```
+
+### Read in restoration projects
+
+```{r}
+# read in and clean restoration projects sf object - point geometry
+### ---> NOTE: Lucy chose not to use this dataset, as it's one-to-many with
+###            the restoration_project_ex dataset below, which is more useful
+###            for our purposes
+restoration_worksites <- st_read(dsn = here("raw_data", "restoration_projects",
+                                            "cdfw_restoration_projects", "ds168.gdb"),
+                                layer = "ds168") %>%
+  st_as_sf() %>%
+  st_transform(crs = global_crs) %>%
+  rename(project_id = ProjectID,
+         worksite_id = WorksiteID,
+         worksite_name = WorksiteNa,
+         award_year = Award_Year,
+         worksite_latitude = WorksiteLa,
+         worksite_longitude = WorksiteLo,
+         geometry = Shape)
+
+# read in and clean restoration projects additional fields - dataframe
+restoration_projects <- st_read(dsn = here("raw_data", "restoration_projects",
+                                           "cdfw_restoration_projects", "ds168.gdb"),
+                                   layer = "ds168_ex") %>%
+  rename(project_id = ProjectID) %>%
+  rename_with(tolower) %>%
+  st_as_sf(coords = c("center_longitude", "center_latitude"),
+           crs = global_crs)
+
+# identify project characteristics to drop
+drop_project_type <- c("Water Measuring Devices",
+                       "Monitoring Watershed Restoration",
+                       "AmericCorps",
+                       "Project Design",
+                       "Public Involvement and Capacity Building",
+                       "Private Sector Technical Training and Education",
+                       "Public School Watershed and Fishery Conservation Education Project",
+                       "Cooperative Rearing",
+                       "Watershed and Regional Organization",
+                       "Watershed Evaluation, Assessment, Planning",
+                       "Monitoring Status and Trends")
+
+drop_cal_work_status <- c("Terminated/Cancelled",
+                          "TerminateCancel")
+
+drop_grant_status <- c("Cancelnofundsspent")
+
+# join additional fields to restoration projects sf object
+restoration_projects <- restoration_projects %>%
+  filter(project_type %notin% drop_project_type,
+         cal_work_status %notin% drop_cal_work_status,
+         grant_status %notin% drop_grant_status)
+
+# clean up
+rm(restoration_worksites, drop_project_type, drop_cal_work_status, drop_grant_status)
+```
+
+
+
+# Load NHD data
+
+## Download and clean flowlines
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "nhd_flowlines"))) {
+  dir.create(here("raw_data", "nhd_flowlines"))
+}
+
+# set nhdR download and directory paths
+Sys.setenv(nhdR_path = here("raw_data", "nhd_flowlines"))
+
+# download flowlines and attribute data for VPUs 17 (PNW) and 18 (CA)
+suppressMessages(nhd_plus_get(vpu = 17, component = "NHDSnapshot"))
+suppressMessages(nhd_plus_get(vpu = 18, component = "NHDSnapshot"))
+suppressMessages(nhd_plus_get(vpu = 17, "NHDPlusAttributes"))
+suppressMessages(nhd_plus_get(vpu = 18, "NHDPlusAttributes"))
+
+# read in flowlines
+flowlines_17 <- nhd_plus_load(vpu = 17,
+                              component = "NHDSnapshot",
+                              dsn = "NHDFlowline") %>%
+  st_transform(crs = global_crs)
+
+flowlines_18 <- nhd_plus_load(vpu = 18,
+                              component = "NHDSnapshot",
+                              dsn = "NHDFlowline") %>%
+  st_transform(crs = global_crs)
+
+# create a single flowlines object, clean fields names,
+# and filter for intersection with CDFW project areas
+flowlines_all <- rbind(flowlines_17, flowlines_18) %>%
+  rename(length_km = LENGTHKM) %>%
+  rename_with(.fn = tolower) %>%
+  dplyr::select(comid, gnis_id, gnis_name, length_km, ftype) %>%
+  filter(ftype %notin% drop_ftypes)
+
+flowlines_study <- flowlines_all %>%
+  st_join(y = restoration_areas_diss, join = st_intersects, left = FALSE)
+
+# clean up
+rm(flowlines_17, flowlines_18)
+```
+
+
+
+# Sample control points 
+
+```{r}
+# sample midpoints with comid as the unique identifier
+# and add a field identifying these sf objects as control points
+control_points <- flowlines_study %>%
+  dplyr::select(comid) %>%
+  st_line_midpoints() %>%
+  cbind(flowlines_study$comid) %>%
+  rename(obs_id = flowlines_study.comid) %>%
+  mutate(obs_type = "control")
+```
+
+
+
+# Create a single dataset of points of interest (control and restored)
+
+## Combine restoration sites and control sites to create a single dataframe of study points
+
+```{r}
+study_points <- restoration_projects %>%
+  dplyr::select(project_id, geometry) %>%
+  rename(obs_id = project_id) %>%
+  mutate(obs_type = "restoration_site") %>%
+  rbind(control_points)
+```
+
+## Filter study points for intersection with incorporated and census-designated places
+
+```{r}
+# load census bureau "places" sf polygon objects
+incorp_cdp <- places(state = "CA", year = 2020) %>%
+  rename(place_fip = PLACEFP,
+         geo_id = GEOID,
+         name = NAME,
+         name_w_type = NAMELSAD,
+         type_code = LSAD,
+         fips_code = CLASSFP,
+         area_land = ALAND,
+         area_water = AWATER) %>%
+  dplyr::select(place_fip, geo_id, name, name_w_type, type_code,
+                fips_code, area_land, area_water)
+
+# filter points of interest for spatial intersection with incorporated and
+# census-designated places
+study_points <- st_join(x = study_points,
+                        y = dplyr::select(incorp_cdp, geometry),
+                        join = st_intersects,
+                        left = FALSE)
+
+# clean up
+rm(control_points, incorp_cdp)
+```
+
+## Visualize control points and restoration points
+
+```{r}
+# generate a map of control points and restoration points
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = study_points, aes(color = obs_type), size = 0.5) +
+  theme_minimal()
+```
+
+
+
+# Enrich study points with project and hydroecological data
+
+## Associate study points with project attributes
+
+```{r}
+# drop duplicate study points
+study_points <- study_points %>%
+  distinct(geometry, .keep_all = TRUE) %>%
+  left_join(y = st_drop_geometry(dplyr::select(restoration_projects, project_id,
+                                               award_year, project_type, agency,
+                                               amount_approved)),
+            by = c("obs_id" = "project_id"))
+```
+
+## Associate study points with flowlines and flowline attributes
+
+### Import flowlines value-added attributes (VAAs)
+
+```{r}
+# download value-added attributes (original source: Hydroshare)
+drive_download(file = as_id("1tpMnQDXD50jYQ5EtZJthOAKPc5squEn0"),
+               path = here("raw_data", "nhd_flowlines", "vaa.zip"),
+               overwrite = TRUE)
+
+# unzip value-added attributes
+unzip(zipfile = here("raw_data", "nhd_flowlines", "vaa.zip"),
+      exdir = here("raw_data", "nhd_flowlines"))
+
+# read in value-added attributes and filter for intersection with California
+# this is needed to calculate upstream attributes that may extend beyond CDFW territory
+vaa <- read_fst(path = here("raw_data", "nhd_flowlines", "nhdplusVAA.fst", "nhdplusVAA.fst")) %>%
+  filter(comid %in% flowlines_all$comid,
+         ftype %notin% drop_ftypes) %>%
+  rename(stream_order = streamorde,
+         from_node = fromnode,
+         to_node = tonode,
+         level_path = levelpathi,
+         path_length = pathlength,
+         terminal_path = terminalpa,
+         up_level_path = uplevelpat,
+         up_hydroseq = uphydroseq,
+         down_level_path = dnlevelpat,
+         down_hydroseq = dnhydroseq,
+         area_sqkm = areasqkm,
+         tot_da_sqkm = totdasqkm) %>%
+  dplyr::select(comid, stream_order, from_node, to_node, hydroseq, level_path,
+                path_length, terminal_path, up_level_path, up_hydroseq,
+                down_level_path, down_hydroseq, slope, tot_da_sqkm)
+
+# add drainage area from value-added attributes to flowlines
+flowlines_all <- left_join(x = flowlines_all, y = vaa, by = "comid")
+
+# clean up
+rm(vaa)
+```
+
+### Add flowline and flowline value-added attributes to study points
+
+```{r}
+# join study points to flowlines based on nearest feature
+study_points <- study_points %>%
+  st_join(y = dplyr::select(flowlines_all, comid, ftype, stream_order, slope, tot_da_sqkm),
+          join = st_nearest_feature)
+```
+
+### Add HUC12 and CDFW Areas of Conservation Emphasis attributes
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "ace"))) {
+  dir.create(here("raw_data", "ace"))
+}
+
+# specify url
+ace_url <- "https://filelib.wildlife.ca.gov/Public/BDB/ACE/ACE_Summary_Datasets.zip"
+
+# download file
+if(!file.exists(here("raw_data", "ace", "ace_summary_datasets.zip"))) {
+  download.file(url = ace_url,
+                destfile = here("raw_data", "ace", "ACE_Summary_Datasets.zip"))
+}
+
+# unzip file
+unzip(here("raw_data", "ace", "ACE_Summary_Datasets.zip"),
+      exdir = here("raw_data", "ace"))
+
+# read in and clean ACE dataset
+huc12 <- readOGR(dsn = here("raw_data", "ace", "ACE_Summary_Datasets", "ds2743.gdb")) %>%
+  st_as_sf() %>%
+  st_transform(crs = global_crs) %>%
+  ms_simplify(keep = 0.05) %>%
+  st_intersection(y = ca_boundary) %>%
+  rename(huc12 = HUC12,
+         huc12_name = Name,
+         native_aquatic_rank = NtvAqRankSW,
+         native_aquatic_index = NtvAqSumSW,
+         native_fish_count = NtvFish,
+         native_aquatic_invert_count = NtvAqInvt,
+         native_aquatic_amphib_count = NtvAqAmph,
+         native_aquatic_reptile_count = NtvAqRept) %>%
+  mutate(huc12_area_sqkm = drop_units(set_units(st_area(geometry), "km^2"))) %>%
+  dplyr::select(huc12, huc12_name, huc12_area_sqkm,
+                native_aquatic_rank, native_aquatic_index, native_fish_count,
+                native_aquatic_invert_count, native_aquatic_amphib_count,
+                native_aquatic_reptile_count)
+
+# enrich restoration projects with HUC12 and ACE
+study_points <- st_join(study_points, huc12) 
+
+# clean up
+rm(ace_url)
+```
+
+

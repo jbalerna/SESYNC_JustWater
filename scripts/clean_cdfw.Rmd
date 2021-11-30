@@ -230,9 +230,9 @@ restoration_projects <- st_join(x = ds168, y = incorp_cdp, join = st_intersects,
 
 # quickly visualize restoration sites falling with census place boundaries
 ggplot() +
-  geom_sf(data = ca_boundary, fill = "lightgrey") +
-  geom_sf(data = ms_simplify(ds734, keep = 0.05), fill = "lightblue") +
-  geom_sf(data = restoration_projects, aes(color = award_year)) +
+  geom_sf(data = ca_boundary, fill = "white") +
+  geom_sf(data = ms_simplify(ds734, keep = 0.05), fill = "lightgrey") +
+  geom_sf(data = restoration_projects, aes(color = project_type_code)) +
   theme_minimal()
 ```
 
@@ -581,7 +581,7 @@ restoration_projects <- cbind(restoration_projects, nitrates_agg)
 rm(nitrates_url, nitrates_agg)
 ```
 
-## 303d Listed Waterbodies
+## 303d listed waterbodies
 
 ```{r}
 # create directory
@@ -635,7 +635,7 @@ restoration_buffered <- st_buffer(restoration_projects, dist = set_units(10, "km
   dplyr::select(index)
 
 # intersect buffered restoration sites with 303d listed waterbodies
-restoration_buffered <- restoration_buffered %>%
+restoration_buffered_303d <- restoration_buffered %>%
   st_join(y = waterbodies_303d_lines) %>%
   st_join(y = waterbodies_303d_polygons) %>%
   st_drop_geometry() %>%
@@ -644,19 +644,184 @@ restoration_buffered <- restoration_buffered %>%
             lakes_ponds_303d = max(waterbody_303d.x, na.rm = TRUE))
 
 # clean results
-restoration_buffered <- do.call(data.frame,
-                                lapply(restoration_buffered,
-                                       function(x) replace(x, is.infinite(x), NA)))
+restoration_buffered_303d <- do.call(data.frame,
+                                     lapply(restoration_buffered_303d,
+                                            function(x) replace(x, is.infinite(x), NA)))
 
 # join to restoration projects dataframe
-restoration_projects <- left_join(restoration_projects, restoration_buffered,
+restoration_projects <- left_join(restoration_projects, restoration_buffered_303d,
                                   by = "index")
 
 # clean up
 rm(waterbodies_303d_lines_url, waterbodies_303d_polygons_url,
-   waterbodies_303d_lines, waterbodies_303d_polygons)
+   waterbodies_303d_lines, waterbodies_303d_polygons, restoration_buffered_303d)
 ```
 
+## Anadromous fish distribution data
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "anadromous_dist"))) {
+  dir.create(here("raw_data", "anadromous_dist"))
+}
+```
+
+### Coho
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "anadromous_dist", "coho"))) {
+  dir.create(here("raw_data", "anadromous_dist", "coho"))
+}
+
+# specify coho url
+coho_url <- "ftp://ftp.streamnet.org/pub/calfish/Coho_Distribution_and_Range_Jun16.zip"
+
+# download coho data
+if(!file.exists(here("raw_data", "anadromous_dist", "coho", "coho.zip"))) {
+  download.file(url = coho_url,
+                destfile = here("raw_data", "anadromous_dist", "coho", "coho.zip"))
+}
+
+# unzip coho data
+unzip(zipfile = here("raw_data", "anadromous_dist", "coho", "coho.zip"),
+      exdir = here("raw_data", "anadromous_dist", "coho"))
+
+# read in coho data and clean
+coho <- readOGR(dsn = here("raw_data", "anadromous_dist", "coho", "ds534", "ds534.gdb")) %>%
+  st_as_sf() %>%
+  st_transform(crs = global_crs) %>%
+  mutate(coho = TRUE) %>%
+  dplyr::select(coho, geometry)
+```
+
+### Coastal chinook
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "anadromous_dist", "coastal_chinook"))) {
+  dir.create(here("raw_data", "anadromous_dist", "coastal_chinook"))
+}
+
+# specify coastal chinook url
+coastal_chinook_url <- "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/900_999/ds981.zip"
+
+# download coastal chinook data
+if(!file.exists(here("raw_data", "anadromous_dist", "coastal_chinook", "coastal_chinook.zip"))) {
+  download.file(url = coastal_chinook_url,
+                destfile = here("raw_data", "anadromous_dist", "coastal_chinook", "coastal_chinook.zip"))
+}
+
+# unzip coastal chinook data
+unzip(zipfile = here("raw_data", "anadromous_dist", "coastal_chinook", "coastal_chinook.zip"),
+      exdir = here("raw_data", "anadromous_dist", "coastal_chinook"))
+
+# read in coastal chinook data and clean
+coastal_chinook <- st_read(here("raw_data", "anadromous_dist", "coastal_chinook")) %>%
+  st_zm() %>%
+  st_transform(crs = global_crs) %>%
+  st_buffer(dist = set_units(1000, "m"))
+
+coastal_chinook <- st_union(coastal_chinook) %>%
+  st_as_sf() %>%
+  st_make_valid(geometry) %>%
+  mutate(coastal_chinook = TRUE)
+```
+
+### Spring-run Central Valley chinook
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "anadromous_dist", "spring_cv_chinook"))) {
+  dir.create(here("raw_data", "anadromous_dist", "spring_cv_chinook"))
+}
+
+# specify spring-run Central Valley chinook url
+spring_cv_chinook_url <- "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/900_999/ds982.zip"
+
+# download spring-run Central Valley chinook data
+if(!file.exists(here("raw_data", "anadromous_dist", "spring_cv_chinook", "spring_cv_chinook.zip"))) {
+  download.file(url = spring_cv_chinook_url,
+                destfile = here("raw_data", "anadromous_dist", "spring_cv_chinook", "spring_cv_chinook.zip"))
+}
+
+# download spring-run Central Valley chinook data
+unzip(zipfile = here("raw_data", "anadromous_dist", "spring_cv_chinook", "spring_cv_chinook.zip"),
+      exdir = here("raw_data", "anadromous_dist", "spring_cv_chinook"))
+
+# read in coastal chinook data and clean
+spring_cv_chinook <- readOGR(dsn = here("raw_data", "anadromous_dist", "spring_cv_chinook", "ds982.gdb")) %>%
+  st_as_sf() %>%
+  st_transform(crs = global_crs) %>%
+  st_buffer(dist = set_units(1000, "m"))
+
+spring_cv_chinook <- st_union(spring_cv_chinook) %>%
+  st_as_sf() %>%
+  st_make_valid(geometry) %>%
+  mutate(spring_cv_chinook = TRUE)
+```
+
+### Summer steelhead
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "anadromous_dist", "summer_steelhead"))) {
+  dir.create(here("raw_data", "anadromous_dist", "summer_steelhead"))
+}
+
+# specify summer steelhead url
+summer_steelhead_url <- "ftp://ftp.streamnet.org/pub/calfish/Summer_Steelhead_Distribution_and_Range_Oct09.zip"
+
+# download summer steelhead data
+if(!file.exists(here("raw_data", "anadromous_dist", "summer_steelhead", "summer_steelhead.zip"))) {
+  download.file(url = summer_steelhead_url,
+                destfile = here("raw_data", "anadromous_dist", "summer_steelhead", "summer_steelhead.zip"))
+}
+
+# unzip summer steelhead data
+unzip(zipfile = here("raw_data", "anadromous_dist", "summer_steelhead", "summer_steelhead.zip"),
+      exdir = here("raw_data", "anadromous_dist", "summer_steelhead"))
+
+# read in summer steelhead data and clean
+summer_steelhead <- st_read(here("raw_data", "anadromous_dist", "summer_steelhead"),
+                            layer = "Summer_Steelhead_Range") %>%
+  st_transform(global_crs) %>%
+  mutate(summer_steelhead = TRUE) %>%
+  dplyr::select(summer_steelhead, geometry)
+```
+
+### Winter Steelhead
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "anadromous_dist", "winter_steelhead"))) {
+  dir.create(here("raw_data", "anadromous_dist", "winter_steelhead"))
+}
+
+# specify winter steelhead url
+winter_steelhead_url <- "ftp://ftp.streamnet.org/pub/calfish/Winter_Steelhead_Distribution_and_Range_Jun12.zip"
+
+# download winter steelhead data
+if(!file.exists(here("raw_data", "anadromous_dist", "winter_steelhead", "winter_steelhead.zip"))) {
+  download.file(url = winter_steelhead_url,
+                destfile = here("raw_data", "anadromous_dist", "winter_steelhead", "winter_steelhead.zip"))
+}
+
+# unzip winter steelhead data
+unzip(zipfile = here("raw_data", "anadromous_dist", "winter_steelhead", "winter_steelhead.zip"),
+      exdir = here("raw_data", "anadromous_dist", "winter_steelhead"))
+
+# read in winter steelhead data and clean
+winter_steelhead <- st_read(here("raw_data", "anadromous_dist", "winter_steelhead"),
+                            layer = "Winter_Steelhead_Range") %>%
+  st_transform(global_crs) %>%
+  mutate(winter_steelhead = TRUE) %>%
+  dplyr::select(winter_steelhead, geometry)
+```
+
+```{r}
+# join anadromous fish distributions to restoration projects using the buffer
 
 
+```
 
