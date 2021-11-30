@@ -28,6 +28,9 @@ library(terra) # for raster work
 library(raster) # for raster work
 library(areal) # for areal weighted interpolation
 library(tmap) # for mapping
+library(ggpubr) # for figures
+#library(rstatix)
+library(ggthemes) # for figures
 library(praise) # for positivity boosts :)
 
 # define functions and global options
@@ -451,25 +454,10 @@ ca_acs_blkgrp <- get_acs(state = "CA",
 # 2. 
 ```
 
-*To Do*
-#1. Pull sample census file (eg. population)
-#/1b. merge tabular to spatial data
-#2. Create a sample point (eg. Fresno)
-#3. Pull the relevant census block group stats for the block group that point falls into
-#4. automate for all points & all desired infos
 
-later
-/1. Download 2000 census appropriate data (tidycensus is not cooperating)
-/1b. If needed, merge tabular to spatial data
-/2. Create a sample point (eg. Fresno)
-/3. Create a polygon that represents a 1km buffer around the sample point 
-**4. Do areal weighted interpolation (ie. mean value) of the relevant data layer for that buffer**
-/4b option. Pull census block group info for the BG that the point falls within
-/5. Set it up to automate step 3 (ie. iterate through all points in a list and create buffered files)
-**6. Set it up to automate step 4 (ie. iterate through aerial weighted interpolation)**
-/6b option. Iterate thru simple option
-**7. Run some fancier t-tests**
-**8. Upload as gpckg**
+
+
+# Newer analysis, 11/29/21
 
 
 ```{r load data}
@@ -477,6 +465,11 @@ later
 # load geopackage of sites
 study_points <- st_read("intermediate_data/study_points.gpkg") 
 st_crs(study_points) # double check
+
+# confirm which column is the unique identifier
+n_distinct(study_points$obs_id) # unique identifier
+n_distinct(study_points$comid) # not unique
+nrow(study_points)
 
 # load census spatial data
 blk_grp_sf <- st_read("raw_data/census/shapefiles/CA_blck_grp_2000.shp") 
@@ -557,6 +550,11 @@ df_sf_buff <- st_buffer(df_sf, 1000)
 
 # test that
 mapview(df_sf_buff)
+
+# save
+point1_buff <- df_sf_buff %>%
+    st_transform(st_crs(study_points))
+
 
 ## replicate for all sites
 # before buffering, transform CRS from planar to projected
@@ -641,6 +639,187 @@ ggplot(site_w_blkgrp) +
   labs(x = "% BIPOC") 
 ggsave("intermediate_outputs/density_pctg_bipoc.png", width = 8, height = 5)
 
+## JMLR question: Since this is a point analysis, should this all have been done in 
+```
+
+```{r areal interpolation set up for buffered sites}
+
+#### first, test with single site ####
+# identify areas of intersection
+site_blk_grp_overlap_area <- st_intersection(x = point1_buff, 
+                                         y = blk_grp_ca) %>% 
+   mutate(site_blk_grp_intersect_area = st_area(.)) 
+
+# view that
+mapview(site_blk_grp_overlap_area)
+
+# calculate overall area for each point
+study_points_buff2 <- study_points_buff %>%
+  mutate(buff_circle_area = st_area(study_points_buff))
+summary(study_points_buff2$buff_circle_area) # area is always 3140157 m^2
+
+# calculate % area for each
+site_blk_grp_overlap_area <- site_blk_grp_overlap_area %>%
+  mutate(pctg_intersect_area = site_blk_grp_intersect_area/3140157)
+
+# simplify df
+site_blk_grp_overlap_area2 <- site_blk_grp_overlap_area %>%
+  dplyr::select(obs_id, GISJOIN, 
+    total_pop, nh_white, mhi, pctg_bipoc, 
+    site_blk_grp_intersect_area, pctg_intersect_area)
+
+# apply those weights
+site_blk_grp_overlap_area2 <-  site_blk_grp_overlap_area2 %>%
+  mutate(total_pop_wtd = total_pop * pctg_intersect_area, # wtd = weighted
+    nh_white_wtd = nh_white * pctg_intersect_area,
+    mhi_wtd = mhi * pctg_intersect_area,
+    pctg_bipoc_wtd = pctg_bipoc * pctg_intersect_area)
+
+# sum across block groups associated with each point
+site_blk_grp_overlap_area3 <- site_blk_grp_overlap_area2 %>%
+    st_drop_geometry() %>%  # drop geometry for pivot
+  group_by(obs_id) %>%
+  summarize(total_pop_buff = sum(total_pop_wtd),
+    nh_white_buff = sum(nh_white_wtd),
+    mhi_wtd_buff = sum(mhi_wtd),
+    pctg_bipoc_buff = sum(pctg_bipoc_wtd))
+
+
+
+
+
+
+#### next, repeat for all sites ####
+
+## prep sf objects for intersection
+# transform in an attempt to address st_intersection assumption
+study_points_buff_t <- study_points_buff %>%
+  st_transform(3488) #transform to NAD83(NSRS2007) / California Albers
+
+blk_grp_ca_t <- blk_grp_ca %>%
+  st_transform(3488) #transform to NAD83(NSRS2007) / California Albers
+
+# 10 of the block groups have non-valid geometries; i am cleaning them up simply with a 0-meter buffer
+blk_grp_ca_t <- st_buffer(blk_grp_ca_t, dist = 0)
+
+# check that it worked
+test <- blk_grp_ca_t %>%
+  mutate(valid_geom = st_is_valid(test))
+test %>% filter(valid_geom == FALSE) # it worked
+
+# identify areas of intersection
+site_blk_grp_overlap_area <- st_intersection(x = study_points_buff_t, 
+                                         y = blk_grp_ca_t) %>% 
+   mutate(site_blk_grp_intersect_area = st_area(.)) 
+  ### JMLR: warning message: attribute variables are assumed to be spatially constant throughout all geometries 
+
+# backup
+site_blk_grp_overlap_area_orig <- site_blk_grp_overlap_area
+
+# check that
+mapview(site_blk_grp_overlap_area[1:500,])
+
+# calculate % area for each
+site_blk_grp_overlap_area <- site_blk_grp_overlap_area %>%
+  st_drop_geometry() %>%  # drop geometry for ease of processing
+  mutate(pctg_intersect_area = site_blk_grp_intersect_area/3140157)
+
+
+# add a check that the geometries sum to 100%
+site_blk_grp_overlap_area_test <- site_blk_grp_overlap_area %>%
+  group_by(obs_id) %>%
+  summarize(summed_pctg_intersect_area = sum(pctg_intersect_area),
+    summed_area = (sum(site_blk_grp_intersect_area)/3140157))
+
+# some of the geometries don't add up to 100% - look at those 713 projects
+site_not_100pct_blk_grp_covered <- site_blk_grp_overlap_area_test %>%
+  filter(as.numeric(summed_area) < 1)
+
+# are they controls or actual projects?
+site_not_100pct_blk_grp_covered2 <- study_points_buff %>% 
+  left_join(site_not_100pct_blk_grp_covered, by = "obs_id")
+
+site_not_100pct_blk_grp_covered2 %>%   filter(as.numeric(summed_area) < 1) %>% count(obs_type) 
+  # 9 695 controls, 18 restoration sites
+
+# map them
+site_not_blk_grp_covered <- site_not_100pct_blk_grp_covered2 %>%
+  filter(as.numeric(summed_area) < 1)
+mapview(site_not_blk_grp_covered)
+mapshot(site_not_blk_grp_covered, "intermediate_outputs/site_not_blk_grp_covered.html") # not saving; not sure why
+
+## SESYNC JMLR: Decide: what to do with these sites out of place
+
+# simplify df
+site_blk_grp_overlap_area2 <- site_blk_grp_overlap_area %>%
+  dplyr::select(obs_id, GISJOIN, 
+    total_pop, nh_white, mhi, pctg_bipoc, 
+    site_blk_grp_intersect_area, pctg_intersect_area)
+
+# apply those weights
+site_blk_grp_overlap_area2 <-  site_blk_grp_overlap_area2 %>%
+  mutate(total_pop_wtd = total_pop * pctg_intersect_area, # wtd = weighted
+    nh_white_wtd = nh_white * pctg_intersect_area,
+    mhi_wtd = mhi * pctg_intersect_area,
+    pctg_bipoc_wtd = pctg_bipoc * pctg_intersect_area)
+
+# sum across block groups associated with each point
+site_blk_grp_overlap_area3 <- site_blk_grp_overlap_area2 %>%
+  group_by(obs_id) %>%
+  summarize(total_pop_buff = sum(total_pop_wtd),
+    nh_white_buff = sum(nh_white_wtd),
+    mhi_wtd_buff = sum(mhi_wtd),
+    pctg_bipoc_buff = sum(pctg_bipoc_wtd))
+
+# backup
+saveRDS(site_blk_grp_overlap_area3, "intermediate_data/site_blk_grp_overlap_area3.rds")
+
+# remove units
+site_blk_grp_overlap_area4 <- site_blk_grp_overlap_area3 %>%
+  mutate(total_pop_buff_area = as.numeric(total_pop_buff),
+    nh_white_buff_area = as.numeric(nh_white_buff),
+    mhi_wtd_buff_area = as.numeric(mhi_wtd_buff),
+    pctg_bipoc_buff_area = as.numeric(pctg_bipoc_buff)) %>%
+  dplyr::select(obs_id, total_pop_buff_area, nh_white_buff_area, 
+    mhi_wtd_buff_area, pctg_bipoc_buff_area)
+
+# backup
+saveRDS(site_blk_grp_overlap_area4, "intermediate_data/site_blk_grp_overlap_area4.rds")
+
+# join back to summary data
+study_points_w_ses <- study_points %>%
+  left_join(site_blk_grp_overlap_area4, by = "obs_id")
+
+# note to JMLR: i should do more checking to make sure this is working as expected
+
+# export as geopackage
+st_write(study_points_w_ses,
+  dsn = "intermediate_data/study_points_w_ses.gpkg", 
+  layer = "intermediate_data/study_points_w_ses.gpkg",
+  driver = "GPKG")
+# note this is in the wrong CRS
+```
+
+```{r quick t-test work}
+
 ```
 
 
+
+
+*To Do*
+/1. Download 2000 census appropriate data (tidycensus is not cooperating)
+/1b. If needed, merge tabular to spatial data
+/2. Create a sample point (eg. Fresno)
+/3. Create a polygon that represents a 1km buffer around the sample point 
+/4. Do areal weighted interpolation (ie. mean value) of the relevant data layer for that buffer**
+/4b option. Pull census block group info for the BG that the point falls within
+/5. Set it up to automate step 3 (ie. iterate through all points in a list and create buffered files)
+/6. Set it up to automate step 4 (ie. iterate through aerial weighted interpolation)**
+/6b option. Iterate thru simple option
+**7. Upload file as gpckg**
+**8. Pull updated education data**
+**9. Get ready for stats: Run some fancier t-tests, pull pearson's coeff code**
+
+*For group*
+SESYNC JMLR: Decide: what to do with buffered sites that have some % of area not overlapping census block groups (or not overlapping BGs at all)
