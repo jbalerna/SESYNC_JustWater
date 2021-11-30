@@ -109,8 +109,18 @@ tmap_leaflet(
 ```{r pull census data, message = FALSE, cache = TRUE}
 # pull census data variable tables
 census_vars <- load_variables(year = 2020, dataset = "sf1") # 2010 census is most current right now; 2020 coming soon
+census_vars_2000_sf3 <- load_variables(year = 2000, dataset = "sf3") # 
+census_vars_2000_sf4 <- load_variables(year = 2020, dataset = "sf4")
+census_vars_2000_sf2 <- load_variables(year = 2020, dataset = "sf2")
+View(census_vars_2000_sf3)
+
 acs_5y_vars <- load_variables(year = 2019, dataset = "acs5") # 2014-2019 5-year ACS estimates, down to the block group level
 acs_1y_vars <- load_variables(year = 2019, dataset = "acs1") # 2019 1-yr ACS estimates
+
+# simplify 2000 census for viewing
+census_vars_2000_sf3_cleaner <- census_vars_2000_sf3 %>% 
+  count(concept) 
+
 
 # simplify ACS variables for viewing
 acs_cleaner <- acs_5y_vars %>% 
@@ -125,6 +135,136 @@ saveRDS(ca_census_pop_tract, "intermediate_data/ca_census_pop_tract.rds")
 rm(ca_census_pop_blkgrp)
 
 
+P001001 # TOTAL POPULATION [1]
+P003001 # 100-PERCENT COUNT OF THE POPULATION [1]
+HCT012001 # MHI in 1999 (Median household income in 1999!!Total	)
+P007003 # Total!!Hispanic or Latino!!White alone
+P037015 # Total female bachelor's degree
+P037015 # Total male bachelor's degree
+
+#total_pop = "P001001" # TOTAL POPULATION [1]
+#hundred_pct_count_popn = "P003001"
+#mhi = "HCT012001", # MHI in 1999 (Median household income in 1999!!Total	)
+#nh_white = "P007003", # Total!!Hispanic or Latino!!White alone
+fem_bachelors = "P037015", # Total female bachelor's degree
+male_bachelors = "P037015" # Total male bachelor's degree
+
+
+# 2nd total popn estimate
+tic()
+ca_census_pop_blkgrp2 <- get_decennial(state = "CA",
+  # county = "SET", # set county
+  geography = "block group", # pull block group-level data
+  # Note: we could go to block level
+  variables = c(hundred_pct_count_popn = "P003001"# 100-PERCENT COUNT OF THE POPULATION [1]
+  ), # variable code for total population
+  year = 2000,                                         
+  geometry = FALSE # include vector geometry %>%
+) 
+toc()
+
+
+# NH white
+tic()
+ca_census_pop_blkgrp_nhwhite <- get_decennial(state = "CA",
+  # county = "SET", # set county
+  geography = "block group", # pull block group-level data
+  # Note: we could go to block level
+  variables = c(nh_white = "P007003"),
+  year = 2000,                                         
+  geometry = FALSE # include vector geometry %>%
+) 
+toc()
+ 
+# MHI
+tic()
+ca_census_pop_blkgrp_mhi <- get_decennial(state = "CA",
+  # county = "SET", # set county
+  geography = "block group", # pull block group-level data
+  # Note: we could go to block level
+  variables = c(mhi = "HCT012001"),
+  year = 2000,                                         
+  geometry = FALSE # include vector geometry %>%
+) 
+toc()
+
+# fem ed
+tic()
+ca_census_pop_blkgrp_fem_ed <- get_decennial(state = "CA",
+  # county = "SET", # set county
+  geography = "block group", # pull block group-level data
+  # Note: we could go to block level
+  variables = c(fem_bachelors = "P037015"),
+  year = 2000,                                         
+  geometry = FALSE # include vector geometry %>%
+) 
+toc()
+
+# male ed
+tic()
+ca_census_pop_blkgrp_male_ed <- get_decennial(state = "CA",
+  # county = "SET", # set county
+  geography = "block group", # pull block group-level data
+  # Note: we could go to block level
+  variables = c(male_bachelors = "P037015"),
+  year = 2000,                                         
+  geometry = FALSE # include vector geometry %>%
+) 
+toc()
+
+# save those files
+saveRDS(ca_census_pop_blkgrp, "intermediate_outputs/ca_census_pop_blkgrp.rds")
+saveRDS(ca_census_pop_blkgrp2, "intermediate_outputs/ca_census_pop_blkgrp2.rds")
+saveRDS(ca_census_pop_blkgrp_nhwhite, "intermediate_outputs/ca_census_pop_blkgrp_nhwhite.rds")
+saveRDS(ca_census_pop_blkgrp_mhi, "intermediate_outputs/ca_census_pop_blkgrp_mhi.rds")
+saveRDS(ca_census_pop_blkgrp_fem_ed, "intermediate_outputs/ca_census_pop_blkgrp_fem_ed.rds")
+saveRDS(ca_census_pop_blkgrp_male_ed, "intermediate_outputs/ca_census_pop_blkgrp_male_ed.rds")
+
+## reformat tbl's
+# total pop - JMLR redo this
+ca_census_pop_blkgrp <- ca_census_pop_blkgrp %>%
+  rename(total_pop = value) %>% # JMLR reformat
+  dplyr::select(-c(NAME, variable))
+glimpse(ca_census_pop_blkgrp)
+
+# hundred pct count of pop
+ca_census_pop_blkgrp2 <- ca_census_pop_blkgrp2 %>%
+  rename(hundred_pct_count_popn = value) %>%
+  dplyr::select(-c(NAME, variable))
+glimpse(ca_census_pop_blkgrp2)
+
+# NH white
+ca_census_pop_blkgrp_nhwhite <- ca_census_pop_blkgrp_nhwhite %>%
+  rename(nh_white = value) %>%
+  dplyr::select(-c(NAME, variable))
+glimpse(ca_census_pop_blkgrp_nhwhite)
+
+# MHI
+ca_census_pop_blkgrp_mhi <- ca_census_pop_blkgrp_mhi %>%
+  rename(mhi = value) %>%
+  dplyr::select(-c(NAME, variable))
+glimpse(ca_census_pop_blkgrp_mhi)
+
+# female education
+ca_census_pop_blkgrp_fem_ed <- ca_census_pop_blkgrp_fem_ed %>%
+  rename(fem_ed = value) %>%
+  dplyr::select(-c(NAME, variable))
+glimpse(ca_census_pop_blkgrp_fem_ed)
+
+# male education
+ca_census_pop_blkgrp_male_ed <- ca_census_pop_blkgrp_male_ed %>%
+  rename(male_ed = value) %>%
+  dplyr::select(-c(NAME, variable))
+glimpse(ca_census_pop_blkgrp_male_ed)
+
+
+#  Things I have observed - remale ed & male ed have the same numbers; that seems like a mistake.
+# MHI has no data.
+# % NH white
+```
+
+
+```{r older census data pull, message = FALSE, cache = TRUE}
 # get CA block-group-level population estimates from the 2010 census
 tic()
 ca_census_pop_blkgrp <- get_decennial(state = "CA",
@@ -312,13 +452,16 @@ ca_acs_blkgrp <- get_acs(state = "CA",
 ```
 
 *To Do*
-/1. Pull sample census file (eg. population)
-/1b. merge tabular to spatial data
-2. Create a sample point (eg. Fresno)
-3. Pull the relevant census block group stats for the block group that point falls into
-4. automate for all points & all desired infos
+#1. Pull sample census file (eg. population)
+#/1b. merge tabular to spatial data
+#2. Create a sample point (eg. Fresno)
+#3. Pull the relevant census block group stats for the block group that point falls into
+#4. automate for all points & all desired infos
 
 laterr
+1. Download 2000 census appropriate data (tidycensus is not cooperating)
+1b. If needed, merge tabular to spatial data
+2. Create a sample point (eg. Fresno)
 3. Create a polygon that represents a 1km buffer around the sample point 
 4. Do aerial weighted interpolation (ie. mean vallue) of the relevant data layer for that buffer
 5. Set it up to automate step 3 (ie. iterate through all points in a list and create buffered files)
@@ -327,5 +470,9 @@ laterr
 7. Read more about race variable - % [non?] non-Hispanic white?
 8. Check crs & any needed transformations with Lucy (ie. Nick's layer & census layers are different)
 
+
+```{r}
+
+```
 
 
