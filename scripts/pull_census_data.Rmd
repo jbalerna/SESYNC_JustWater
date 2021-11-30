@@ -458,20 +458,188 @@ ca_acs_blkgrp <- get_acs(state = "CA",
 #3. Pull the relevant census block group stats for the block group that point falls into
 #4. automate for all points & all desired infos
 
-laterr
-1. Download 2000 census appropriate data (tidycensus is not cooperating)
-1b. If needed, merge tabular to spatial data
-2. Create a sample point (eg. Fresno)
-3. Create a polygon that represents a 1km buffer around the sample point 
-4. Do aerial weighted interpolation (ie. mean vallue) of the relevant data layer for that buffer
-5. Set it up to automate step 3 (ie. iterate through all points in a list and create buffered files)
-6. Set it up to automate step 4 (ie. iterate through aerial weighted interpolation)
+later
+/1. Download 2000 census appropriate data (tidycensus is not cooperating)
+/1b. If needed, merge tabular to spatial data
+/2. Create a sample point (eg. Fresno)
+/3. Create a polygon that represents a 1km buffer around the sample point 
+**4. Do areal weighted interpolation (ie. mean value) of the relevant data layer for that buffer**
+/4b option. Pull census block group info for the BG that the point falls within
+/5. Set it up to automate step 3 (ie. iterate through all points in a list and create buffered files)
+**6. Set it up to automate step 4 (ie. iterate through aerial weighted interpolation)**
+/6b option. Iterate thru simple option
+**7. Run some fancier t-tests**
+**8. Upload as gpckg**
 
-7. Read more about race variable - % [non?] non-Hispanic white?
-8. Check crs & any needed transformations with Lucy (ie. Nick's layer & census layers are different)
+
+```{r load data}
+
+# load geopackage of sites
+study_points <- st_read("intermediate_data/study_points.gpkg") 
+st_crs(study_points) # double check
+
+# load census spatial data
+blk_grp_sf <- st_read("raw_data/census/shapefiles/CA_blck_grp_2000.shp") 
+
+# transform to universal crs
+blk_grp_transf <- blk_grp_sf %>%
+  st_transform(global_crs)
+st_crs(blk_grp_transf) # double check
+
+# load census tabular data
+census_part1 <- read_csv(here("raw_data", "census", "nhgis0001_ds147_2000_blck_grp.csv"),
+                     col_names = TRUE)
+census_part2 <- read_csv(here("raw_data", "census", "nhgis0002_ds147_2000_blck_grp.csv"),
+                     col_names = TRUE)
+census_part3 <- read_csv(here("raw_data", "census", "nhgis0002_ds152_2000_blck_grp.csv"),
+                     col_names = TRUE)
+
+```
+
+```{r join tabular and spatial census data}
+# columns of interest from part 2
+# FXS001:      Total
+# FYF001:      Not Hispanic or Latino >> White alone
+# HD1013:      Male >> Bachelor's degree
+# HD1029:      Female >> Bachelor's degree
+# HF6001:      Median income in 1999
+
+# i think i may need to pull more for bachelors, so i'm going to focus on NH white & MHI for now
+
+# simplify
+census_part1 <- census_part1 %>%
+  dplyr::select(GISJOIN, FXS001)
+
+census_part2 <- census_part2 %>%
+  dplyr::select(GISJOIN, FYF001)
+
+census_part3 <- census_part3 %>%
+  dplyr::select(GISJOIN, HD1013, HD1029, HF6001)
+
+census_tabular <- census_part1 %>%
+  left_join(census_part2, by = "GISJOIN")
+
+census_tabular <- census_tabular %>%
+  left_join(census_part3, by = "GISJOIN")
+
+# rename
+census_tabular <- census_tabular %>%
+  rename(total_pop = FXS001,
+    nh_white = FYF001,
+    male_bach = HD1013,
+    fem_bach = HD1029,
+    mhi = HF6001)
+
+# join tabular to spatial data
+blk_grp_ca <- blk_grp_transf %>%
+  merge(census_tabular, by = "GISJOIN")
+
+# add % bipoc column
+blk_grp_ca <- blk_grp_ca %>%
+  mutate(pctg_bipoc = ((total_pop - nh_white) / total_pop))
+
+mapview(blk_grp_ca[1:1000,])
+```
 
 
-```{r}
+
+```{r buffer sites}
+## test workflow on one point
+# sample 1 point
+point1 = study_points[2,]
+point1
+
+# before buffering, transform CRS from planar to projected
+df_sf <- st_as_sf(point1) %>% st_transform(3488) #transform to NAD83(NSRS2007) / California Albers
+
+# create a 1km buffer
+df_sf_buff <- st_buffer(df_sf, 1000)
+
+# test that
+mapview(df_sf_buff)
+
+## replicate for all sites
+# before buffering, transform CRS from planar to projected
+df_sf <- st_as_sf(study_points) %>% 
+  st_transform(3488) #transform to NAD83(NSRS2007) / California Albers
+
+# create a 1km buffer
+df_sf_buff <- st_buffer(df_sf, 1000)
+
+# test that
+mapview(df_sf_buff[1:100,])
+
+# transform back to previous crs
+study_points_buff <- df_sf_buff %>%
+  st_transform(st_crs(study_points))
+
+```
+
+```{r quick point in polygon analysis}
+
+# double check crs
+st_crs(study_points)
+st_crs(blk_grp_ca)
+
+# find points within polygons
+site_w_blkgrp_st_contain <- st_join(study_points, blk_grp_ca, join = st_within)
+glimpse(site_w_blkgrp)
+glimpse(blk_grp_ca)
+
+site_w_blkgrp <-  site_w_blkgrp_st_contain
+glimpse(site_w_blkgrp_st_contain)
+
+# which sites dont join to a block group?
+sites_not_in_blk_grp <- site_w_blkgrp %>% 
+  filter(is.na(GISJOIN)) %>%   # 54 sites
+  mapview()
+ 
+# save that map
+mapshot(sites_not_in_blk_grp, "intermediate_outputs/sites_not_in_blk_grp.html")
+
+# save that file
+saveRDS(site_w_blkgrp, "intermediate_data/site_w_blkgrp.rds")
+
+# quick check if there's a difference
+site_w_blkgrp_analysis <- site_w_blkgrp %>%
+  filter(!is.na(GISJOIN)) %>%
+  group_by(obs_type) %>%
+  summarize(n = n(),
+    mean_total_pop = mean(total_pop),
+    mean_mhi = mean(mhi),
+    mean_pctg_bipoc = mean(pctg_bipoc),
+    na.rm = TRUE)
+site_w_blkgrp_analysis
+
+
+# plot simple histogram
+ggplot(site_w_blkgrp) +
+  geom_histogram(aes(x = total_pop, fill = obs_type), alpha = .6) + 
+  labs(x = "Total Population") 
+ggsave("intermediate_outputs/hist_total_pop.png", width = 8, height = 5)
+
+# try a density plot with a jittered rug
+ggplot(site_w_blkgrp) +
+  geom_density(aes(x = total_pop, fill = obs_type), alpha = .6) +
+  geom_rug(aes(x = total_pop, y = 0), 
+    position = position_jitter(height = 0)) + 
+  labs(x = "Total Population") 
+ggsave("intermediate_outputs/density_total_pop.png", width = 8, height = 5)
+
+
+# plot simple histogram
+ggplot(site_w_blkgrp) +
+  geom_histogram(aes(x = pctg_bipoc, fill = obs_type), alpha = .6) + 
+  labs(x = "% BIPOC") 
+ggsave("intermediate_outputs/hist_pctg_bipoc.png", width = 8, height = 5)
+
+# try a density plot with a jittered rug
+ggplot(site_w_blkgrp) +
+  geom_density(aes(x = pctg_bipoc, fill = obs_type), alpha = .6) +
+  geom_rug(aes(x = pctg_bipoc, y = 0), 
+    position = position_jitter(height = 0)) + 
+  labs(x = "% BIPOC") 
+ggsave("intermediate_outputs/density_pctg_bipoc.png", width = 8, height = 5)
 
 ```
 
