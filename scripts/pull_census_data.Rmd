@@ -29,8 +29,10 @@ library(raster) # for raster work
 library(areal) # for areal weighted interpolation
 library(tmap) # for mapping
 library(ggpubr) # for figures
-library(rstatix)
 library(ggthemes) # for figures
+library(rstatix) # for statistics
+library(stats) # for statistics
+library(corrplot) # for statistics
 library(praise) # for positivity boosts :)
 
 # define functions and global options
@@ -532,6 +534,15 @@ blk_grp_ca <- blk_grp_ca %>%
   mutate(pctg_bipoc = ((total_pop - nh_white) / total_pop))
 
 mapview(blk_grp_ca[1:1000,])
+
+# check the education numbers
+test_blk_grp_ca <- blk_grp_ca %>%
+  mutate(college = (male_bach + fem_bach),
+    pct_college = (college/total_pop))
+
+# test
+summary(test_blk_grp_ca$pct_college)
+
 ```
 
 
@@ -720,34 +731,36 @@ site_blk_grp_overlap_area_orig <- site_blk_grp_overlap_area
 mapview(site_blk_grp_overlap_area_orig[1:500,])
 
 # calculate % area for each
-site_blk_grp_overlap_area <- site_blk_grp_overlap_area %>%
+site_blk_grp_overlap_area <- site_blk_grp_overlap_area_orig %>%
   st_drop_geometry() %>%  # drop geometry for ease of processing
-  mutate(pctg_intersect_area = site_blk_grp_intersect_area/3140157)
-
-
-# add a check that the geometries sum to 100%
-site_blk_grp_overlap_area_test <- site_blk_grp_overlap_area %>%
   group_by(obs_id) %>%
-  summarize(summed_pctg_intersect_area = sum(pctg_intersect_area),
-    summed_area = (sum(site_blk_grp_intersect_area)/3140157)) %>%
-  ungroup()
+  mutate(summed_intersect_area = sum(site_blk_grp_intersect_area)) %>%
+  ungroup() %>%
+  mutate(pctg_intersect_area = site_blk_grp_intersect_area/summed_intersect_area)
+
+# add a check that the geometries sum to 100% - they do not
+#site_blk_grp_overlap_area_test <- site_blk_grp_overlap_area %>%
+#  group_by(obs_id) %>%
+#  summarize(summed_pctg_intersect_area = sum(pctg_intersect_area),
+#    summed_area = (sum(site_blk_grp_intersect_area)/3140157)) %>%
+#  ungroup()
 
 # some of the geometries don't add up to 100% - look at those 713 projects
-site_not_100pct_blk_grp_covered <- site_blk_grp_overlap_area_test %>%
-  filter(as.numeric(summed_area) < 1)
+#site_not_100pct_blk_grp_covered <- site_blk_grp_overlap_area_test %>%
+#  filter(as.numeric(summed_area) < 1)
 
 # are they controls or actual projects?
-site_not_100pct_blk_grp_covered2 <- study_points_buff %>% 
-  left_join(site_not_100pct_blk_grp_covered, by = "obs_id")
+#site_not_100pct_blk_grp_covered2 <- study_points_buff %>% 
+#  left_join(site_not_100pct_blk_grp_covered, by = "obs_id")
 
-site_not_100pct_blk_grp_covered2 %>%   filter(as.numeric(summed_area) < 1) %>% count(obs_type) 
+#site_not_100pct_blk_grp_covered2 %>%   filter(as.numeric(summed_area) < 1) %>% count(obs_type) 
   # 9 695 controls, 18 restoration sites
 
 # map them
-site_not_blk_grp_covered <- site_not_100pct_blk_grp_covered2 %>%
-  filter(as.numeric(summed_area) < 1)
-mapview(site_not_blk_grp_covered)
-mapshot(site_not_blk_grp_covered, "intermediate_outputs/site_not_blk_grp_covered.html") # not saving; not sure why
+#site_not_blk_grp_covered <- site_not_100pct_blk_grp_covered2 %>%
+#  filter(as.numeric(summed_area) < 1)
+#mapview(site_not_blk_grp_covered)
+#mapshot(site_not_blk_grp_covered, "intermediate_outputs/site_not_blk_grp_covered.html") # not saving; not sure why
 
 ## SESYNC JMLR: Decide: what to do with these sites out of place
 
@@ -765,7 +778,7 @@ site_blk_grp_overlap_area2 <-  site_blk_grp_overlap_area2 %>%
     pctg_bipoc_wtd = pctg_bipoc * pctg_intersect_area)
 
 # sum across block groups associated with each point
-site_blk_grp_overlap_area3 <- site_blk_grp_overlap_area2 %>%
+™ <- site_blk_grp_overlap_area2 %>%
   group_by(obs_id) %>%
   summarize(total_pop_buff = sum(total_pop_wtd),
     nh_white_buff = sum(nh_white_wtd),
@@ -773,7 +786,7 @@ site_blk_grp_overlap_area3 <- site_blk_grp_overlap_area2 %>%
     pctg_bipoc_buff = sum(pctg_bipoc_wtd))
 
 # backup
-saveRDS(site_blk_grp_overlap_area3, "intermediate_data/site_blk_grp_overlap_area3.rds")
+saveRDS(site_blk_grp_overlap_area3, "intermediate_data/site_blk_grp_overlap_area3_120221.rds")
 
 # remove units
 site_blk_grp_overlap_area4 <- site_blk_grp_overlap_area3 %>%
@@ -785,7 +798,7 @@ site_blk_grp_overlap_area4 <- site_blk_grp_overlap_area3 %>%
     mhi_wtd_buff_area, pctg_bipoc_buff_area)
 
 # backup
-saveRDS(site_blk_grp_overlap_area4, "intermediate_data/site_blk_grp_overlap_area4.rds")
+saveRDS(site_blk_grp_overlap_area4, "intermediate_data/site_blk_grp_overlap_area4_120221.rds")
 
 # join back to summary data
 study_points_w_ses <- study_points %>%
@@ -797,6 +810,7 @@ study_points_w_ses <- study_points %>%
 st_write(study_points_w_ses,
   dsn = "intermediate_data/study_points_w_ses.gpkg", 
   layer = "intermediate_data/study_points_w_ses.gpkg",
+  delete_dsn = TRUE,
   driver = "GPKG")
 # note this is in the wrong CRS
 ```
@@ -834,9 +848,9 @@ glimpse(study_points_w_ses)
 /6. Set it up to automate step 4 (ie. iterate through aerial weighted interpolation)**
 /6b option. Iterate thru simple option
 /7. Upload file as gpckg**
+/8a. redo buffering denominator - adjust the denominator for buffered sites that dont overlap census BGs
 **8. Pull updated education data**
 **9. Get ready for stats: Run some fancier t-tests, pull pearson's coeff code**
-**adjust the denominator for buffered sites that dont overlap census BGs**
 
 
 *Question for group*
@@ -848,4 +862,36 @@ SESYNC JMLR: Decide: what to do with buffered sites that have some % of area not
 3. Control site pairwise matching
 4. Run stats
 5. Test for spatial autocorrelation; figure out if/how we need to account for temporal autocorrelation
+
+
+```{r Stats work}
+
+## Prep for correlation matrix
+# Select non-categorical variables
+study_corr <- study_points_w_ses %>%
+  dplyr::select(-c(obs_id, obs_type, project_type, agency, comid, ftype, stream_order))
+
+# Drop geometry
+study_corr <- study_corr %>%
+    st_drop_geometry() 
+
+# Make all variables numeric
+study_corr <- study_corr %>%
+  mutate(across(, ~as.numeric(.)))
+
+# Compute correlation matrix
+glimpse(study_corr)
+cor(study_corr)
+
+# Take only complete cases
+study_corr <- study_corr[complete.cases(study_corr),]
+
+# Make Pearson's correlation matrix
+res <- cor(study_corr)
+corrplot(res,
+  method = "number",
+  type = "upper" # show upper side only
+  )
+
+```
 
