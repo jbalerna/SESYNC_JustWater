@@ -29,7 +29,7 @@ library(raster) # for raster work
 library(areal) # for areal weighted interpolation
 library(tmap) # for mapping
 library(ggpubr) # for figures
-#library(rstatix)
+library(rstatix)
 library(ggthemes) # for figures
 library(praise) # for positivity boosts :)
 
@@ -646,12 +646,12 @@ ggsave("intermediate_outputs/density_pctg_bipoc.png", width = 8, height = 5)
 
 #### first, test with single site ####
 # identify areas of intersection
-site_blk_grp_overlap_area <- st_intersection(x = point1_buff, 
+site_blk_grp_overlap_area_test<- st_intersection(x = point1_buff, 
                                          y = blk_grp_ca) %>% 
    mutate(site_blk_grp_intersect_area = st_area(.)) 
 
 # view that
-mapview(site_blk_grp_overlap_area)
+mapview(site_blk_grp_overlap_area_test)
 
 # calculate overall area for each point
 study_points_buff2 <- study_points_buff %>%
@@ -699,7 +699,7 @@ study_points_buff_t <- study_points_buff %>%
 blk_grp_ca_t <- blk_grp_ca %>%
   st_transform(3488) #transform to NAD83(NSRS2007) / California Albers
 
-# 10 of the block groups have non-valid geometries; i am cleaning them up simply with a 0-meter buffer
+# 10 of the block groups have non-valid geometries; i am cleaning them up simply with a 0-meter buffer - JMLR, ask Lucy
 blk_grp_ca_t <- st_buffer(blk_grp_ca_t, dist = 0)
 
 # check that it worked
@@ -711,13 +711,13 @@ test %>% filter(valid_geom == FALSE) # it worked
 site_blk_grp_overlap_area <- st_intersection(x = study_points_buff_t, 
                                          y = blk_grp_ca_t) %>% 
    mutate(site_blk_grp_intersect_area = st_area(.)) 
-  ### JMLR: warning message: attribute variables are assumed to be spatially constant throughout all geometries 
+  ### JMLR: warning message: attribute variables are assumed to be spatially constant throughout all geometries - dbl chk
 
 # backup
 site_blk_grp_overlap_area_orig <- site_blk_grp_overlap_area
 
 # check that
-mapview(site_blk_grp_overlap_area[1:500,])
+mapview(site_blk_grp_overlap_area_orig[1:500,])
 
 # calculate % area for each
 site_blk_grp_overlap_area <- site_blk_grp_overlap_area %>%
@@ -729,7 +729,8 @@ site_blk_grp_overlap_area <- site_blk_grp_overlap_area %>%
 site_blk_grp_overlap_area_test <- site_blk_grp_overlap_area %>%
   group_by(obs_id) %>%
   summarize(summed_pctg_intersect_area = sum(pctg_intersect_area),
-    summed_area = (sum(site_blk_grp_intersect_area)/3140157))
+    summed_area = (sum(site_blk_grp_intersect_area)/3140157)) %>%
+  ungroup()
 
 # some of the geometries don't add up to 100% - look at those 713 projects
 site_not_100pct_blk_grp_covered <- site_blk_grp_overlap_area_test %>%
@@ -801,7 +802,22 @@ st_write(study_points_w_ses,
 ```
 
 ```{r quick t-test work}
+# make a density plot
+total_pop_dens <- ggdensity(study_points_w_ses, x = "total_pop_buff_area",
+          add = "mean", color = "obs_type", fill = "obs_type",
+          #rug = TRUE, 
+          xlab = "Total population",
+          ylab = "Density of restoration sites")
+          #panel.labs = list(buy_type = 
+                        #      c("Family Wealth", "LLC")))
+total_pop_dens
 
+stat.test <- study_points_w_ses %>% 
+  t_test(total_pop_buff_area ~ obs_type) %>%
+  add_significance()
+stat.test
+
+glimpse(study_points_w_ses)
 ```
 
 
@@ -817,9 +833,19 @@ st_write(study_points_w_ses,
 /5. Set it up to automate step 3 (ie. iterate through all points in a list and create buffered files)
 /6. Set it up to automate step 4 (ie. iterate through aerial weighted interpolation)**
 /6b option. Iterate thru simple option
-**7. Upload file as gpckg**
+/7. Upload file as gpckg**
 **8. Pull updated education data**
 **9. Get ready for stats: Run some fancier t-tests, pull pearson's coeff code**
+**adjust the denominator for buffered sites that dont overlap census BGs**
 
-*For group*
-SESYNC JMLR: Decide: what to do with buffered sites that have some % of area not overlapping census block groups (or not overlapping BGs at all)
+
+*Question for group*
+SESYNC JMLR: Decide: what to do with buffered sites that have some % of area not overlapping census block groups (or not overlapping BGs at all) --> decision: change denominator to be actual area that overlaps with census block groups.
+
+*Next steps for group work*
+1. Select subset of data with 
+2. ID covariates & decide which attributes to keep
+3. Control site pairwise matching
+4. Run stats
+5. Test for spatial autocorrelation; figure out if/how we need to account for temporal autocorrelation
+
