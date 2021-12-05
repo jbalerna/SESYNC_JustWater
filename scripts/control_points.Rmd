@@ -36,6 +36,8 @@ suppressPackageStartupMessages(library(ggnewscale))
 suppressPackageStartupMessages(library(caladaptr))
 suppressPackageStartupMessages(library(nhdR))
 suppressPackageStartupMessages(library(nhdplusTools))
+suppressPackageStartupMessages(library(corrplot))
+suppressPackageStartupMessages(library(MatchIt))
 ```
 
 ## Set global options
@@ -462,6 +464,13 @@ study_points <- study_points %>%
                                                   ut_network_df = ut_network),
          drainage_density = upstream_length_km / tot_da_sqkm) %>%
   ungroup()
+
+# clean up missing data
+study_points <- study_points %>%
+  mutate(slope = case_when(slope == -9998 ~ NA_real_,
+                            TRUE ~ slope),
+         drainage_density = case_when(is.infinite(drainage_density) ~ NA_real_,
+                                       TRUE ~ drainage_density))
 ```
 
 ## Add HUC12 and CDFW Areas of Conservation Emphasis attributes
@@ -759,6 +768,16 @@ study_points_buffered_303d <- do.call(data.frame,
 study_points <- left_join(study_points, study_points_buffered_303d,
                           by = "obs_id")
 
+# replace 303d NA values with 0
+study_points$streams_303d[is.na(study_points$streams_303d)] <- 0
+study_points$lakes_ponds_303d[is.na(study_points$lakes_ponds_303d)] <- 0
+
+# create a single 303d column that combine stream, lakes, and ponds statuses
+study_points <- study_points %>%
+  rowwise() %>%
+  mutate(any_303d = max(streams_303d, lakes_ponds_303d)) %>%
+  ungroup()
+
 # clean up
 rm(waterbodies_303d_lines_url, waterbodies_303d_polygons_url,
    waterbodies_303d_lines, waterbodies_303d_polygons, study_points_buffered_303d)
@@ -767,197 +786,220 @@ rm(waterbodies_303d_lines_url, waterbodies_303d_polygons_url,
 ## Add in anadromous fish distribution data
 
 ```{r}
-# create directory
-if(!dir.exists(here("raw_data", "anadromous_dist"))) {
-  dir.create(here("raw_data", "anadromous_dist"))
+# specify whether to include fish data
+fish <- FALSE
+```
+
+```{r}
+if(fish) {
+  # create directory
+  if(!dir.exists(here("raw_data", "anadromous_dist"))) {
+    dir.create(here("raw_data", "anadromous_dist"))
+  }
 }
 ```
 
 ### Import coho
 
 ```{r}
-# create directory
-if(!dir.exists(here("raw_data", "anadromous_dist", "coho"))) {
-  dir.create(here("raw_data", "anadromous_dist", "coho"))
+if(fish) {
+  # create directory
+  if(!dir.exists(here("raw_data", "anadromous_dist", "coho"))) {
+    dir.create(here("raw_data", "anadromous_dist", "coho"))
+  }
+  
+  # specify coho url
+  coho_url <- "ftp://ftp.streamnet.org/pub/calfish/Coho_Distribution_and_Range_Jun16.zip"
+  
+  # download coho data
+  if(!file.exists(here("raw_data", "anadromous_dist", "coho", "coho.zip"))) {
+    download.file(url = coho_url,
+                  destfile = here("raw_data", "anadromous_dist", "coho", "coho.zip"))
+  }
+  
+  # unzip coho data
+  unzip(zipfile = here("raw_data", "anadromous_dist", "coho", "coho.zip"),
+        exdir = here("raw_data", "anadromous_dist", "coho"))
+  
+  # read in coho data and clean
+  coho <- readOGR(dsn = here("raw_data", "anadromous_dist", "coho", "ds534", "ds534.gdb")) %>%
+    st_as_sf() %>%
+    st_transform(crs = global_crs) %>%
+    mutate(coho = TRUE) %>%
+    dplyr::select(coho, geometry)
 }
-
-# specify coho url
-coho_url <- "ftp://ftp.streamnet.org/pub/calfish/Coho_Distribution_and_Range_Jun16.zip"
-
-# download coho data
-if(!file.exists(here("raw_data", "anadromous_dist", "coho", "coho.zip"))) {
-  download.file(url = coho_url,
-                destfile = here("raw_data", "anadromous_dist", "coho", "coho.zip"))
-}
-
-# unzip coho data
-unzip(zipfile = here("raw_data", "anadromous_dist", "coho", "coho.zip"),
-      exdir = here("raw_data", "anadromous_dist", "coho"))
-
-# read in coho data and clean
-coho <- readOGR(dsn = here("raw_data", "anadromous_dist", "coho", "ds534", "ds534.gdb")) %>%
-  st_as_sf() %>%
-  st_transform(crs = global_crs) %>%
-  mutate(coho = TRUE) %>%
-  dplyr::select(coho, geometry)
 ```
 
 ### Import coastal chinook
 
 ```{r}
-# create directory
-if(!dir.exists(here("raw_data", "anadromous_dist", "coastal_chinook"))) {
-  dir.create(here("raw_data", "anadromous_dist", "coastal_chinook"))
+if(fish) {
+  # create directory
+  if(!dir.exists(here("raw_data", "anadromous_dist", "coastal_chinook"))) {
+    dir.create(here("raw_data", "anadromous_dist", "coastal_chinook"))
+  }
+  
+  # specify coastal chinook url
+  coastal_chinook_url <- "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/900_999/ds981.zip"
+  
+  # download coastal chinook data
+  if(!file.exists(here("raw_data", "anadromous_dist", "coastal_chinook", "coastal_chinook.zip"))) {
+    download.file(url = coastal_chinook_url,
+                  destfile = here("raw_data", "anadromous_dist", "coastal_chinook", "coastal_chinook.zip"))
+  }
+  
+  # unzip coastal chinook data
+  unzip(zipfile = here("raw_data", "anadromous_dist", "coastal_chinook", "coastal_chinook.zip"),
+        exdir = here("raw_data", "anadromous_dist", "coastal_chinook"))
+  
+  # read in coastal chinook data and clean
+  coastal_chinook <- st_read(here("raw_data", "anadromous_dist", "coastal_chinook")) %>%
+    st_zm() %>%
+    st_transform(crs = global_crs) %>%
+    st_buffer(dist = set_units(1000, "m"))
+  
+  coastal_chinook <- st_union(coastal_chinook) %>%
+    st_as_sf() %>%
+    st_make_valid(geometry) %>%
+    mutate(coastal_chinook = TRUE)
 }
-
-# specify coastal chinook url
-coastal_chinook_url <- "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/900_999/ds981.zip"
-
-# download coastal chinook data
-if(!file.exists(here("raw_data", "anadromous_dist", "coastal_chinook", "coastal_chinook.zip"))) {
-  download.file(url = coastal_chinook_url,
-                destfile = here("raw_data", "anadromous_dist", "coastal_chinook", "coastal_chinook.zip"))
-}
-
-# unzip coastal chinook data
-unzip(zipfile = here("raw_data", "anadromous_dist", "coastal_chinook", "coastal_chinook.zip"),
-      exdir = here("raw_data", "anadromous_dist", "coastal_chinook"))
-
-# read in coastal chinook data and clean
-coastal_chinook <- st_read(here("raw_data", "anadromous_dist", "coastal_chinook")) %>%
-  st_zm() %>%
-  st_transform(crs = global_crs) %>%
-  st_buffer(dist = set_units(1000, "m"))
-
-coastal_chinook <- st_union(coastal_chinook) %>%
-  st_as_sf() %>%
-  st_make_valid(geometry) %>%
-  mutate(coastal_chinook = TRUE)
 ```
 
 ### Import spring-run Central Valley chinook
 
 ```{r}
-# create directory
-if(!dir.exists(here("raw_data", "anadromous_dist", "spring_cv_chinook"))) {
-  dir.create(here("raw_data", "anadromous_dist", "spring_cv_chinook"))
+if(fish) {
+  # create directory
+  if(!dir.exists(here("raw_data", "anadromous_dist", "spring_cv_chinook"))) {
+    dir.create(here("raw_data", "anadromous_dist", "spring_cv_chinook"))
+  }
+  
+  # specify spring-run Central Valley chinook url
+  spring_cv_chinook_url <- "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/900_999/ds982.zip"
+  
+  # download spring-run Central Valley chinook data
+  if(!file.exists(here("raw_data", "anadromous_dist", "spring_cv_chinook", "spring_cv_chinook.zip"))) {
+    download.file(url = spring_cv_chinook_url,
+                  destfile = here("raw_data", "anadromous_dist", "spring_cv_chinook", "spring_cv_chinook.zip"))
+  }
+  
+  # download spring-run Central Valley chinook data
+  unzip(zipfile = here("raw_data", "anadromous_dist", "spring_cv_chinook", "spring_cv_chinook.zip"),
+        exdir = here("raw_data", "anadromous_dist", "spring_cv_chinook"))
+  
+  # read in coastal chinook data and clean
+  spring_cv_chinook <- readOGR(dsn = here("raw_data", "anadromous_dist", "spring_cv_chinook", "ds982.gdb")) %>%
+    st_as_sf() %>%
+    st_transform(crs = global_crs) %>%
+    st_buffer(dist = set_units(1000, "m"))
+  
+  spring_cv_chinook <- st_union(spring_cv_chinook) %>%
+    st_as_sf() %>%
+    st_make_valid(geometry) %>%
+    mutate(spring_cv_chinook = TRUE)
 }
-
-# specify spring-run Central Valley chinook url
-spring_cv_chinook_url <- "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/900_999/ds982.zip"
-
-# download spring-run Central Valley chinook data
-if(!file.exists(here("raw_data", "anadromous_dist", "spring_cv_chinook", "spring_cv_chinook.zip"))) {
-  download.file(url = spring_cv_chinook_url,
-                destfile = here("raw_data", "anadromous_dist", "spring_cv_chinook", "spring_cv_chinook.zip"))
-}
-
-# download spring-run Central Valley chinook data
-unzip(zipfile = here("raw_data", "anadromous_dist", "spring_cv_chinook", "spring_cv_chinook.zip"),
-      exdir = here("raw_data", "anadromous_dist", "spring_cv_chinook"))
-
-# read in coastal chinook data and clean
-spring_cv_chinook <- readOGR(dsn = here("raw_data", "anadromous_dist", "spring_cv_chinook", "ds982.gdb")) %>%
-  st_as_sf() %>%
-  st_transform(crs = global_crs) %>%
-  st_buffer(dist = set_units(1000, "m"))
-
-spring_cv_chinook <- st_union(spring_cv_chinook) %>%
-  st_as_sf() %>%
-  st_make_valid(geometry) %>%
-  mutate(spring_cv_chinook = TRUE)
 ```
 
 ### Import summer steelhead
 
 ```{r}
-# create directory
-if(!dir.exists(here("raw_data", "anadromous_dist", "summer_steelhead"))) {
-  dir.create(here("raw_data", "anadromous_dist", "summer_steelhead"))
+if(fish) {
+  # create directory
+  if(!dir.exists(here("raw_data", "anadromous_dist", "summer_steelhead"))) {
+    dir.create(here("raw_data", "anadromous_dist", "summer_steelhead"))
+  }
+  
+  # specify summer steelhead url
+  summer_steelhead_url <- "ftp://ftp.streamnet.org/pub/calfish/Summer_Steelhead_Distribution_and_Range_Oct09.zip"
+  
+  # download summer steelhead data
+  if(!file.exists(here("raw_data", "anadromous_dist", "summer_steelhead", "summer_steelhead.zip"))) {
+    download.file(url = summer_steelhead_url,
+                  destfile = here("raw_data", "anadromous_dist", "summer_steelhead", "summer_steelhead.zip"))
+  }
+  
+  # unzip summer steelhead data
+  unzip(zipfile = here("raw_data", "anadromous_dist", "summer_steelhead", "summer_steelhead.zip"),
+        exdir = here("raw_data", "anadromous_dist", "summer_steelhead"))
+  
+  # read in summer steelhead data and clean
+  summer_steelhead <- st_read(here("raw_data", "anadromous_dist", "summer_steelhead"),
+                              layer = "Summer_Steelhead_Range") %>%
+    st_transform(global_crs) %>%
+    mutate(summer_steelhead = TRUE) %>%
+    dplyr::select(summer_steelhead, geometry)
 }
-
-# specify summer steelhead url
-summer_steelhead_url <- "ftp://ftp.streamnet.org/pub/calfish/Summer_Steelhead_Distribution_and_Range_Oct09.zip"
-
-# download summer steelhead data
-if(!file.exists(here("raw_data", "anadromous_dist", "summer_steelhead", "summer_steelhead.zip"))) {
-  download.file(url = summer_steelhead_url,
-                destfile = here("raw_data", "anadromous_dist", "summer_steelhead", "summer_steelhead.zip"))
-}
-
-# unzip summer steelhead data
-unzip(zipfile = here("raw_data", "anadromous_dist", "summer_steelhead", "summer_steelhead.zip"),
-      exdir = here("raw_data", "anadromous_dist", "summer_steelhead"))
-
-# read in summer steelhead data and clean
-summer_steelhead <- st_read(here("raw_data", "anadromous_dist", "summer_steelhead"),
-                            layer = "Summer_Steelhead_Range") %>%
-  st_transform(global_crs) %>%
-  mutate(summer_steelhead = TRUE) %>%
-  dplyr::select(summer_steelhead, geometry)
 ```
 
 ### Import winter steelhead
 
 ```{r}
-# create directory
-if(!dir.exists(here("raw_data", "anadromous_dist", "winter_steelhead"))) {
-  dir.create(here("raw_data", "anadromous_dist", "winter_steelhead"))
+if(fish) {
+  # create directory
+  if(!dir.exists(here("raw_data", "anadromous_dist", "winter_steelhead"))) {
+    dir.create(here("raw_data", "anadromous_dist", "winter_steelhead"))
+  }
+  
+  # specify winter steelhead url
+  winter_steelhead_url <- "ftp://ftp.streamnet.org/pub/calfish/Winter_Steelhead_Distribution_and_Range_Jun12.zip"
+  
+  # download winter steelhead data
+  if(!file.exists(here("raw_data", "anadromous_dist", "winter_steelhead", "winter_steelhead.zip"))) {
+    download.file(url = winter_steelhead_url,
+                  destfile = here("raw_data", "anadromous_dist", "winter_steelhead", "winter_steelhead.zip"))
+  }
+  
+  # unzip winter steelhead data
+  unzip(zipfile = here("raw_data", "anadromous_dist", "winter_steelhead", "winter_steelhead.zip"),
+        exdir = here("raw_data", "anadromous_dist", "winter_steelhead"))
+  
+  # read in winter steelhead data and clean
+  winter_steelhead <- st_read(here("raw_data", "anadromous_dist", "winter_steelhead"),
+                              layer = "Winter_Steelhead_Range") %>%
+    st_transform(global_crs) %>%
+    mutate(winter_steelhead = TRUE) %>%
+    dplyr::select(winter_steelhead, geometry)
 }
-
-# specify winter steelhead url
-winter_steelhead_url <- "ftp://ftp.streamnet.org/pub/calfish/Winter_Steelhead_Distribution_and_Range_Jun12.zip"
-
-# download winter steelhead data
-if(!file.exists(here("raw_data", "anadromous_dist", "winter_steelhead", "winter_steelhead.zip"))) {
-  download.file(url = winter_steelhead_url,
-                destfile = here("raw_data", "anadromous_dist", "winter_steelhead", "winter_steelhead.zip"))
-}
-
-# unzip winter steelhead data
-unzip(zipfile = here("raw_data", "anadromous_dist", "winter_steelhead", "winter_steelhead.zip"),
-      exdir = here("raw_data", "anadromous_dist", "winter_steelhead"))
-
-# read in winter steelhead data and clean
-winter_steelhead <- st_read(here("raw_data", "anadromous_dist", "winter_steelhead"),
-                            layer = "Winter_Steelhead_Range") %>%
-  st_transform(global_crs) %>%
-  mutate(winter_steelhead = TRUE) %>%
-  dplyr::select(winter_steelhead, geometry)
 ```
 
 ### Add all fish types to study points
 
 ```{r}
-# intersect buffered points with fish sf objects
-study_points_buffered_fish <- study_points_buffered %>%
-  st_join(coho) %>%
-  st_join(coastal_chinook) %>%
-  st_join(spring_cv_chinook) %>%
-  st_join(summer_steelhead) %>%
-  st_join(winter_steelhead) %>%
-  st_drop_geometry()
-
-# clean up - this is challenging for memory
-rm(coho, coastal_chinook, spring_cv_chinook, summer_steelhead, winter_steelhead,
-   coho_url, coastal_chinook_url, spring_cv_chinook_url,
-   summer_steelhead_url, winter_steelhead_url)
-
-# clean duplicates introduced in spatial join
-study_points_buffered_fish <- study_points_buffered_fish %>%
-  group_by(obs_id) %>%
-  summarize(coho = max(coho, na.rm = TRUE),
-            coastal_chinook = max(coastal_chinook, na.rm = TRUE),
-            spring_cv_chinook = max(spring_cv_chinook, na.rm = TRUE),
-            summer_steelhead = max(summer_steelhead, na.rm = TRUE),
-            winter_steelhead = max(winter_steelhead, na.rm = TRUE)) %>%
-  distinct()
-
-# add fish data to study points
-study_points <- left_join(study_points, study_points_buffered_fish, by = "obs_id")
-
-# clean up
-rm(study_points_buffered_fish)
+if(fish) {
+  # intersect buffered points with fish sf objects
+  study_points_buffered_fish <- study_points_buffered %>%
+    st_join(coho) %>%
+    st_join(coastal_chinook) %>%
+    st_join(spring_cv_chinook) %>%
+    st_join(summer_steelhead) %>%
+    st_join(winter_steelhead) %>%
+    st_drop_geometry()
+  
+  # clean up - this is challenging for memory
+  rm(coho, coastal_chinook, spring_cv_chinook, summer_steelhead, winter_steelhead,
+     coho_url, coastal_chinook_url, spring_cv_chinook_url,
+     summer_steelhead_url, winter_steelhead_url)
+  
+  # clean duplicates introduced in spatial join
+  study_points_buffered_fish <- study_points_buffered_fish %>%
+    group_by(obs_id) %>%
+    summarize(coho = max(coho, na.rm = TRUE),
+              coastal_chinook = max(coastal_chinook, na.rm = TRUE),
+              spring_cv_chinook = max(spring_cv_chinook, na.rm = TRUE),
+              summer_steelhead = max(summer_steelhead, na.rm = TRUE),
+              winter_steelhead = max(winter_steelhead, na.rm = TRUE)) %>%
+    distinct()
+  
+  # add fish data to study points
+  study_points <- left_join(study_points, study_points_buffered_fish, by = "obs_id") %>%
+    rowwise() %>%
+    mutate(n_anadromous = sum(coho, coastal_chinook, spring_cv_chinook,
+                              summer_steelhead, winter_steelhead, na.rm = TRUE)) %>%
+    ungroup()
+  
+  # clean up
+  rm(study_points_buffered_fish)
+}
 ```
 
 
@@ -991,7 +1033,95 @@ rm(ses)
 
 
 
-# Run exploratory statistics
+# Clean final study points attributes dataframe
 
 ```{r}
+# interpolate/attend to missing values
+# HERE!
+
+# filter outliers
+study_points <- study_points %>%
+  filter(drainage_density < 3)
 ```
+
+
+
+# Explore correlation between variables
+
+```{r}
+# list variables of interest for correlation evaluation
+check_corr_vars <- c("slope", "drainage_density", "native_aquatic_index", "csci_score",
+                     "cwip_score", "nitrate_score", "total_pop_buff_area",
+                     "mhi_wtd_buff_area", "pctg_bipoc_buff_area")
+
+if(fish) {
+  check_corr_vars <- c(check_corr_vars, "n_anadromous")
+}
+
+# drop geometry from study points, select columns of interest, and make numeric
+check_corr <- study_points %>%
+  st_drop_geometry() %>%
+  dplyr::select(check_corr_vars) %>%
+  mutate(across(everything(), ~as.numeric(.)))
+
+# grab only complete cases
+check_corr <- check_corr[complete.cases(check_corr), ]
+
+# make a Pearson's correlation matrix
+cor(check_corr) %>%
+  corrplot(.,
+           method = "number",
+           type = "upper")
+```
+
+
+
+# Create match data
+
+## Set up datasets for matching
+
+```{r}
+# identify data of interest in matching
+match_vars <- c("obs_id", "obs_type",
+                "slope", "drainage_density", "native_aquatic_index",
+                "csci_score", "any_303d",
+                "total_pop_buff_area", "mhi_wtd_buff_area", "pctg_bipoc_buff_area")
+
+# create dataframe of data of interest for matching
+to_match <- study_points %>%
+  st_drop_geometry() %>%
+  dplyr::select(match_vars) %>%
+  mutate(obs_type_bin = case_when(obs_type == "control" ~ 0,
+                                  obs_type == "restoration_site" ~ 1))
+
+# keep only complete cases
+to_match <- to_match[complete.cases(to_match), ]
+```
+
+## Do the matching
+
+```{r}
+# match on nearest neighbor
+match_nearestneighbor <- matchit(obs_type_bin ~ slope + drainage_density +
+                                   native_aquatic_index + csci_score + any_303d +
+                                   total_pop_buff_area, 
+                                 data = to_match,
+                                 method = "nearest",
+                                 distance = "glm")
+```
+
+## Reshape match data
+
+```{r}
+match_index <- rep(NA, nrow(data_to_match))
+match_index[1:100] <- 1:100
+match_index[as.numeric(match_nearestneighbor$match.matrix)] <- 1:100
+data_to_match$match_index <- match_index
+matched_points <- st_sf(data_to_match, geometry = c(st_geometry(cdfw_subsample), st_geometry(control_points))) %>%
+  filter(!is.na(match_index)) %>%
+  mutate(restoration = factor(restoration, labels = c('no', 'yes')))
+```
+
+
+
+
