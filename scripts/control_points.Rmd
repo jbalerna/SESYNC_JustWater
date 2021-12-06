@@ -22,6 +22,7 @@ suppressPackageStartupMessages(library(googledrive))
 suppressPackageStartupMessages(library(readr))
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(sf))
+suppressPackageStartupMessages(library(spdep))
 suppressPackageStartupMessages(library(raster))
 suppressPackageStartupMessages(library(elevatr))
 suppressPackageStartupMessages(library(esri2sf))
@@ -38,6 +39,7 @@ suppressPackageStartupMessages(library(nhdR))
 suppressPackageStartupMessages(library(nhdplusTools))
 suppressPackageStartupMessages(library(corrplot))
 suppressPackageStartupMessages(library(MatchIt))
+suppressPackageStartupMessages(library(survival))
 ```
 
 ## Set global options
@@ -326,6 +328,9 @@ control_points <- flowlines_study %>%
   cbind(flowlines_study$comid) %>%
   rename(obs_id = flowlines_study.comid) %>%
   mutate(obs_type = "control")
+
+# drop control points co-located with restoration sites
+# HERE!
 ```
 
 
@@ -547,6 +552,7 @@ eflows <- st_read(here("raw_data", "eflows", "Final_Classification_9CLASS",
   st_transform(crs = global_crs) %>%
   rename(eflows_class = CLASS,
          comid = COMID) %>%
+  mutate(eflows_class = as.character(eflows_class))
   dplyr::select(eflows_class, comid) %>%
   distinct(comid, .keep_all = TRUE)
 
@@ -594,6 +600,42 @@ if(FALSE) {
   
   rm(loca, precip_api_call, study_points_coords)
 }
+```
+
+Easier precip data source: UC Berkeley geolibrary
+https://geodata.lib.berkeley.edu/catalog/stanford-fs379qr8881 
+Original source: PRISM
+Annual normal, 1971-2000
+
+```{r}
+# create directory
+if(!dir.exists(here("raw_data", "precip"))) {
+  dir.create(here("raw_data", "precip"))
+}
+
+# specify url
+precip_url <- "https://stacks.stanford.edu/file/druid:fs379qr8881/data.zip"
+
+# download zipped file of precip data
+if(!file.exists(here("raw_data", "precip", "precip.zip"))) {
+  download.file(url = precip_url,
+                destfile = here("raw_data", "precip", "precip.zip"))
+}
+
+# unzip precip data
+unzip(zipfile = here("raw_data", "precip", "precip.zip"),
+      exdir = here("raw_data", "precip"))
+
+# read in precip raster
+precip <- raster(here("raw_data", "precip", "cappt7100_14", "hdr.adf"))
+
+# grab precip value for each restoration site
+precip_extract <- extract(precip, study_points) %>%
+  as_tibble() %>%
+  rename(precip = value)
+
+# bind to study points
+study_points <- cbind(study_points, precip_extract)
 ```
 
 ## Add California Stream Condition Index
@@ -1051,7 +1093,7 @@ study_points <- study_points %>%
 ```{r}
 # list variables of interest for correlation evaluation
 check_corr_vars <- c("slope", "drainage_density", "native_aquatic_index", "csci_score",
-                     "cwip_score", "nitrate_score", "total_pop_buff_area",
+                     "precip", "cwip_score", "nitrate_score", "total_pop_buff_area",
                      "mhi_wtd_buff_area", "pctg_bipoc_buff_area")
 
 if(fish) {
@@ -1083,8 +1125,8 @@ cor(check_corr) %>%
 ```{r}
 # identify data of interest in matching
 match_vars <- c("obs_id", "obs_type",
-                "slope", "drainage_density", "native_aquatic_index",
-                "csci_score", "any_303d",
+                "slope", "drainage_density", "precip",
+                "native_aquatic_index", "csci_score", "any_303d",
                 "total_pop_buff_area", "mhi_wtd_buff_area", "pctg_bipoc_buff_area")
 
 # create dataframe of data of interest for matching
@@ -1103,25 +1145,47 @@ to_match <- to_match[complete.cases(to_match), ]
 ```{r}
 # match on nearest neighbor
 match_nearestneighbor <- matchit(obs_type_bin ~ slope + drainage_density +
-                                   native_aquatic_index + csci_score + any_303d +
-                                   total_pop_buff_area, 
+                                   native_aquatic_index + precip + csci_score +
+                                   any_303d + total_pop_buff_area, 
                                  data = to_match,
                                  method = "nearest",
                                  distance = "glm")
+
+# pull out dataframe of match results
+match_result <- match.data(match_nearestneighbor)
 ```
 
-## Reshape match data
+
+
+# Have fun with stats
+
+## Run conditional logistic regression
 
 ```{r}
-match_index <- rep(NA, nrow(data_to_match))
-match_index[1:100] <- 1:100
-match_index[as.numeric(match_nearestneighbor$match.matrix)] <- 1:100
-data_to_match$match_index <- match_index
-matched_points <- st_sf(data_to_match, geometry = c(st_geometry(cdfw_subsample), st_geometry(control_points))) %>%
-  filter(!is.na(match_index)) %>%
-  mutate(restoration = factor(restoration, labels = c('no', 'yes')))
+# run conditional logistic regression with clogit
+match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area + pctg_bipoc_buff_area + strata(subclass),
+                    data = match_result)
 ```
 
+## Check spatial autocorrelation
 
+### Join in geometry
 
+```{r}
+# join geometry to matched points
+match_result_sf <- study_points %>%
+  dplyr::select(obs_id, geometry) %>%
+  inner_join(match_result, by = "obs_id")
+
+# map match result
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = match_result_sf, aes(color = obs_type), size = 0.8) +
+  theme_minimal()
+```
+
+### Test Moran's i
+
+```{r}
+```
 
