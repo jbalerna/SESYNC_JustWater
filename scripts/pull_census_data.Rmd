@@ -817,14 +817,25 @@ st_write(study_points_w_ses,
 
 ```{r quick t-test work}
 # make a density plot
-total_pop_dens <- ggdensity(study_points_w_ses, x = "total_pop_buff_area",
+pctg_bipoc_dens <- ggdensity(study_points_w_ses, x = "pctg_bipoc_buff_area",
           add = "mean", color = "obs_type", fill = "obs_type",
           #rug = TRUE, 
-          xlab = "Total population",
+          xlab = "Percentage BIPOC",
           ylab = "Density of restoration sites")
           #panel.labs = list(buy_type = 
                         #      c("Family Wealth", "LLC")))
-total_pop_dens
+pctg_bipoc_dens
+
+## T-Test pre-tests
+
+# We will do this later if needed
+outliers <- study_points_w_ses %>% 
+  st_drop_geometry() %>%
+  group_by(obs_type) %>%
+  identify_outliers(pctg_bipoc_buff_area) # this is not working, not sure why
+
+e_outliers <- outliers %>%
+  filter(is.extreme == TRUE)
 
 stat.test <- study_points_w_ses %>% 
   t_test(total_pop_buff_area ~ obs_type) %>%
@@ -850,15 +861,16 @@ glimpse(study_points_w_ses)
 /7. Upload file as gpckg**
 /8a. redo buffering denominator - adjust the denominator for buffered sites that dont overlap census BGs
 **8. Pull updated education data**
-**9. Get ready for stats: Run some fancier t-tests, pull pearson's coeff code**
+/9. Get ready for stats: Run some fancier t-tests, pull pearson's coeff code**
 
 
 *Question for group*
 SESYNC JMLR: Decide: what to do with buffered sites that have some % of area not overlapping census block groups (or not overlapping BGs at all) --> decision: change denominator to be actual area that overlaps with census block groups.
 
 *Next steps for group work*
-1. Select subset of data with 
-2. ID covariates & decide which attributes to keep
+/1. Select subset of data with 
+/2. ID covariates & decide which attributes to keep
+/3. Clean variables for NAs (eg. slope; check drainage density)
 3. Control site pairwise matching
 4. Run stats
 5. Test for spatial autocorrelation; figure out if/how we need to account for temporal autocorrelation
