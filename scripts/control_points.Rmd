@@ -41,6 +41,9 @@ suppressPackageStartupMessages(library(corrplot))
 suppressPackageStartupMessages(library(MatchIt))
 suppressPackageStartupMessages(library(survival))
 suppressPackageStartupMessages(library(ggpubr))
+suppressPackageStartupMessages(library(rstatix))
+suppressPackageStartupMessages(library(PairedData))
+
 ```
 
 ## Set global options
@@ -1141,6 +1144,7 @@ match_vars <- c("obs_id", "obs_type",
                 "slope", "drainage_density", "precip",
                 "native_aquatic_index", "csci_score", "any_303d",
                 "total_pop_buff_area", "mhi_wtd_buff_area", "pctg_bipoc_buff_area")
+# could pair on HUC4 or HUC6
 
 # create dataframe of data of interest for matching
 to_match <- study_points %>%
@@ -1185,9 +1189,12 @@ plot(matched_1, type = "qq", interactive = FALSE)
 
 ## calculate the optimal caliper 
 # (using recommendation of .2 of the standard deviation of the logit of the propensity score)
+# JMLR: double check whether this is taken from n=6500 or n=492
 distances <- matched_1$distances
 matched_1_data <- matched_1$X
 mean(matched_1)
+
+matchit
 
 # pull out dataframe of match results
 match_result <- match.data(matched_1)
@@ -1202,23 +1209,176 @@ match_result <- match.data(matched_1)
 
 ```{r}
 
+### Pctg BIPOC ###
 # make boxplot
 pctg_bipoc_boxplot <- ggboxplot(match_result, 
   x = "obs_type", y = "pctg_bipoc_buff_area",
   color = "obs_type", add = "jitter", shape = "obs_type",
-  title = "Title here",
+  #title = "Title here",
   xlab = "Observation Type",
   ylab = "Percentage BIPOC \n(in 1-km circle around site)"
   )
 pctg_bipoc_boxplot
 
-# make density plot
+# save that
+ggsave("intermediate_outputs/pctg_bipoc_boxplot.png",
+  width = 6, height = 6,
+  units = "in",
+  dpi = 600)
 
-# 
-stat.test <- study_points_w_ses %>% 
-  t_test(total_pop_buff_area ~ obs_type) %>%
-  add_significance()
-stat.test
+# could make density plot if wanted
+ggplot(match_result) +
+  geom_density(aes(x = pctg_bipoc_buff_area, fill = obs_type), 
+    alpha = .6) +
+  geom_rug(aes(x = pctg_bipoc_buff_area, y = 0), 
+    position = position_jitter(height = 0)) + 
+  labs(x = "Percentage BIPOC") 
+ggsave("intermediate_outputs//pctg_bipoc_density_plot.png", width = 6, height = 6)
+
+# make a histogram
+ggplot(match_result) +
+  geom_histogram(aes(x = pctg_bipoc_buff_area, fill = obs_type), 
+    alpha = .6) 
+
+## paired samples t-test assumptions check
+# yes, samples are paired
+# yes, sample size is large enough (n > 30 samples)
+# shapiro-wilk normality test
+d <- with(match_result,
+  pctg_bipoc_buff_area[obs_type == "restoration_site"] -
+    pctg_bipoc_buff_area[obs_type == "control"])
+shapiro.test(d)
+  # not normally distributed
+
+# summary stats by group
+match_result %>% group_by(obs_type) %>%
+  summarise(
+    count = n(),
+    median = median(pctg_bipoc_buff_area),
+    IQR = IQR(pctg_bipoc_buff_area)
+  )
+
+# order dataset
+match_result2 <- match_result %>%
+  arrange(subclass)
+
+# plot paired data
+rest_site <- subset(match_result2, 
+  obs_type == "restoration_site", pctg_bipoc_buff_area)
+control_site <- subset(match_result2, 
+  obs_type == "control", pctg_bipoc_buff_area)
+pd <- paired(rest_site, control_site)
+plot(pd, type = "profile") + theme_bw()
+
+# save that
+ggsave("intermediate_outputs/pctg_bipoc_paired_boxplot.png",
+  width = 6, height = 6,
+  units = "in",
+  dpi = 600)
+
+
+rest_site <- subset(match_result2, 
+  obs_type == "restoration_site", pctg_bipoc_buff_area)
+control_site <- subset(match_result2, 
+  obs_type == "control", pctg_bipoc_buff_area)
+
+test <- wilcox.test(pctg_bipoc_buff_area ~ obs_type,
+  data = match_result2,
+  paired = TRUE) # i'm not sure i've done this pairing correctly!
+
+test <- wilcox.test(rest_site, control_site, paired = TRUE)
+test
+
+
+
+
+
+
+
+
+
+
+##### REPEAT FOR MHI - start here
+# make boxplot
+mhi_boxplot <- ggboxplot(match_result, 
+  x = "obs_type", y = "mhi_wtd_buff_area",
+  color = "obs_type", add = "jitter", shape = "obs_type",
+  #title = "Title here",
+  xlab = "Observation Type",
+  ylab = "Median Household Income"
+  )
+mhi_boxplot
+
+# save that
+ggsave("intermediate_outputs/mhi_boxplot.png",
+  width = 6, height = 6,
+  units = "in",
+  dpi = 600)
+
+# could make density plot if wanted
+ggplot(match_result) +
+  geom_density(aes(x = mhi_wtd_buff_area, fill = obs_type), 
+    alpha = .6) +
+  geom_rug(aes(x = mhi_wtd_buff_area, y = 0), 
+    position = position_jitter(height = 0)) + 
+  labs(x = "Median Household Income") 
+ggsave("intermediate_outputs/mhi_density_plot.png", width = 6, height = 6)
+
+
+# make a histogram
+ggplot(match_result) +
+  geom_histogram(aes(x = mhi_wtd_buff_area, fill = obs_type), 
+    alpha = .6) 
+
+## paired samples t-test assumptions check
+# yes, samples are paired
+# yes, sample size is large enough (n > 30 samples)
+# shapiro-wilk normality test
+d <- with(match_result,
+  mhi_wtd_buff_area[obs_type == "restoration_site"] -
+    mhi_wtd_buff_area[obs_type == "control"])
+shapiro.test(d)
+  # not normally distributed
+
+# summary stats by group
+match_result %>% group_by(obs_type) %>%
+  summarise(
+    count = n(),
+    median = median(mhi_wtd_buff_area),
+    IQR = IQR(mhi_wtd_buff_area)
+  )
+
+# order dataset
+match_result2 <- match_result %>%
+  arrange(subclass)
+
+# plot paired data
+rest_site <- subset(match_result2, 
+  obs_type == "restoration_site", mhi_wtd_buff_area)
+control_site <- subset(match_result2, 
+  obs_type == "control", mhi_wtd_buff_area)
+pd <- paired(rest_site, control_site)
+plot(pd, type = "profile") + theme_bw()
+
+# save that
+ggsave("intermediate_outputs/mhi_paired_boxplot.png",
+  width = 6, height = 6,
+  units = "in",
+  dpi = 600)
+
+
+rest_site <- subset(match_result2, 
+  obs_type == "restoration_site", mhi_wtd_buff_area)
+control_site <- subset(match_result2, 
+  obs_type == "control", mhi_wtd_buff_area)
+
+test <- wilcox.test(mhi_wtd_buff_area ~ obs_type,
+  data = match_result2,
+  paired = TRUE) # i'm not sure i've done this pairing correctly!
+
+test <- wilcox.test(rest_site, control_site, paired = TRUE)
+test
+
 
 ```
 
@@ -1227,13 +1387,35 @@ stat.test
 
 ```{r}
 
-
 # run conditional logistic regression with clogit
-match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area + pctg_bipoc_buff_area + strata(subclass),
-                              data = match_result)
+match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area + 
+    pctg_bipoc_buff_area +
+    strata(subclass),
+  data = match_result)
+
+summary(match_logregression)
+
+match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area  +
+    strata(subclass),
+  data = match_result)
+
+summary(match_logregression)
+
+match_logregression <- clogit(obs_type_bin ~ pctg_bipoc_buff_area  +
+    strata(subclass),
+  data = match_result)
+
+summary(match_logregression)
+
+match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area*pctg_bipoc_buff_area  +
+    strata(subclass),
+  data = match_result)
+
+summary(match_logregression)
 ```
 
 ## Check spatial autocorrelation
+
 
 ### Join in geometry
 
