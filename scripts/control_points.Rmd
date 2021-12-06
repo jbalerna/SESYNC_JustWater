@@ -40,6 +40,7 @@ suppressPackageStartupMessages(library(nhdplusTools))
 suppressPackageStartupMessages(library(corrplot))
 suppressPackageStartupMessages(library(MatchIt))
 suppressPackageStartupMessages(library(survival))
+suppressPackageStartupMessages(library(ggpubr))
 ```
 
 ## Set global options
@@ -1081,12 +1082,21 @@ rm(ses)
 # Clean final study points attributes dataframe
 
 ```{r}
+# load study points
+study_points_orig <- st_read("cleaned_data/study_points_midprocess/study_points.gpkg")
+glimpse(study_points_orig)
+
+# backup
+study_points <- study_points_orig
+
 # interpolate/attend to missing values
 # HERE!
 
 # filter outliers
-study_points <- study_points %>%
-  filter(drainage_density < 3)
+# HERE!
+#study_points <- study_points %>%
+#  filter(drainage_density < 3) # this doesn't do anything rn
+
 ```
 
 
@@ -1141,30 +1151,83 @@ to_match <- study_points %>%
 
 # keep only complete cases
 to_match <- to_match[complete.cases(to_match), ]
+
+# double check how many cases there were before matching
+study_points %>% filter(obs_type == "restoration_site") %>% nrow() # 268
 ```
 
 ## Do the matching
 
 ```{r}
-# match on nearest neighbor
-match_nearestneighbor <- matchit(obs_type_bin ~ slope + drainage_density +
-                                   native_aquatic_index + precip + csci_score +
-                                   any_303d + total_pop_buff_area, 
-                                 data = to_match,
-                                 method = "nearest",
-                                 distance = "glm")
+
+## matched data iteration #1 = match_1to1_nearestneighbor_glm_logit
+# match on nearest neighbor using glm
+matched_1 <- matchit(obs_type_bin ~ slope + drainage_density +
+    native_aquatic_index + precip + csci_score +
+    any_303d + total_pop_buff_area, 
+  data = to_match,
+  method = "nearest",
+  distance = "glm",
+  link = "logit")
+
+## assess quality of matches
+# get high-level details
+matched_1
+
+# check balance
+summary(matched_1)
+
+# plot the distribution of the propensity scores
+plot(matched_1, type = "jitter", interactive = FALSE)
+
+# make qq plots
+plot(matched_1, type = "qq", interactive = FALSE)
+
+## calculate the optimal caliper 
+# (using recommendation of .2 of the standard deviation of the logit of the propensity score)
+distances <- matched_1$distances
+matched_1_data <- matched_1$X
+mean(matched_1)
 
 # pull out dataframe of match results
-match_result <- match.data(match_nearestneighbor)
+match_result <- match.data(matched_1)
+
 ```
 
 
 
 # Have fun with stats
 
+## Make box plots
+
+```{r}
+
+# make boxplot
+pctg_bipoc_boxplot <- ggboxplot(match_result, 
+  x = "obs_type", y = "pctg_bipoc_buff_area",
+  color = "obs_type", add = "jitter", shape = "obs_type",
+  title = "Title here",
+  xlab = "Observation Type",
+  ylab = "Percentage BIPOC \n(in 1-km circle around site)"
+  )
+pctg_bipoc_boxplot
+
+# make density plot
+
+# 
+stat.test <- study_points_w_ses %>% 
+  t_test(total_pop_buff_area ~ obs_type) %>%
+  add_significance()
+stat.test
+
+```
+
+
 ## Run conditional logistic regression
 
 ```{r}
+
+
 # run conditional logistic regression with clogit
 match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area + pctg_bipoc_buff_area + strata(subclass),
                               data = match_result)
