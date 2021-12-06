@@ -552,7 +552,7 @@ eflows <- st_read(here("raw_data", "eflows", "Final_Classification_9CLASS",
   st_transform(crs = global_crs) %>%
   rename(eflows_class = CLASS,
          comid = COMID) %>%
-  mutate(eflows_class = as.character(eflows_class))
+  mutate(eflows_class = as.character(eflows_class)) %>%
   dplyr::select(eflows_class, comid) %>%
   distinct(comid, .keep_all = TRUE)
 
@@ -1167,7 +1167,7 @@ match_result <- match.data(match_nearestneighbor)
 ```{r}
 # run conditional logistic regression with clogit
 match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area + pctg_bipoc_buff_area + strata(subclass),
-                    data = match_result)
+                              data = match_result)
 ```
 
 ## Check spatial autocorrelation
