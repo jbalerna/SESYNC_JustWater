@@ -636,6 +636,9 @@ precip_extract <- extract(precip, study_points) %>%
 
 # bind to study points
 study_points <- cbind(study_points, precip_extract)
+
+# clean up
+rm(precip_url, precip, precip_extract)
 ```
 
 ## Add California Stream Condition Index
