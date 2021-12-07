@@ -43,6 +43,13 @@ suppressPackageStartupMessages(library(survival))
 suppressPackageStartupMessages(library(ggpubr))
 suppressPackageStartupMessages(library(rstatix))
 suppressPackageStartupMessages(library(PairedData))
+suppressPackageStartupMessages(library(optmatch))
+suppressPackageStartupMessages(library(Matching))
+suppressPackageStartupMessages(library(rgenoud))
+#suppressPackageStartupMessages(library(CBPS))
+suppressPackageStartupMessages(library(dbarts))
+suppressPackageStartupMessages(library(randomForest))
+suppressPackageStartupMessages(library(tictoc))
 
 ```
 
@@ -1157,7 +1164,12 @@ to_match <- study_points %>%
 to_match <- to_match[complete.cases(to_match), ]
 
 # double check how many cases there were before matching
-study_points %>% filter(obs_type == "restoration_site") %>% nrow() # 268
+study_points %>% filter(obs_type == "restoration_site") %>% nrow() # 268 originally
+to_match %>% filter(obs_type == "restoration_site") %>% nrow() # 246 now
+
+# backup
+saveRDS(to_match, "intermediate_data/to_match.rds")
+
 ```
 
 ## Do the matching
@@ -1383,11 +1395,114 @@ test
 ```
 
 
+## Iterate through the matches
+
+```{r}
+
+distance_options <- c('glm', 'gam', 'rpart', 'randomforest', 'mahalanobis')
+method_options <- c('nearest', 'optimal', 'genetic')
+
+combos <- expand_grid(distance = distance_options, method = method_options)
+
+# Explicitly write out formula
+full_formula <- as.formula(obs_type_bin ~ slope + drainage_density +
+    native_aquatic_index + precip + csci_score +
+    any_303d + total_pop_buff_area)
+
+# time this because it takes a while to iterate through everything
+tic()
+all_matches <- combos %>%
+  mutate(match = pmap(., function(distance, method) matchit(full_formula,
+    data = to_match, 
+    distance = distance, 
+    method = method)))
+toc()
+
+# save that
+saveRDS(all_matches, "intermediate_data/all_matches.Rds")
+
+# began at 9:55pm, ended at 10:02pm - took only 7 minutes to run! yay!!!!
+
+# JMLR: warning message appears
+# Input `match` is `pmap(...)`.
+# Warning: (from Matching) The key tuning parameters for optimization were are all left at their default values.  The 'pop.size' option in particular should probably be increased for optimal results.  For details please see the help page and http://sekhon.berkeley.edu/papers/MatchingJSS.pdf
+# (from Matching) The key tuning parameters for optimization were are all left at their default values.  The 'pop.size' option in particular should probably be increased for optimal results.  For details please see the help page and http://sekhon.berkeley.edu/papers/MatchingJSS.pdf
+```
+
+```{r making smaller version of all_matches to understand the subsequent functions - can delete later}
+
+distance_options_2 <- c('glm', 'gam')
+method_options_2 <- 'nearest'
+combos2 <- expand_grid(distance = distance_options_2, method = method_options_2)
+
+all_matches2 <- combos2 %>%
+  mutate(match = pmap(., function(distance, method) matchit(full_formula,
+    data = to_match, 
+    distance = distance, 
+    method = method)))
+
+```
+
+
+
+## Process the matches - JMLR: this is the code chunk that I can't figure out!
+
+```{r}
+
+# hard coding for now; JMLR correct this later
+i = nrow()
+
+# perhaps to_match has to be ordered with the restored sites first?
+to_match <- to_match %>% 
+  arrange(desc(obs_type))
+glimpse(to_match)
+  
+process_matches <- function(match_obj, to_match, i) {
+  match_index <- rep(NA, nrow(to_match))
+  match_index[1:268] <- 1:268 # I think this is the # of treatment sites; we should edit this so it's not hard-coded
+  match_index[as.numeric(all_matches2[[3]][[1]]$match.matrix)] <- 1:268 # testing
+  #match_index[as.numeric(match_obj$match.matrix)] <- 1:100 # original
+  to_match$match_index <- match_index
+  matched_points <- st_sf(to_match, geometry = st_geometry(study_points)) %>%
+    filter(!is.na(match_index)) %>%
+    mutate(restoration = factor(obs_type_bin, labels = c('no', 'yes')))
+  i <- i+1
+  return(matched_points)
+}
+
+create_matched_lines <- function(matched_points) {
+  matched_lines <- matched_points %>%
+    group_by(match_index) %>%
+    summarize() %>%
+    st_cast('LINESTRING')
+  return(matched_lines)
+}
+
+
+```
+Error messages being thrown include: all_matches2_w_details <- all_matches2 %>%
+  mutate(matched_points = map(match, process_matches, to_match = to_match))
+    matched_lines = map(matched_points, create_matched_lines))
+
+1: Problem with `mutate()` input `matched_points`.
+ℹ Unknown or uninitialised column: `match.matrix`.
+ℹ Input `matched_points` is `map(match, process_matches, to_match = to_match)`. 
+2: Unknown or uninitialised column: `match.matrix`. 
+
+
+Error: Problem with `mutate()` input `matched_points`.
+x replacement has 6842 rows, data has 6500
+ℹ Input `matched_points` is `map(match, process_matches, to_match = to_match)`.
+
+
+
+
+
 ## Run conditional logistic regression
 
 ```{r}
 
-# run conditional logistic regression with clogit
+# run conditional logistic regression
 match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area + 
     pctg_bipoc_buff_area +
     strata(subclass),
@@ -1412,7 +1527,9 @@ match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area*pctg_bipoc_buff_a
   data = match_result)
 
 summary(match_logregression)
+residuals(match_logregression)
 ```
+
 
 ## Check spatial autocorrelation
 
@@ -1422,8 +1539,13 @@ summary(match_logregression)
 ```{r}
 # join geometry to matched points
 match_result_sf <- study_points %>%
-  dplyr::select(obs_id, geometry) %>%
+  dplyr::select(obs_id, geom) %>%
   inner_join(match_result, by = "obs_id")
+
+# extract lat and lon for use in regressions
+match_result_sf <- match_result_sf %>%
+  dplyr::mutate(lat = sf::st_coordinates(.)[,1],
+    lon = sf::st_coordinates(.)[,2])
 
 # map match result
 ggplot() +
@@ -1435,5 +1557,41 @@ ggplot() +
 ### Test Moran's i
 
 ```{r}
+# Global settings for regions with no neighbors
+set.ZeroPolicyOption(TRUE)
+
+# The final (?) choice of set up for running Moran's I:
+weights = nb2listw(dnearneigh(match_result_sf, 
+  d1 = .1*1000, d2=5*1000), # Discuss in January
+  style = "C", # Discuss in January 
+  zero.policy = TRUE)
+
+# make sure you have the right match results
+match_result_sf$res <- residuals(match_logregression)
+AIC(match_logregression)
+
+# Moran's
+moran.test(match_result_sf$res, weights, alternative = "two.sided")
+  # doesn't pass
+
+## try adding a lat/lon term to the logistic regression
+# preprocess
+match_result_latlon <- match_result_sf %>%
+  st_drop_geometry()
+  
+match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area*pctg_bipoc_buff_area  + lat + lon +
+    strata(subclass),
+  data = match_result_latlon)
+
+match_result_latlon$res <- residuals(match_logregression)
+AIC(match_logregression)
+
+# Moran's
+moran.test(match_result_latlon$res, weights, alternative = "two.sided")
+ 
+# good news, that passes!
+
+
+glimpse(match_result_sf)
 ```
 
