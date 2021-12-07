@@ -1441,6 +1441,9 @@ all_matches2 <- combos2 %>%
     distance = distance, 
     method = method)))
 
+all_matches2_small <- all_matches2$match[2]
+all_matches2_small
+
 ```
 
 
@@ -1460,6 +1463,7 @@ glimpse(to_match)
 process_matches <- function(match_obj, to_match, i) {
   match_index <- rep(NA, nrow(to_match))
   match_index[1:268] <- 1:268 # I think this is the # of treatment sites; we should edit this so it's not hard-coded
+    match_index[as.numeric(match_obj[[3]][[i]]$match.matrix)] <- 1:268 # testing
   match_index[as.numeric(all_matches2[[3]][[1]]$match.matrix)] <- 1:268 # testing
   #match_index[as.numeric(match_obj$match.matrix)] <- 1:100 # original
   to_match$match_index <- match_index
@@ -1583,8 +1587,50 @@ match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area*pctg_bipoc_buff_a
     strata(subclass),
   data = match_result_latlon)
 
+summary(match_logregression)
 match_result_latlon$res <- residuals(match_logregression)
 AIC(match_logregression)
+
+
+# Moran's
+moran.test(match_result_latlon$res, weights, alternative = "two.sided")
+ 
+# good news, that passes!
+
+### run again for another model
+## try adding a lat/lon term to the logistic regression
+# preprocess
+match_result_latlon <- match_result_sf %>%
+  st_drop_geometry()
+  
+match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area + pctg_bipoc_buff_area  + 
+    lat + lon +
+    strata(subclass),
+  data = match_result_latlon)
+
+match_result_latlon$res <- residuals(match_logregression)
+AIC(match_logregression)
+summary(match_logregression)
+
+# Moran's
+moran.test(match_result_latlon$res, weights, alternative = "two.sided")
+ 
+# good news, that passes!
+
+### run again for another model
+## try adding a lat/lon term to the logistic regression
+# preprocess
+match_result_latlon <- match_result_sf %>%
+  st_drop_geometry()
+  
+match_logregression <- clogit(obs_type_bin ~ mhi_wtd_buff_area + pctg_bipoc_buff_area  + 
+    lat + lon +
+    strata(subclass),
+  data = match_result_latlon)
+
+match_result_latlon$res <- residuals(match_logregression)
+AIC(match_logregression)
+summary(match_logregression)
 
 # Moran's
 moran.test(match_result_latlon$res, weights, alternative = "two.sided")
@@ -1592,6 +1638,5 @@ moran.test(match_result_latlon$res, weights, alternative = "two.sided")
 # good news, that passes!
 
 
-glimpse(match_result_sf)
 ```
 
