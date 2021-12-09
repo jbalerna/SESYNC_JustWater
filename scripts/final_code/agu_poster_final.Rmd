@@ -1152,7 +1152,23 @@ cor(corr_check_df) %>%
 rm(corr_check_vars, corr_check_df)
 ```
 
-Mean annual discharge and total drainage area are obviously correlated, that's good to see.
-We will need to pick one. I could go either way - total drainage area is a more reliable
+Mean annual discharge and total drainage area should obviously be correlated, so that's good to see.
+We will need to pick one of the two variables. I could go either way - total drainage area is a more reliable
 value (in terms of data source), but discharge is the variable of direct theoretical interest.
 
+```{r}
+# identify columns to use in assessing completeness
+suggested_vars <- c("slope", "mean_actual_discharge_cfs", "drainage_density",
+                    "native_aquatic_index", "eflows_class", "precip",
+                    "csci_score", "any_303d", "pop_density",
+                    "bipoc_prop", "med_hh_income")
+
+# keep only complete cases across columns of interest
+study_points_complete <- study_points[
+  complete.cases(st_drop_geometry(dplyr::select(study_points, all_of(suggested_vars)))), ]
+
+# summarize remaining study points
+study_points_complete %>%
+  st_drop_geometry() %>%
+  count(obs_type)
+```
