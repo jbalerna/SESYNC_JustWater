@@ -1,0 +1,1174 @@
+---
+title: "CDFW Stream Restoration Siting Analysis"
+author: "Lucy Andrews"
+date: "12/6/2021"
+output: html_document
+---
+
+# SET UP
+
+## Load packages
+
+```{r warning = FALSE, message = FALSE}
+# load packages
+# tidy syntax
+library(tidyverse)
+library(magrittr)
+
+# data cleaning and presentation
+library(janitor)
+library(units)
+library(knitr)
+library(kableExtra)
+
+# file import and management
+library(here)
+library(readxl)
+library(googledrive)
+library(fst)
+
+# spatial data
+library(sf)
+library(raster)
+library(rgdal)
+library(tigris)
+library(rmapshaper)
+library(areal)
+
+# statistics
+library(spdep)
+library(corrplot)
+library(MatchIt)
+library(survival)
+
+# census data
+library(tidycensus)
+
+# visualization
+library(ggnewscale)
+library(ggpubr)
+library(scales)
+
+# hydrologic data
+library(nhdR)
+library(nhdplusTools)
+```
+
+## Specify global options
+
+```{r}
+# specify global options
+# no stringAsFactors
+options(stringsAsFactors = FALSE)
+
+# cache tigris sf objects
+options(tigris_use_cache = TRUE)
+
+# work in CRS EPSG 4269 (NAD83)
+global_crs <- st_crs(4269)
+
+# don't default to scientific notation in numeric display
+options(scipen = 999)
+
+# set a long timeout limit for file download
+options(timeout = 30000)
+
+# specify NHD ftypes to drop from analysis
+drop_ftypes <- c("Coastline", "Pipeline", "Connector")
+
+# set buffer distances
+buffer_drop_control <- set_units(1, "km") # distance between restoration projects and control points
+buffer_pollution <- set_units(15, "km") # distance for pollution attribute creation
+buffer_ses <- set_units(1, "km") # distance for SES attribute creation
+```
+
+## Import custom functions
+
+```{r}
+# import custom functions contained in separate .R file
+source(here("scripts", "final_code", "agu_poster_fxns.R"))
+```
+
+## Create directories
+
+```{r}
+# create directories
+create_directory(here("raw_data"))
+create_directory(here("cleaned_data"))
+create_directory(here("output_data"))
+```
+
+## Import California boundary as sf object
+
+```{r}
+# import CA state boundary as sf object
+ca_boundary <- get_ca_boundary(crs = global_crs)
+```
+
+
+
+# IMPORT AND CLEAN RESTORATION DATA
+
+## Download restoration data
+
+```{r}
+# create directories
+create_directory(here("raw_data", "restoration_terr")) # service territory area
+create_directory(here("raw_data", "restoration_proj")) # restoration project locations
+
+# specify dataset urls
+restoration_terr_url <- "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/700_799/ds734.zip"
+restoration_proj_url <- "https://filelib.wildlife.ca.gov/Public/BDB/GIS/BIOS/Public_Datasets/100_199/ds168.zip"
+
+# download datasets as zipped files
+download_from_url(url = restoration_terr_url,
+                  filename = "ds734.zip",
+                  dir = here("raw_data", "restoration_terr"))
+
+download_from_url(url = restoration_proj_url,
+                  filename = "ds168.zip",
+                  dir = here("raw_data", "restoration_proj"))
+
+# unzip datasets into directory in which the zipped files are located
+unzip_local(zipped_file = "ds734.zip",
+            directory = here("raw_data", "restoration_terr"))
+
+unzip_local(zipped_file = "ds168.zip",
+            directory = here("raw_data", "restoration_proj"))
+
+# clean up
+rm(restoration_terr_url, restoration_proj_url)
+invisible(gc())
+```
+
+## Read in and clean restoration data
+
+### Read in and clean restoration territory data
+
+```{r}
+# read in and clean restoration territory sf objects
+# geometry: MULTIPOLYGON
+restoration_terr <- st_read(dsn = here("raw_data", "restoration_terr", "ds734.shp"),
+                            quiet = TRUE) %>%
+  st_transform(crs = global_crs) %>%
+  rename(huc2 = HUC_2,
+         huc4 = HUC_4,
+         huc6 = HUC_6,
+         huc8 = HUC_8,
+         huc8_state = HU_8_STATE,
+         fips_code = FIPS_C,
+         huc10_name = HU_10_NAME) %>%
+  rename_with(tolower) %>%
+  ms_simplify(keep = 0.05) %>% # simplify geometry for faster mapping
+  mutate(is_valid = st_is_valid(geometry)) %>%
+  filter(is_valid) %>% # drop invalid geometries
+  dplyr::select(-is_valid)
+
+# union restoration territory objects to create a single sf object
+restoration_terr <- restoration_terr %>%
+  st_union() %>%
+  st_as_sf()
+```
+
+### Confirm restoration territory on a map
+
+```{r}
+# create a map of restoration territory
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = restoration_terr, fill = "lightblue2", lwd = 0) +
+  theme_minimal()
+```
+
+### Read in restoration project data
+
+```{r warning = FALSE}
+# read in and clean restoration projects sf object
+# geometry: none (dataframe, but contains longitude and latitude coordinates)
+restoration_proj <- st_read(dsn = here("raw_data", "restoration_proj", "ds168.gdb"),
+                            layer = "ds168_ex",
+                            quiet = TRUE) %>%
+  rename(obs_id = ProjectID) %>%
+  rename_with(tolower) %>%
+  st_as_sf(coords = c("center_longitude", "center_latitude"),
+           crs = global_crs)
+
+# check number of initial project records
+nrow(restoration_proj)
+```
+
+### Map initial restoration project data
+
+```{r}
+# map restoration projects (full dataset)
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = restoration_terr, fill = "lightblue2", lwd = 0) +
+  geom_sf(data = restoration_proj, size = 0.3) +
+  theme_minimal()
+```
+
+### Clean restoration project data
+
+```{r}
+# identify project type values to drop
+drop_project_type <- c("Water Measuring Devices",
+                       "Monitoring Watershed Restoration",
+                       "AmericCorps",
+                       "Project Design",
+                       "Public Involvement and Capacity Building",
+                       "Private Sector Technical Training and Education",
+                       "Public School Watershed and Fishery Conservation Education Project",
+                       "Cooperative Rearing",
+                       "Watershed and Regional Organization",
+                       "Watershed Evaluation, Assessment, Planning",
+                       "Monitoring Status and Trends")
+
+# identify work status values to drop
+drop_cal_work_status <- c("Terminated/Cancelled",
+                          "TerminateCancel")
+
+# identify grant status values to drop
+drop_grant_status <- c("Cancelnofundsspent")
+
+# add column to indicate drop
+restoration_proj <- restoration_proj %>%
+  mutate(drop = case_when(project_type %in% drop_project_type ~ TRUE,
+                          cal_work_status %in% drop_cal_work_status ~ TRUE,
+                          grant_status %in% drop_grant_status ~ TRUE,
+                          TRUE ~ FALSE))
+
+# check count of records to keep and to drop
+restoration_proj %>%
+  st_drop_geometry() %>%
+  count(drop)
+```
+
+```{r}
+# map project records to drop
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = restoration_terr, fill = "lightblue2", lwd = 0) +
+  geom_sf(data = restoration_proj, aes(color = drop), size = 0.3) +
+  facet_wrap(~drop) +
+  scale_color_manual(values = c("darkgreen", "orangered2"), name = "drop record") +
+  theme_minimal()
+
+# drop undesired project records
+restoration_proj <- restoration_proj %>%
+  filter(!drop) %>%
+  dplyr::select(-drop) %>%
+  mutate(obs_type = "restoration") %>%
+  dplyr::select(-geometry, everything(), geometry)
+
+# clean up
+rm(drop_project_type, drop_cal_work_status, drop_grant_status)
+invisible(gc())
+```
+
+
+
+# IMPORT AND CLEAN NHD DATA
+
+## Download NHD data
+
+```{r warning = FALSE, message = FALSE}
+# create directory
+create_directory(here("raw_data", "nhd_flowlines"))
+
+# set nhdR download directory path
+Sys.setenv(nhdR_path = here("raw_data", "nhd_flowlines"))
+
+# download flowlines, attribute data, and runoff modeling data
+# VPUs 17 (PNW) and 18 (CA)
+# NHDSnapshot: basic flowlines
+nhd_plus_get(vpu = 17, component = "NHDSnapshot")
+nhd_plus_get(vpu = 18, component = "NHDSnapshot")
+
+# NHDPlusAttributes: basic attributes
+nhd_plus_get(vpu = 17, component = "NHDPlusAttributes")
+nhd_plus_get(vpu = 18, component = "NHDPlusAttributes")
+
+# EROMExtension: climatic and hydrologic attributes
+nhd_plus_get(vpu = 17, component = "EROMExtension")
+nhd_plus_get(vpu = 18, component = "EROMExtension")
+```
+
+## Read in and clean flowlines
+
+```{r}
+# read in flowlines
+flowlines_17 <- nhd_plus_load(vpu = 17,
+                              component = "NHDSnapshot",
+                              dsn = "NHDFlowline") %>%
+  st_transform(crs = global_crs)
+
+flowlines_18 <- nhd_plus_load(vpu = 18,
+                              component = "NHDSnapshot",
+                              dsn = "NHDFlowline") %>%
+  st_transform(crs = global_crs)
+
+# create and clean a single flowlines object
+flowlines <- rbind(flowlines_17, flowlines_18) %>%
+  rename(length_km = LENGTHKM) %>%
+  rename_with(.fn = tolower) %>%
+  dplyr::select(comid, gnis_id, gnis_name, length_km, ftype) %>%
+  filter(ftype %notin% drop_ftypes) %>% # drop unwanted ftypes
+  # drop flowlines outside of CA boundary
+  st_join(dplyr::select(ca_boundary, geometry), left = FALSE)
+
+# identify flowlines in the restoration study area
+flowlines_study_area <- flowlines %>%
+  st_join(restoration_terr, join = st_intersects, left = FALSE)
+
+# add column to flowlines indicating whether flowline is in study area
+flowlines <- flowlines %>%
+  mutate(in_study_area = comid %in%flowlines_study_area$comid)
+
+# clean up
+rm(flowlines_17, flowlines_18, flowlines_study_area)
+invisible(gc())
+```
+
+## Read in and clean flowlines value-added attributes
+
+```{r}
+# read in value-added attributes (VAA)
+vaa_17 <- nhd_plus_load(vpu = 17,
+                        component = "NHDPlusAttributes",
+                        dsn = "PlusFlowlineVAA")
+
+vaa_18 <- nhd_plus_load(vpu = 18,
+                        component = "NHDPlusAttributes",
+                        dsn = "PlusFlowlineVAA")
+
+# create and clean a single VAA object
+vaa <- rbind(vaa_17, vaa_18) %>%
+  rename(comid = ComID,
+         stream_order = StreamOrde,
+         from_node = FromNode,
+         to_node = ToNode,
+         hydroseq = Hydroseq,
+         level_path_i = LevelPathI,
+         path_length = Pathlength,
+         terminal_path = TerminalPa,
+         up_level_path = UpLevelPat,
+         up_hydroseq = UpHydroseq,
+         down_level_path = DnLevelPat,
+         down_hydroseq = DnHydroseq,
+         tot_da_sqkm = TotDASqKM) %>%
+  dplyr::select(comid, stream_order, tot_da_sqkm, from_node, to_node, hydroseq,
+                level_path_i, path_length, terminal_path, up_level_path,
+                down_level_path, down_hydroseq) %>%
+  filter(comid %in% flowlines$comid)
+
+# join VAA to flowlines
+flowlines <- flowlines %>%
+  left_join(vaa, by = "comid")
+
+# clean up
+rm(vaa_17, vaa_18, vaa)
+invisible(gc())
+```
+
+## Read in slope attribute
+
+```{r}
+# read in slope attributes
+elev_slope_17 <- nhd_plus_load(vpu = 17,
+                               component = "NHDPlusAttributes",
+                               dsn = "elevslope")
+
+elev_slope_18 <- nhd_plus_load(vpu = 18,
+                               component = "NHDPlusAttributes",
+                               dsn = "elevslope")
+
+# create a single slope object
+elev_slope <- rbind(elev_slope_17, elev_slope_18) %>%
+  rename_with(tolower) %>%
+  mutate(slope = case_when(slope < 0 ~ NA_real_,
+                           TRUE ~ slope)) %>%
+  dplyr::select(comid, slope)
+
+# join slope to flowlines
+flowlines <- flowlines %>%
+  left_join(elev_slope, by = "comid")
+
+# clean up
+rm(elev_slope_17, elev_slope_18, elev_slope)
+```
+
+## Read in and clean extended unit runoff method data
+
+```{r}
+# read in EROM tables
+erom_17 <- nhd_plus_load(vpu = 17,
+                         component = "EROMExtension",
+                         dsn = "EROM_MA0001")
+
+erom_18 <- nhd_plus_load(vpu = 18,
+                         component = "EROMExtension",
+                         dsn = "EROM_MA0001")
+
+# create and clean a single EROM object
+erom <- rbind(erom_17, erom_18) %>%
+  rename(comid = ComID,
+         mean_actual_discharge_cfs = Q0001E,
+         mean_nat_discharge_cfs = Q0001C) %>%
+  dplyr::select(comid, mean_actual_discharge_cfs, mean_nat_discharge_cfs) %>%
+  mutate(nat_discharge_prop = mean_actual_discharge_cfs / mean_nat_discharge_cfs) %>%
+  filter(comid %in% flowlines$comid)
+
+# join EROM data to flowlines
+flowlines <- flowlines %>%
+  left_join(erom, by = "comid")
+
+# clean up
+rm(erom_17, erom_18, erom)
+invisible(gc())
+```
+
+## Clean final VAA-enriched flowlines for necessary completeness
+
+```{r}
+# clean flowlines for complete data
+# specify columns that must be complete
+complete_cols <- c("stream_order", "slope")
+
+# identify comid indices of complete flowlines
+flowlines_complete <- flowlines[complete.cases(
+  st_drop_geometry(dplyr::select(flowlines, all_of(complete_cols)))), ] %>%
+  dplyr::select(comid)
+
+# filter flowlines dataset to retain complete cases
+flowlines <- flowlines %>%
+  filter(comid %in% flowlines_complete$comid)
+
+
+# clean up
+rm(complete_cols, flowlines_complete)
+invisible(gc())
+```
+
+## Check persisting NA values
+
+```{r}
+# count NAs in flowlines dataframe
+count_df_na(st_drop_geometry(flowlines))
+```
+
+## Map retained flowlines and restoration projects
+
+```{r}
+# map flowlines, restoration territory study area, and restoration project sites
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = restoration_terr, fill = "lightblue2", lwd = 0) +
+  geom_sf(data = filter(flowlines, stream_order > 2),
+          aes(color = in_study_area), size = 0.1) +
+  scale_color_manual(values = c("darkgrey", "royalblue3")) +
+  geom_sf(data = restoration_proj, color = "darkgreen", size = 0.3) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## Map EROM attributes
+
+```{r}
+# map flowlines, restoration territory study area, and restoration project sites
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = filter(flowlines, stream_order > 3) %>% arrange(mean_actual_discharge_cfs),
+          aes(color = mean_actual_discharge_cfs), size = 0.3) +
+  scale_color_gradient2(low = "lightblue1", mid = "lightblue2", high = "darkblue",
+                        midpoint = 0.1) +
+  theme_minimal()
+```
+
+
+
+# CREATE CONTROL POINTS
+
+## Generate flowline midpoints as control points
+
+```{r cache = TRUE}
+# get flowline midpoints
+control_points <- flowlines %>%
+  filter(in_study_area) %>%
+  st_line_midpoints() %>%
+  cbind(filter(flowlines, in_study_area) %>%
+          dplyr::select(comid) %>%
+          st_drop_geometry()) %>%
+  mutate(obs_type = "control")
+
+# print count of control points
+print("count of control points in full state:")
+nrow(control_points)
+```
+
+
+
+# FILTER STUDY POINTS FOR "URBAN AREAS" AND OVERLAP
+
+## Import Census Bureau incorporated or census-designated places
+
+```{r}
+# load and clean Census Bureau "places" sf polygon objects
+incorp_cdp <- places(state = "CA", year = 2020) %>%
+  rename(place_fip = PLACEFP,
+         geo_id = GEOID,
+         name = NAME,
+         type_code = LSAD) %>%
+  mutate(is_valid = st_is_valid(geometry)) %>%
+  filter(is_valid) %>%
+  dplyr::select(place_fip, geo_id, name, type_code)
+```
+
+## Map incorporated or census-designated places
+
+```{r}
+# map incorporated or census-designated places
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = incorp_cdp, fill = "palevioletred", lwd = 0) +
+  geom_sf(data = filter(flowlines, stream_order > 3),
+          color = "black",
+          size = 0.1,
+          alpha = 0.5) +
+  theme_minimal()
+```
+
+## Filter restoration and control points for intersection with incorporated or census-designated places
+
+```{r}
+# filter restoration projects for intersection with incorporated
+# census-designated places
+restoration_proj <- restoration_proj %>%
+  st_join(dplyr::select(incorp_cdp, geometry), left = FALSE)
+
+# filter control projects for intersection with incorporated
+# census-designated places
+control_points <- control_points %>%
+  st_join(dplyr::select(incorp_cdp, geometry), left = FALSE)
+
+# clean up
+rm(incorp_cdp)
+invisible(gc())
+
+print("restoration projects:")
+nrow(restoration_proj)
+print("control points:")
+nrow(control_points)
+```
+
+## Drop control values that intersect with a buffer around restoration projects
+
+```{r}
+# create a buffered restoration sites sf object
+restoration_proj_buffered <- restoration_proj %>%
+  dplyr::select(obs_id) %>%
+  st_buffer(dist = buffer_drop_control) %>%
+  ms_simplify(keep = 0.05)
+
+# identify control points to drop because
+# they intersect with a restoration project buffer
+control_points_drop <- control_points %>%
+  st_join(dplyr::select(restoration_proj_buffered, geometry), left = FALSE)
+
+print("control points co-located with restoration sites:")
+nrow(control_points_drop)
+print("co-location buffer:")
+print(buffer_drop_control)
+
+# drop control points that are too close to restoration projects
+control_points <- control_points %>%
+  filter(comid %notin% control_points_drop$comid) %>%
+  rename(obs_id = comid)
+
+print("remaining control points:")
+nrow(control_points)
+
+# clean up
+rm(control_points_drop, restoration_proj_buffered)
+invisible(gc())
+```
+
+## Create and map a single dataset of control and restoration sites
+
+```{r}
+# create a single study points sf object
+study_points <- rbind(dplyr::select(restoration_proj, obs_id, obs_type),
+                      control_points) %>%
+  left_join(st_drop_geometry(dplyr::select(restoration_proj, -obs_type)),
+                             by = "obs_id")
+
+# map study points
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = filter(flowlines, stream_order > 2),
+          aes(color = in_study_area), size = 0.1) +
+  scale_color_manual(values = c("darkgrey", "royalblue3")) +
+  new_scale_color() + 
+  geom_sf(data = study_points, aes(color = obs_type), size = 0.3) +
+  scale_color_manual(values = c("chartreuse4", "darkorange1")) +
+  theme_minimal()
+```
+
+
+
+# ADD ATTRIBUTES TO STUDY POINTS
+
+## Associate study points with flowlines and flowline attributes
+
+```{r}
+# join flowline attributes to study points by nearest feature
+study_points <- study_points %>%
+  st_join(dplyr::select(flowlines, comid, ftype, stream_order, tot_da_sqkm,
+                        slope, mean_actual_discharge_cfs),
+          join = st_nearest_feature)
+
+# check out a map
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = filter(flowlines, in_study_area, stream_order > 2),
+          aes(color = abs(log(slope))),
+          size = 0.1) +
+  scale_color_gradient(low = "firebrick4", high = "lightsalmon") +
+  new_scale_color() +
+  geom_sf(data = filter(study_points,
+                        !is.na(mean_actual_discharge_cfs),
+                        mean_actual_discharge_cfs > 0),
+          aes(color = abs(log(mean_actual_discharge_cfs))),
+          size = 0.3) +
+  scale_color_gradient(low = "lightblue1", high = "darkblue") +
+  theme_minimal()
+```
+
+## Compute and add upstream network attributes
+
+```{r cache = TRUE}
+# create specifically formatted flowlines attributes dataframe for upstream analysis
+ut_network <- flowlines %>%
+  st_drop_geometry() %>%
+  rename(COMID = comid,
+         Pathlength = path_length,
+         LENGTHKM = length_km,
+         Hydroseq = hydroseq,
+         LevelPathI = level_path_i,
+         DnHydroseq = down_hydroseq) %>%
+  dplyr::select(COMID, Pathlength, LENGTHKM, Hydroseq, LevelPathI, DnHydroseq)
+  
+# compute upstream stream length (including tributaries) for each study point
+study_points <- study_points %>%
+  rowwise() %>%
+  mutate(upstream_length_km = get_upstream_length(comid = comid,
+                                                  ut_network_df = ut_network),
+         drainage_density = upstream_length_km / tot_da_sqkm) %>%
+  ungroup()
+
+# get rid of control points with Inf drainage densities
+study_points <- study_points %>%
+  filter(!is.infinite(drainage_density))
+
+# check it out on a map
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = filter(flowlines, stream_order > 2),
+          color = "darkgrey",
+          size = 0.1) +
+  geom_sf(data = filter(study_points, upstream_length_km < 1000),
+          aes(color = upstream_length_km),
+          size = 0.3) +
+  scale_color_gradient2(low = "lightblue2", mid = "lightblue2", high = "darkblue",
+                        midpoint = 5) +
+  theme_minimal()
+
+# clean up
+rm(ut_network)
+invisible(gc())
+```
+
+## Add HUC12 and ACE data
+
+```{r}
+# create directory
+create_directory(here("raw_data", "ace"))
+
+# specify url
+ace_url <- "https://filelib.wildlife.ca.gov/Public/BDB/ACE/ACE_Summary_Datasets.zip"
+
+# download file
+download_from_url(url = ace_url,
+                  filename = "ace_summary_datasets.zip",
+                  directory = here("raw_data", "ace"))
+
+# unzip file
+unzip_local(zipped_file = "ace_summary_datasets.zip",
+            directory = here("raw_data", "ace"))
+
+# read in and clean ACE dataset
+huc12 <- readOGR(dsn = here("raw_data", "ace", "ACE_Summary_Datasets", "ds2743.gdb")) %>%
+  st_as_sf() %>%
+  st_transform(crs = global_crs) %>%
+  ms_simplify(keep = 0.05) %>%
+  st_intersection(y = ca_boundary) %>%
+  rename(huc12 = HUC12,
+         huc12_name = Name,
+         native_aquatic_rank = NtvAqRankSW,
+         native_aquatic_index = NtvAqSumSW,
+         native_fish_count = NtvFish,
+         native_aquatic_invert_count = NtvAqInvt,
+         native_aquatic_amphib_count = NtvAqAmph,
+         native_aquatic_reptile_count = NtvAqRept) %>%
+  mutate(huc12_area_sqkm = drop_units(set_units(st_area(geometry), "km^2"))) %>%
+  dplyr::select(huc12, huc12_name, huc12_area_sqkm,
+                native_aquatic_rank, native_aquatic_index, native_fish_count,
+                native_aquatic_invert_count, native_aquatic_amphib_count,
+                native_aquatic_reptile_count)
+
+# enrich restoration projects with HUC12 and ACE
+study_points <- st_join(study_points, huc12, join = st_intersects)
+
+# clean HUC12
+huc12 <- huc12 %>%
+  dplyr::select(huc12, huc12_name, huc12_area_sqkm)
+
+# map ACE data
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = filter(flowlines, stream_order > 2),
+          color = "darkgrey",
+          size = 0.1) +
+  geom_sf(data = study_points, aes(color = native_aquatic_rank), size = 0.3) +
+  scale_color_gradient(low = "red", high = "darkblue") +
+  theme_minimal()
+    
+# clean up
+rm(ace_url)
+invisible(gc())
+```
+
+## Add environmental flows
+
+```{r}
+# create directory
+create_directory(here("raw_data", "eflows"))
+
+# specify url
+eflows_url <- "https://s3-us-west-1.amazonaws.com/funcflow/resources/eflow_geodatabase.zip"
+
+# download eflows
+download_from_url(url = eflows_url,
+                  filename = "eflows.zip",
+                  directory = here("raw_data", "eflows"))
+
+# unzip eflows
+unzip_local(zipped_file = "eflows.zip",
+            directory = here("raw_data", "eflows"))
+
+# read in eflows data
+eflows <- st_read(here("raw_data", "eflows", "Final_Classification_9CLASS",
+                       "Final_Classification_9CLASS.shp")) %>%
+  st_transform(crs = global_crs) %>%
+  rename(eflows_class = CLASS,
+         comid = COMID) %>%
+  mutate(eflows_class = as.character(eflows_class)) %>%
+  dplyr::select(eflows_class, comid) %>%
+  distinct(comid, .keep_all = TRUE)
+
+# add eflows to restoration projects
+study_points <- study_points %>%
+  st_join(y = dplyr::select(eflows, eflows_class), join = st_nearest_feature)
+
+# check out on a map
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = filter(flowlines, stream_order > 2),
+          color = "darkgrey",
+          size = 0.1) +
+  geom_sf(data = study_points, aes(color = eflows_class), size = 0.3) +
+  theme_minimal()
+
+# clean up
+rm(eflows, eflows_url)
+invisible(gc())
+```
+
+## Add precipitation data
+
+```{r warning = FALSE}
+# create directory
+create_directory(here("raw_data", "precip"))
+
+# specify url
+precip_url <- "https://stacks.stanford.edu/file/druid:fs379qr8881/data.zip"
+
+# download zipped file of precip data
+download_from_url(url = precip_url,
+                  filename = "precip.zip",
+                  directory = here("raw_data", "precip"))
+
+# unzip precip data
+unzip_local(zipped_file = "precip.zip",
+            directory = here("raw_data", "precip"))
+
+# read in precip raster
+precip <- raster(here("raw_data", "precip", "cappt7100_14", "hdr.adf"))
+
+# grab precip value for each restoration site
+precip_extract <- extract(precip, study_points) %>%
+  as_tibble() %>%
+  rename(precip = value)
+
+# bind to study points
+study_points <- cbind(study_points, precip_extract)
+
+# check it out on a map
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = filter(flowlines, stream_order > 2),
+          color = "darkgrey",
+          size = 0.1) +
+  geom_sf(data = study_points, aes(color = precip), size = 0.3) +
+  scale_color_gradient(low = "lightblue3", high = "darkblue") +
+  theme_minimal()
+
+# clean up
+rm(precip_url, precip, precip_extract)
+invisible(gc())
+```
+
+## Add CSCI
+
+```{r}
+# create directory
+create_directory(here("raw_data", "csci"))
+
+# specify file url
+csci_url <- "https://indicators.ucdavis.edu/cwip/sites/default/files/data/indicator_59452/data_59452_all.csv"
+
+# download file
+download_from_url(url = csci_url,
+                  filename = "csci_all.csv",
+                  directory = here("raw_data", "csci"))
+
+# read in CSCI file
+csci <- read_csv(here("raw_data", "csci", "csci_all.csv"),
+                     col_names = TRUE) %>%
+  rename(index = "...1") %>%
+  group_by(station_code) %>%
+  summarize(csci_score = min(csci_score, na.rm = TRUE),
+            cwip_score = cwip_score[which.min(csci_score)],
+            stream_name = stream_name[which.min(csci_score)],
+            station_code = station_code[which.min(csci_score)],
+            sample_date = sample_date[which.min(csci_score)],
+            latitude = latitude[which.min(csci_score)],
+            longitude = longitude[which.min(csci_score)]) %>%
+  rowid_to_column(var = "csci_index") %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = global_crs)
+
+# calculate the average CSCI score for all restoration sites
+# using all CSCI observations within 10km of a restoration site
+# aka intersecting a 10km buffer
+csci_agg <- aggregate(dplyr::select(csci, csci_score, cwip_score),
+                      dplyr::select(study_points, obs_id),
+                      FUN = mean, 
+                      join = function(x, y) st_is_within_distance(x, y, dist = buffer_pollution)) %>%
+  st_drop_geometry()
+
+# bind CSCI aggregated values to restoration projects
+study_points <- cbind(study_points, csci_agg)
+
+# clean up
+rm(csci_url, csci_agg, csci)
+invisible(gc())
+```
+
+## Add nitrates
+
+```{r}
+# create directory
+create_directory(here("raw_data", "nitrates"))
+
+# specify url
+nitrates_url <- "https://indicators.ucdavis.edu/cwip/sites/default/files/data/indicator_32232/data_32232_all.csv"
+
+# download file
+download_from_url(url = nitrates_url,
+                  filename = "nitrates_all.csv",
+                  directory = here("raw_data", "nitrates"))
+
+# read in nitrates file
+nitrates <- read_csv(here("raw_data", "nitrates", "nitrates_all.csv"),
+                     col_names = TRUE) %>%
+  rename(index = "...1") %>%
+  group_by(code) %>%
+  summarize(nitrate_score = min(score, na.rm = TRUE),
+            name = name[which.min(score)],
+            code = code[which.min(score)],
+            date = date[which.min(score)],
+            lat = lat[which.min(score)],
+            lon = lon[which.min(score)]) %>%
+  st_as_sf(coords = c("lon", "lat"), crs = global_crs)
+
+# calculate the average nitrates score for all restoration sites
+# using all nitrates observations within 10km of a restoration site
+# aka intersecting a 10km buffer
+nitrates_agg <- aggregate(dplyr::select(nitrates, nitrate_score),
+                          dplyr::select(study_points, obs_id),
+                          FUN = mean, 
+                          join = function(x, y) st_is_within_distance(x, y, dist = buffer_pollution)) %>%
+  st_drop_geometry()
+
+# bind CSCI aggregated values to restoration projects
+study_points <- cbind(study_points, nitrates_agg)
+
+# clean up
+rm(nitrates_url, nitrates_agg, nitrates)
+invisible(gc())
+```
+
+## Add 303d listed waterbodies
+
+```{r warning = FALSE}
+# create directory
+create_directory(here("raw_data", "303d"))
+
+# specify url
+waterbodies_303d_lines_url <- "https://gispublic.waterboards.ca.gov/webmap/303d_2014_2016/files/IR_1416_Impaired_Lines.zip"
+
+# download file
+download_from_url(url = nitrates_url,
+                  filename = "IR_1416_Impaired_Lines.zip",
+                  directory = here("raw_data", "303d"))
+
+# unzip file
+unzip_local(zipped_file = "IR_1416_Impaired_Lines.zip",
+            directory = here("raw_data", "303d"))
+
+# specify url
+waterbodies_303d_polygons_url <- "https://gispublic.waterboards.ca.gov/webmap/303d_2014_2016/files/IR_1416_Impaired_Polys.zip"
+
+# download file
+download_from_url(url = nitrates_url,
+                  filename = "IR_1416_Impaired_Polys.zip",
+                  directory = here("raw_data", "303d"))
+
+# unzip file
+unzip_local(zipped_file = "IR_1416_Impaired_Polys.zip",
+            directory = here("raw_data", "303d"))
+
+# read in
+waterbodies_303d_lines <- st_read(here("raw_data", "303d", "IR_1416_Impaired_Lines")) %>%
+  st_transform(crs = global_crs) %>%
+  ms_simplify(keep = 0.05) %>%
+  mutate(waterbody_303d = TRUE) %>%
+  dplyr::select(waterbody_303d)
+
+waterbodies_303d_polygons <- st_read(here("raw_data", "303d", "IR_1416_Impaired_Polys")) %>%
+  st_transform(crs = global_crs) %>%
+  ms_simplify(keep = 0.05) %>%
+  mutate(waterbody_303d = TRUE,
+         is_valid = st_is_valid(geometry)) %>%
+  filter(is_valid) %>%
+  dplyr::select(waterbody_303d)
+
+# buffer restoration sites for intersection with 303d listed waterbodies
+study_points_buffered <- st_buffer(study_points, dist = buffer_pollution) %>%
+  dplyr::select(obs_id)
+
+# intersect buffered restoration sites with 303d listed waterbodies
+study_points_buffered_303d <- study_points_buffered %>%
+  st_join(y = waterbodies_303d_lines) %>%
+  st_join(y = waterbodies_303d_polygons) %>%
+  st_drop_geometry() %>%
+  group_by(obs_id) %>%
+  summarize(streams_303d = max(waterbody_303d.x, na.rm = TRUE),
+            lakes_ponds_303d = max(waterbody_303d.x, na.rm = TRUE))
+
+# clean results
+study_points_buffered_303d <- do.call(data.frame,
+                                      lapply(study_points_buffered_303d,
+                                             function(x) replace(x, is.infinite(x), NA)))
+
+# join to restoration projects dataframe
+study_points <- left_join(study_points, study_points_buffered_303d,
+                          by = "obs_id")
+
+# replace 303d NA values with 0
+study_points$streams_303d[is.na(study_points$streams_303d)] <- 0
+study_points$lakes_ponds_303d[is.na(study_points$lakes_ponds_303d)] <- 0
+
+# create a single 303d column that combine stream, lakes, and ponds statuses
+study_points <- study_points %>%
+  rowwise() %>%
+  mutate(any_303d = max(streams_303d, lakes_ponds_303d)) %>%
+  ungroup()
+
+# clean up
+rm(waterbodies_303d_lines_url, waterbodies_303d_polygons_url,
+   waterbodies_303d_lines, waterbodies_303d_polygons, study_points_buffered_303d,
+   study_points_buffered)
+invisible(gc())
+```
+
+
+
+# GENERATE SOCIOECONOMIC DATA
+
+## Download block group geometry and socioeconomic data for Census
+
+```{r cache = TRUE}
+# pull block groups geometry and total population figures
+block_groups <- get_decennial(state = "CA",
+                              geography = "block group",
+                              variables = c(tot_pop_count = "P001001"),
+                              year = 2000,
+                              geometry = TRUE) %>%
+  st_transform(crs = global_crs) %>%
+  rename(block_group_id = GEOID,
+         tot_pop_count = value) %>%
+  dplyr::select(block_group_id, tot_pop_count)
+
+# pull total population of non-Hispanic white alone and median household income
+nonhisp_white <- get_decennial(state = "CA",
+                               geography = "block group",
+                               variables = c(nonhisp_white_pop_count = "P007003",
+                                             med_hh_income = "P053001"),
+                               year = 2000,
+                               geometry = FALSE) %>%
+  pivot_wider(names_from = "variable", values_from = "value") %>%
+  rename(block_group_id = GEOID) %>%
+  dplyr::select(block_group_id, nonhisp_white_pop_count, med_hh_income)
+
+# join all socioeconomic data together
+block_groups <- block_groups %>%
+  left_join(nonhisp_white, by = "block_group_id") %>%
+  dplyr::select(-geometry, everything(), geometry)
+
+# check it out on a map
+ggplot() +
+  geom_sf(data = ms_simplify(block_groups, keep = 0.01),
+          aes(fill = med_hh_income), lwd = 0) +
+  theme_minimal()
+
+# clean up
+rm(nonhisp_white)
+invisible(gc())
+```
+
+## Create buffered study points
+
+```{r}
+# create polygons object of buffers around study points
+study_points_buffered <- st_buffer(study_points, dist = buffer_ses) %>%
+  dplyr::select(obs_id)
+```
+
+## Do areal interpolations
+
+```{r}
+# interpolate population values - extensive
+aw_pop <- aw_interpolate(.data = st_transform(study_points_buffered, crs = st_crs(3488)),
+                         tid = obs_id,
+                         source = st_transform(block_groups, crs = st_crs(3488)),
+                         sid = block_group_id,
+                         output = "tibble",
+                         weight = "sum",
+                         extensive = c("tot_pop_count", "nonhisp_white_pop_count")) %>%
+  mutate(nonhisp_white_prop = nonhisp_white_pop_count / tot_pop_count) %>%
+  mutate(nonhisp_white_prop = case_when(nonhisp_white_prop > 1 ~ 1,
+                                        TRUE ~ nonhisp_white_prop),
+         bipoc_prop = 1 - nonhisp_white_prop) %>%
+  rename(pop_density = tot_pop_count) %>%
+  dplyr::select(-nonhisp_white_pop_count)
+
+# interpolate income value - intensive
+aw_income <- aw_interpolate(.data = st_transform(study_points_buffered, crs = st_crs(3488)),
+                            tid = obs_id,
+                            source = st_transform(block_groups, crs = st_crs(3488)),
+                            sid = block_group_id,
+                            output = "tibble",
+                            weight = "sum",
+                            intensive = "med_hh_income")
+```
+
+## Add areal interpolations to study points
+
+```{r}
+# join areally interpolated socioeconomic data to study points
+study_points <- study_points %>%
+  left_join(aw_pop, by = "obs_id") %>%
+  left_join(aw_income, by = "obs_id")
+
+# check it out on a map
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = filter(flowlines, stream_order > 2),
+          color = "darkgrey",
+          size = 0.1) +
+  geom_sf(data = study_points, aes(color = med_hh_income), size = 0.3) +
+  scale_color_gradient(low = "darkseagreen1", high = "darkgreen") +
+  theme_minimal()
+
+# clean up
+rm(aw_income, aw_pop, block_groups, study_points_buffered)
+invisible(gc())
+```
+
+
+
+# CHECK DATA COMPLETENESS AND CORRELATION
+
+## Count missing data
+
+```{r}
+# count NAs in each column of the study points object
+count_df_na(st_drop_geometry(study_points))
+```
+
+## Check correlations
+
+```{r}
+# list variables to assess for correlation/covariation
+corr_check_vars <- c("tot_da_sqkm", "slope", "mean_actual_discharge_cfs",
+                     "drainage_density", "native_aquatic_index", "precip",
+                     "csci_score", "nitrate_score", "any_303d",
+                     "pop_density", "bipoc_prop", "med_hh_income")
+
+# create a dataframe subsetted for columns of interest in correlation
+corr_check_df <- study_points %>%
+  dplyr::select(all_of(corr_check_vars)) %>%
+  st_drop_geometry()
+
+# keep only complete cases
+corr_check_df <- corr_check_df[complete.cases(corr_check_df), ]
+
+# make a Pearson's correlation matrix
+cor(corr_check_df) %>%
+  corrplot(., method = "number", type = "upper")
+
+# clean up
+rm(corr_check_vars, corr_check_df)
+```
+
+Mean annual discharge and total drainage area should obviously be correlated, so that's good to see.
+We will need to pick one of the two variables. I could go either way - total drainage area is a more reliable
+value (in terms of data source), but discharge is the variable of direct theoretical interest.
+
+```{r}
+# identify columns to use in assessing completeness
+suggested_vars <- c("slope", "mean_actual_discharge_cfs", "drainage_density",
+                    "native_aquatic_index", "eflows_class", "precip",
+                    "csci_score", "any_303d", "pop_density",
+                    "bipoc_prop", "med_hh_income")
+
+# keep only complete cases across columns of interest
+study_points_complete <- study_points[
+  complete.cases(st_drop_geometry(dplyr::select(study_points, all_of(suggested_vars)))), ]
+
+# summarize remaining study points
+study_points_complete %>%
+  st_drop_geometry() %>%
+  count(obs_type)
+```
