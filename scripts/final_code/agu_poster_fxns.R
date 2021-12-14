@@ -1,7 +1,7 @@
 # Stream restoration analysis functions
 # for AGU poster code
 
-# Lucy Andrews - December 2020
+# Lucy Andrews - December 2021
 
 # - %not%in: returns the negation of %in%
 # - get_ca_boundary: imports CA boundary into global environment as sf object
@@ -11,6 +11,7 @@
 # - download_from_url: checks if a file exists in a directory and if not downloads it from a url
 # - unzip_local: unzips a zipped file into the directory in which the zipped file is located
 # - count_df_na: takes a dataframe and returns counts of NA values in each column
+# - process_matches: returns matched pairs from a matchit object and an attribute dataframe
 
 # -----------------------------
 
@@ -151,5 +152,37 @@ unzip_local <- function(zipped_file, directory) {
 count_df_na <- function(df) {
   
   sapply(df, function(x) sum(is.na(x)))
+  
+}
+
+# -----------------------------
+
+# process_matches(): returns matched pairs from a matchit object and an attribute sf object
+
+process_matches <- function(matchit_obj, study_points_to_match_sf) {
+  
+  study_points_to_match_sf <- study_points_to_match_sf %>%
+    rowid_to_column(var = "row_id")
+  
+  return_matches <- study_points_to_match_sf %>%
+    filter(obs_type == "restoration") %>%
+    rename(match_id = row_id) %>%
+    dplyr::select(obs_id, obs_type, geometry, match_id)
+  
+  match_indices <- matchit_obj$match.matrix %>%
+    as.numeric() %>%
+    as_tibble() %>%
+    rowid_to_column(var = "match_id") %>%
+    rename("row_id" = value)
+  
+  control_matches <- study_points_to_match_sf %>%
+    dplyr::select(obs_id, obs_type, geometry, row_id) %>%
+    inner_join(match_indices, by = "row_id") %>%
+    dplyr::select(-row_id)
+  
+  return_matches <- return_matches %>%
+    rbind(control_matches)
+  
+  return(return_matches)
   
 }

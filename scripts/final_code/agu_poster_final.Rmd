@@ -17,6 +17,7 @@ library(magrittr)
 
 # data cleaning and presentation
 library(janitor)
+library(glue)
 library(units)
 library(knitr)
 library(kableExtra)
@@ -40,6 +41,7 @@ library(spdep)
 library(corrplot)
 library(MatchIt)
 library(survival)
+library(randomForest)
 
 # census data
 library(tidycensus)
@@ -600,7 +602,9 @@ invisible(gc())
 study_points <- rbind(dplyr::select(restoration_proj, obs_id, obs_type),
                       control_points) %>%
   left_join(st_drop_geometry(dplyr::select(restoration_proj, -obs_type)),
-                             by = "obs_id")
+                             by = "obs_id") %>%
+  mutate(obs_type_binary = case_when(obs_type == "restoration" ~ 1,
+                                     obs_type == "control" ~ 0))
 
 # map study points
 ggplot() +
@@ -609,7 +613,7 @@ ggplot() +
           aes(color = in_study_area), size = 0.1) +
   scale_color_manual(values = c("darkgrey", "royalblue3")) +
   new_scale_color() + 
-  geom_sf(data = study_points, aes(color = obs_type), size = 0.3) +
+  geom_sf(data = study_points, aes(color = obs_type), size = 0.4) +
   scale_color_manual(values = c("chartreuse4", "darkorange1")) +
   theme_minimal()
 ```
@@ -1129,6 +1133,8 @@ count_df_na(st_drop_geometry(study_points))
 
 ## Check correlations
 
+Note: explore correlations more thoroughly and decide whether/which variables to drop.
+
 ```{r}
 # list variables to assess for correlation/covariation
 corr_check_vars <- c("tot_da_sqkm", "slope", "mean_actual_discharge_cfs",
@@ -1156,19 +1162,291 @@ Mean annual discharge and total drainage area should obviously be correlated, so
 We will need to pick one of the two variables. I could go either way - total drainage area is a more reliable
 value (in terms of data source), but discharge is the variable of direct theoretical interest.
 
+## Drop incomplete cases
+
 ```{r}
 # identify columns to use in assessing completeness
-suggested_vars <- c("slope", "mean_actual_discharge_cfs", "drainage_density",
-                    "native_aquatic_index", "eflows_class", "precip",
-                    "csci_score", "any_303d", "pop_density",
-                    "bipoc_prop", "med_hh_income")
+# currently dropped: tot_da_sqkm, nitrate_score
+complete_vars <- c("slope", "mean_actual_discharge_cfs", "drainage_density",
+                   "native_aquatic_index", "eflows_class", "precip",
+                   "csci_score", "any_303d", "pop_density",
+                   "bipoc_prop", "med_hh_income")
 
 # keep only complete cases across columns of interest
 study_points_complete <- study_points[
-  complete.cases(st_drop_geometry(dplyr::select(study_points, all_of(suggested_vars)))), ]
+  complete.cases(st_drop_geometry(dplyr::select(study_points, all_of(complete_vars)))), ]
 
-# summarize remaining study points
+# summarize remaining study points - original and remaining
+study_points %>%
+  st_drop_geometry() %>%
+  count(obs_type)
+
 study_points_complete %>%
   st_drop_geometry() %>%
   count(obs_type)
 ```
+
+
+
+# CREATE MATCHES
+
+## Run first match analysis without a caliper
+
+```{r}
+# specify variables to use in the matching formula
+match_vars <- c("slope", "mean_actual_discharge_cfs", "drainage_density",
+                "native_aquatic_index", "precip",
+                "csci_score", "any_303d", "pop_density")
+
+# create a match formula
+match_formula <- as.formula(glue('obs_type_binary ~ {glue_collapse(match_vars, "+")}'))
+
+# do the matching without a caliper first
+matchit_no_caliper <- matchit(formula = match_formula,
+                              data = study_points_complete,
+                              method = "genetic",
+                              distance = "glm",
+                              caliper = NULL)
+
+# extract and clean the match data
+pairs_no_caliper <- match.data(matchit_no_caliper) %>%
+  mutate(subclass = as.numeric(levels(subclass))[subclass])
+
+# create lines connecting pairs
+lines_no_caliper <- pairs_no_caliper %>%
+  group_by(subclass) %>%
+  summarize(match_id = mean(subclass)) %>%
+  st_cast("LINESTRING") %>%
+  mutate(euc_distance_km = drop_units(set_units(st_length(geometry), "km")))
+
+# check it out on a map
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = restoration_terr, fill = "grey", lwd = 0) +
+  geom_sf(data = lines_no_caliper, aes(color = euc_distance_km)) +
+  scale_color_gradient2(low = "dodgerblue", mid = "darkblue", high = "red",
+                        midpoint = 400) +
+  new_scale_color() +
+  geom_sf(data = pairs_no_caliper, aes(color = obs_type), size = 1) +
+  theme_minimal()
+```
+
+### Check out Euclidean distance distribution
+
+```{r}
+# create caption text
+cap_text <- paste("count of pairs:", nrow(lines_no_caliper), collapse = " ")
+
+# check out density plot of distances between paired points
+ggplot() +
+  geom_histogram(data = lines_no_caliper,
+                 aes(x = euc_distance_km),
+                 fill = "lightgrey",
+                 color = "darkgrey",
+                 binwidth = 25) +
+  ylim(0, 150) +
+  labs(caption = cap_text) +
+  theme_minimal()
+```
+
+## Determine caliper size
+
+```{r}
+# determine standard deviation of matched pair distances
+distance_sd <- sd(pairs_no_caliper$distance)
+
+# calculate the caliper size
+caliper_val <- 0.2 * log(distance_sd / (1 - distance_sd))
+```
+
+## Re-run the matching with a caliper
+
+```{r}
+# do the matching with a caliper this time
+matchit_w_caliper <- matchit(formula = match_formula,
+                             data = study_points_complete,
+                             method = "genetic",
+                             distance = "glm",
+                             caliper = caliper_val)
+
+# extract and clean the match data
+pairs_w_caliper <- match.data(matchit_w_caliper) %>%
+  mutate(subclass = as.numeric(levels(subclass))[subclass])
+
+# create lines connecting pairs
+lines_w_caliper <- pairs_w_caliper %>%
+  group_by(subclass) %>%
+  summarize(match_id = mean(subclass)) %>%
+  st_cast("LINESTRING") %>%
+  mutate(euc_distance_km = drop_units(set_units(st_length(geometry), "km")))
+
+# check it out on a map
+ggplot() +
+  geom_sf(data = ca_boundary) +
+  geom_sf(data = restoration_terr, fill = "grey", lwd = 0) +
+  geom_sf(data = lines_w_caliper, aes(color = euc_distance_km)) +
+  scale_color_gradient2(low = "dodgerblue", mid = "darkblue", high = "red",
+                        midpoint = 400) +
+  new_scale_color() +
+  geom_sf(data = pairs_w_caliper, aes(color = obs_type), size = 1) +
+  theme_minimal()
+```
+
+### Check out Euclidean distance distribution for calipered run
+
+```{r}
+# create caption text
+cap_text <- paste("count of pairs:", nrow(lines_w_caliper), collapse = " ")
+
+# check out density plot of distances between paired points
+ggplot() +
+  geom_histogram(data = lines_w_caliper,
+                 aes(x = euc_distance_km),
+                 fill = "lightgrey",
+                 color = "darkgrey",
+                 binwidth = 25) +
+  ylim(0, 150) +
+  labs(caption = cap_text) +
+  theme_minimal()
+```
+
+## Evaluate calipered match results
+
+### See summary
+
+```{r}
+# summarize match output
+summary(matchit_w_caliper)
+```
+
+### View distribution in jitter plot
+
+```{r}
+# view the distribution of propensity scores
+plot(matchit_w_caliper, type = "jitter", interactive = FALSE)
+```
+
+### Check covariate balance
+
+```{r}
+# view the covariate balance
+plot(matchit_w_caliper, type = "qq", interactive = FALSE)
+```
+
+### See matched results in Love plot
+
+```{r}
+# create a Love plot
+plot(summary(matchit_w_caliper))
+```
+
+## Compute summary statistics for matched populations
+
+```{r}
+# create box plots
+ggplot() +
+  geom_boxplot(data = pairs_w_caliper,
+               aes(x = obs_type,
+                   y = bipoc_prop,
+                   color = obs_type),
+               fill = "lightgrey") +
+  theme_minimal()
+
+# create box plots
+ggplot() +
+  geom_boxplot(data = pairs_w_caliper,
+               aes(x = obs_type,
+                   y = med_hh_income,
+                   color = obs_type),
+               fill = "lightgrey") +
+  theme_minimal()
+```
+
+```{r}
+# take a quick look at parametric summary statistics
+pairs_w_caliper %>%
+  st_drop_geometry() %>%
+  group_by(obs_type) %>%
+  summarize(mean_hh_income = mean(med_hh_income),
+            iqr_hh_income = IQR(med_hh_income),
+            min_hh_income = min(med_hh_income),
+            max_hh_income = max(med_hh_income),
+            mean_bipoc_prop = mean(bipoc_prop),
+            iqr_bipoc_prop = IQR(bipoc_prop),
+            min_bipoc_prop = min(bipoc_prop),
+            max_bipoc_prop = max(bipoc_prop))
+```
+
+
+
+# RUN REGRESSION ANALYSES
+
+## Check interaction option
+
+Best regression uses interaction, based on AIC.
+
+```{r}
+# run a conditional logistic regression
+cond_log_regression <- clogit(obs_type_binary ~
+                                  med_hh_income * bipoc_prop + strata(subclass),
+                                data = match.data(matchit_w_caliper))
+
+# check results
+summary(cond_log_regression)
+
+AIC(cond_log_regression)
+```
+
+## Check Moran's I
+
+```{r}
+# grab coordinates
+pairs_w_caliper <- pairs_w_caliper %>%
+  mutate(lat = sf::st_coordinates(.)[ , 2],
+         lon = sf::st_coordinates(.)[ , 1])
+
+# set global option for regions with no neighbors
+set.ZeroPolicyOption(TRUE)
+
+# set up Moran's I test
+weights = nb2listw(dnearneigh(pairs_w_caliper, 
+                              d1 = 0.1 * 1000, d2 = 5 * 1000),
+                   style = "C",
+                   zero.policy = TRUE)
+
+# confirm match correct results
+pairs_w_caliper$residuals <- residuals(cond_log_regression)
+
+AIC(cond_log_regression)
+
+# test Moran's I
+moran.test(pairs_w_caliper$residuals, weights, alternative = "two.sided")
+```
+
+### Run conditional logistic regression with lat/long
+
+```{r}
+# add lat and lon values to pairs object
+pairs_w_caliper_no_sf <- pairs_w_caliper %>%
+  st_drop_geometry()
+  
+# check regression with lat and lon terms
+cond_log_regression_latlon <- clogit(obs_type_binary ~
+                                  med_hh_income * bipoc_prop + lat + lon + strata(subclass),
+                                data = pairs_w_caliper_no_sf)
+
+# view results
+summary(cond_log_regression_latlon)
+
+cond_log_regression_latlon$residuals <- residuals(cond_log_regression_latlon)
+
+AIC(cond_log_regression_latlon)
+
+# test Moran's I again
+moran.test(cond_log_regression_latlon$residuals, weights, alternative = "two.sided")
+```
+
+
+
+
+
