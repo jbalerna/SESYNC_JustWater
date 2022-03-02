@@ -1,0 +1,230 @@
+---
+title: "Comparison of statistical matching methods"
+author: "Quentin D. Read"
+date: "9/7/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In the previous notebook, I only tested out one of the simplest methods of statistical matching, the nearest-neighbor method using propensity score matching, using GLM to calculate the propensity scores. In that method, every individual data point gets a propensity score which is calculated by fitting a generalized linear model (logistic regression) to the data. In that regression, the outcome (0 for control and 1 for treatment) is predicted by all the covariates. It's also possible to use a GAM or random forest model instead of a GLM, among other options. 
+
+The definition of propensity score is the probability that a data point will belong to either the treatment or control group, given the covariates. So it's nothing more than the fitted values of the GLM (or other model) for each data point. So when you fit the model, that results in every data point getting a propensity score. The pairwise differences between points' propensity scores are used to assign each treatment point a corresponding control point. It's also possible to calculate the Mahalanobis distance between the pairs of data points instead of the difference between their propensity scores.
+
+So basically by using the default options, I was making three choices.
+
+1. Use propensity score as the distance metric for matching two points (instead of Mahalanobis distance or some other type of distance)
+2. Use GLM to estimate the propensity scores for each point (instead of GAM, random forest, regression tree, or some other model)
+3. Use simple nearest-neighbor algorithm to sequentially find pairs (instead of a more sophisticated method that uses optimization to minimize the overall distances)
+
+Let's take a look at how the results of matching change when we change any of those three things above.
+
+## Put together example data
+
+These are the same data points from the previous notebook. I just copied the code all in one place.
+
+```{r make data points, message = FALSE, warning = FALSE, results = 'hide'}
+library(sf)
+library(dplyr)
+library(ggplot2)
+library(glue)
+library(tidyr)
+library(units)
+library(raster)
+library(MatchIt)
+library(purrr)
+library(optmatch)
+library(Matching)
+library(rgenoud)
+library(CBPS)
+library(dbarts)
+
+theme_set(theme_bw())
+
+direc <- '/nfs/ejstream-data/example_data'
+
+cdfw_part1 <- st_read(dsn = glue("{direc}/cdfw_ds0168/ds168.gdb"), layer = "ds168_ex") %>%
+  st_as_sf(coords = c('Center_Longitude', 'Center_Latitude'), crs = 4326)
+cali_polygon <- st_read(glue('{direc}/cali_polygon.gpkg'))
+cali_nhd <- st_read(glue('{direc}/cali_nhd_cropped.gpkg'))
+
+SRS_iterative_N1 <- function(focal_points, radius, n, point = NULL, show_progress = FALSE) {
+  require(sp)
+  
+  if (is.null(point)) {
+    point <- sample(length(focal_points), 1)
+  }
+  
+  focal_points <- focal_points@coords
+  dimnames(focal_points)[[1]] <- 1:nrow(focal_points)
+  remaining_points <- focal_points
+  
+  final_points <- c()
+  s <- 0
+  
+  # Keep going until the desired number of points is reached
+  while(s < n) {
+    final_points <- c(final_points, point)
+    s <- s+1
+    
+    if(show_progress) print(paste('Found', s, 'of', n, 'points.'))
+    
+    dist_s <- spDistsN1(pts = remaining_points, pt = focal_points[dimnames(focal_points)[[1]] == point, ], longlat = FALSE)
+    
+    # Cross off all points within 2*radius from the focal point
+    outside_circle <- dist_s >= 2*radius
+    remaining_points <- remaining_points[outside_circle, , drop = FALSE]
+    
+    # If none are left, quit.
+    if(nrow(remaining_points) == 0) {
+      warning('Final number of points is less than n.')
+      return(sort(as.numeric(final_points)))
+    }
+    
+    # Find shortest distance in the remaining points to any one of the previously chosen points.
+    point <- dimnames(remaining_points)[[1]][which.min(dist_s[outside_circle])]
+  }
+  
+  return(sort(as.numeric(final_points)))
+}
+
+cdfw_tosample <- cdfw_part1 %>%
+  st_transform(crs = st_crs(cali_polygon)) %>%
+  st_filter(cali_polygon) 
+
+set.seed(888)
+treatment_pt_index <- SRS_iterative_N1(as(cdfw_tosample, 'Spatial'), radius = 15000, n = 100)
+
+cdfw_subsample <- cdfw_tosample[treatment_pt_index, ]
+cdfw_buffer <- st_buffer(cdfw_subsample, dist = set_units(5, 'km'))
+
+control_nhd <- st_difference(cali_nhd, st_union(cdfw_buffer)) %>% 
+  st_union
+
+control_points <- st_sample(control_nhd, size = 1000, type = 'regular') 
+control_points <- control_points[!is.na(st_dimension(control_points))] %>%
+  st_cast('POINT')
+
+bioclim_data <- getData('worldclim', var = 'bio', res = 2.5)
+
+bioclim_treatment <- raster::extract(bioclim_data, cdfw_subsample)
+bioclim_control <- raster::extract(bioclim_data, st_as_sf(control_points))
+
+duplicates <- duplicated(bioclim_control)
+missing <- apply(bioclim_control, 1, function(x) any(is.na(x)))
+control_points <- control_points[!duplicates & !missing]
+bioclim_control <- bioclim_control[!duplicates & !missing, ]
+
+standardized_data <- scale(rbind(bioclim_treatment, bioclim_control))
+
+data_to_match <- cbind(
+  data.frame(restoration = rep(c(1, 0), c(nrow(bioclim_treatment), nrow(bioclim_control)))),
+  standardized_data
+)
+```
+
+## Comparing matching techniques
+
+Let's look at how the results of the matching change when we change options 1, 2, and 3 above. 
+
+Options 1 and 2 are controlled by the `distance` argument to the `matchit()` function. Most of the `distance` methods use some form of propensity score matching, but if you set `distance = "mahalanobis"`, the Mahalanobis distance is used instead. So that's Option 1. For Option 2, the default is `distance = "glm"`, meaning we are using propensity scores to match the pairs, and the propensity scores are calculated with a logistic regression (generalized linear model or GLM). That's what we used in the previous notebook. The other options for `distance` include `"gam"`, `"rpart"`, `"randomforest"`, `"nnet"`, `"cbps"`, and `"bart"`, which are all different machine learning classification models (using different predictors to predict whether a data point should be treatment or control). In all cases you get a probability between 0 and 1 for the fitted value at each data point which you use as the score for matching. I left out neural network (`"nnet"`) because it required supplying some different parameters and I am not experienced enough with them to know what is a sensible value. We will try out different options for this.
+
+Option 3 is the algorithm that's used to generate the pairs, once you have the propensity scores. That's controlled by the `method` argument to the `matchit()` function. Our default that we used in the previous notebook was `method = "nearest"`. That is a simple algorithm that just goes through, finds the two nearest score points, takes them as the first pair, then goes through again and finds the next closest, until all are taken. This is probably the simplest algorithm but not the best as it is not guaranteed to arrive at the overall best solution. The other algorithms do some kind of optimization where different ways are tried out to try to maximize the value of some overall optimization criterion. So they will take longer to run but likely give you overall better matches. That includes options `"optimal"`, `"full"`, and `"genetic"`. The `"full"` option is probably not appropriate for our purposes because it uses all of the control points and we only want to use as many as needed to match the treatment points. So we can ignore that one. The other options are `"exact"`, `"cem"`, and `"subclass"`. The exact matching option is also not appropriate here because it matches exact pairs which isn't possible with our continuous variables. The `"cem"` and `"subclass"` options use some kind of binning. I'm not sure if these are really appropriate either.
+
+### Running the matchit code
+
+We'll try out different combinations of the `distance` and `method` argument and see how much of a difference it makes. 
+
+```{r}
+distance_options <- c('glm', 'gam', 'rpart', 'randomforest', 'cbps', 'bart', 'mahalanobis')
+method_options <- c('nearest', 'optimal', 'genetic')
+
+combos <- expand_grid(distance = distance_options, method = method_options)
+
+# Explicitly write out formula because using "." caused an issue
+full_formula <- as.formula(glue('restoration ~ {glue_collapse(names(data_to_match)[-1], "+")}'))
+
+all_matches <- combos %>%
+  mutate(match = pmap(., function(distance, method) matchit(full_formula, data = data_to_match, distance = distance, method = method)))
+```
+
+For the optimization methods there are tuning parameters that need to be tinkered with in some cases. For now I will ignore that.
+
+### Processing the matched data
+
+I will define a function to process the match indexes from each match object to a data object that's easier to work with, and apply it to all the match objects.
+
+```{r}
+process_matches <- function(match_obj, data_to_match) {
+  match_index <- rep(NA, nrow(data_to_match))
+  match_index[1:100] <- 1:100
+  match_index[as.numeric(match_obj$match.matrix)] <- 1:100
+  data_to_match$match_index <- match_index
+  matched_points <- st_sf(data_to_match, geometry = c(st_geometry(cdfw_subsample), st_geometry(control_points))) %>%
+    filter(!is.na(match_index)) %>%
+    mutate(restoration = factor(restoration, labels = c('no', 'yes')))
+  return(matched_points)
+}
+
+create_matched_lines <- function(matched_points) {
+  matched_lines <- matched_points %>%
+    group_by(match_index) %>%
+    summarize() %>%
+    st_cast('LINESTRING')
+  return(matched_lines)
+}
+
+all_matches <- all_matches %>%
+  mutate(matched_points = map(match, process_matches, data_to_match = data_to_match),
+         matched_lines = map(matched_points, create_matched_lines))
+```
+
+## Comparing the results
+
+For each combination of model used to estimate the differences (`distance`) and matching algorithm (`method`), what is the average Euclidean distance between the matched pairs? Define a function to do this and plot the results.
+
+```{r}
+get_euc_distance <- function(matched_points) {
+  matched_points %>%
+    st_drop_geometry() %>%
+    pivot_longer(-c(restoration,match_index)) %>%
+    pivot_wider(names_from = restoration) %>%
+    group_by(match_index) %>%
+    summarize(euc_distance = sqrt(sum((yes-no)^2)))
+}
+
+match_distances <- all_matches %>%
+  mutate(distance_list = map(matched_points, get_euc_distance)) %>%
+  dplyr::select(distance, method, distance_list) %>%
+  unnest(distance_list)
+
+ggplot(match_distances, aes(x = distance, y = euc_distance, fill = method)) +
+  geom_boxplot() +
+  facet_grid(. ~ method) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Well, based on this, I think the genetic algorithm crushes the competition. We want to have a low average distance within pairs so it's clear that the genetic algorithm does the best there. The exception is Mahalanobis distance which looks pretty good for all the methods. But it looks like it has about as good of performance as the genetic algorithm, and it seems like as long as you use the genetic algorithm the type of model used to generate the propensity scores doesn't matter at all.
+
+## Make a map of the results
+
+I was curious how far apart in space the points are for the different algorithms. But given that the genetic algorithm is clearly the best, I will just plot a couple different distance types, and in all cases the results from the genetic algorithm.
+
+```{r}
+match_maps <- all_matches %>%
+  filter(distance %in% c('glm', 'randomforest', 'mahalanobis'), method %in% 'genetic') %>%
+  pmap(function(distance, method, matched_points, matched_lines, ...) {
+    ggplot() +
+      geom_sf(data = cali_polygon) +
+      geom_sf(data = matched_lines, color = 'forestgreen', size = 0.4, alpha = 0.5) +
+      geom_sf(data = matched_points, size = 1, aes(color = restoration)) +
+      ggtitle(glue('Distance: {distance}, Method: {method}')) +
+      theme(legend.position = c(.8, .8))
+  })
+
+gridExtra::grid.arrange(grobs = match_maps, nrow = 1)
+```
+
+It looks like we have much closer points in space than the "crude" nearest-neighbor algorithm I used in the previous notebook!

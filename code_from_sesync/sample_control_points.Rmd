@@ -1,0 +1,97 @@
+---
+title: "Sampling random control points for restoration"
+author: "Quentin Read"
+date: "9/1/2021"
+output: html_document
+---
+
+This is my idea for how you could sample a population of "control" points where no stream restoration occurred, that you could later use to pair with the known "treatment" points where restoration did occur. For this example, I'll use just a small subset of the restoration points for demonstration purposes.
+
+## Load packages and data
+
+```{r packages, message = FALSE}
+library(sf)
+library(dplyr)
+library(ggplot2)
+library(glue)
+library(tidyr)
+library(units)
+
+direc <- '~/Documents/temp/justwater'
+```
+
+
+```{r load data}
+cdfw_part1 <- st_read(dsn = glue("{direc}/cdfw_ds0168/ds168.gdb"), layer = "ds168_ex") %>%
+  st_as_sf(coords = c('Center_Longitude', 'Center_Latitude'), crs = 4326)
+cdfw_part2 <- st_read(dsn = glue("{direc}/cdfw_ds734"), layer = "ds734")
+```
+
+## Sample and buffer treatment points
+
+For now we do not care about the individual restoration polygons so just join them all into one big polygon.
+
+```{r union polygon}
+cali_polygon <- st_union(cdfw_part2)
+
+p <- ggplot() + 
+  geom_sf(data = st_geometry(cali_polygon))
+
+p
+```
+
+Now project the points into the CRS of the polygon, take the subset of the points that are inside the polygon, and then take a subsample of 100 points from that (for demonstration purposes).
+
+```{r process points}
+set.seed(919) # For reproducibility
+
+cdfw_subsample <- cdfw_part1 %>%
+  st_transform(crs = st_crs(cali_polygon)) %>%
+  st_filter(cali_polygon) %>%
+  sample_n(100)
+```
+
+Make a buffer of 5 km radius around each point (I just made up that number).
+
+```{r buffer points}
+cdfw_buffer <- st_buffer(cdfw_subsample, dist = set_units(5, 'km'))
+
+p +
+  geom_sf(data = cdfw_buffer, fill = 'red')
+```
+
+## Create sampling area for control points
+
+First subtract the buffer zones from the large polygon to get a "Swiss cheese" polygon with those circles taken out, then buffer that polygon again by -5 km to get rid of the edges. Then plot the original polygon with the treatment points and the sampling area for the control points on top. 
+
+```{r subtract buffers}
+control_area <- st_difference(cali_polygon, st_union(cdfw_buffer)) %>%
+  st_buffer(dist = set_units(-5, 'km'))
+
+p +
+  geom_sf(data = cdfw_buffer, fill = 'red') +
+  geom_sf(data = control_area, fill = 'slateblue')
+```
+
+## Sample control points
+
+Now take a random sample of 100 points in the control area. Later when you do the statistical matching, you can used them to pair with the treatment points. Note you can also create a more even spatial distribution of the random points using a sampling method other than `"random"`. Read the documentation.
+
+```{r sample control points}
+control_points <- st_sample(control_area, size = 100, type = 'random')
+```
+
+For illustration purposes, buffer the control points as well, and plot both sets of points on the same map. Treatment points where restoration happened are red, and the candidate points for control points are blue.
+
+```{r buffer control points}
+control_buffer <- st_buffer(control_points, dist = set_units(5, 'km'))
+
+p +
+  geom_sf(data = cdfw_buffer, fill = 'red') +
+  geom_sf(data = control_buffer, fill = 'slateblue') 
+```
+
+
+## Caveats
+
+This may not be a good way to get a comparable control population -- you might want to sample in a more constrained area that is closer to where the actual restorations took place. Also like I said, the 5 km buffer may not be a good number. That's especially true because if you actually used all 4000 restoration points, a 5 km buffer around all of them would probably take up most of the area and not leave any area for the control points. But I think this is the basic approach you'd want to take.

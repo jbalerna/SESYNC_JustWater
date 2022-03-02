@@ -1,0 +1,173 @@
+---
+title: "California restoration projects exploration"
+author: "Quentin Read"
+date: "8/27/2021"
+output: html_document
+---
+
+Here I will give some basic examples of how to spatially join your point data and polygon data (two different types of vector data). I've also included an example with rasters to show how to associate raster data with vector data.
+
+I'd also highly recommend checking out two SESYNC geospatial lessons if you haven't already:
+
+- [Intro to vector and raster data](https://cyberhelp.sesync.org/geospatial-packages-in-R-lesson/)
+- [Vector data analysis](https://cyberhelp.sesync.org/vector-analysis-syracuse-lesson/)
+
+OK, let's start walking through some code.
+
+Load packages.
+
+```{r packages}
+library(sf)
+library(dplyr)
+library(ggplot2)
+library(glue)
+library(tidyr)
+
+direc <- '~/Documents/temp/justwater'
+```
+
+Load point data (part 1). For some reason this does not recognize the lat and long columns and automatically turn it into a spatial object so I manually specified those columns. I'm using coordinate reference system `4326` which is shorthand for lat-long. Then load polygon data (part 2). Note I left out the download and unzip part for now since Jenny already provided me with data. 
+
+```{r load data}
+cdfw_part1 <- st_read(dsn = glue("{direc}/cdfw_ds0168/ds168.gdb"), layer = "ds168_ex") %>%
+  st_as_sf(coords = c('Center_Longitude', 'Center_Latitude'), crs = 4326)
+cdfw_part2 <- st_read(dsn = glue("{direc}/cdfw_ds734"), layer = "ds734")
+```
+
+Reproject the lat-long points into the Albers coordinate system that the polygons are in.
+
+```{r reproject}
+cdfw_part1 <- st_transform(cdfw_part1, crs = st_crs(cdfw_part2))
+```
+
+
+Do the filtering by grant status and work status (corrected from Jenny's code). About 70 rows are removed.
+
+```{r filter by status}
+work_status_eliminate <- c("Notstarted", "TerminateCancel", "Terminated/Cancelled", "NA")
+grant_status_eliminate <- c("Cancelnofundsspent", "Execfworknotstarted", "Fcontractpending", "NA")
+cdfw_part1_filtered <- cdfw_part1 %>% 
+  filter(!Cal_Work_Status %in% work_status_eliminate,
+         !Grant_Status %in% grant_status_eliminate) 
+```
+
+## Joining your point and polygon layer together
+
+Visualize the point layer and polygon layer to see how they overlap. I also colored the points by the amount of money expended, log transformed so you can see the high values. Some have zero expended. 
+
+```{r quick map}
+ggplot() +
+  geom_sf(data = st_geometry(cdfw_part2)) +
+  geom_sf(data = cdfw_part1_filtered, aes(color = Amount_Expended)) +
+  scale_color_viridis_c(trans = 'log10', labels = scales::dollar_format(scale = 1/1000),
+                       name = 'Amount expended (thousands)')
+```
+
+Example calculations by polygon. Let's say we wanted to know the total amount expended on all restoration projects in each `BASIN` (that's one of the attributes of the polygon layer). We would need to (1) spatially join the point layer and polygon layer, so we know which polygon each point is in, then (2) group by `BASIN` and take the sum. Note that I'm using defaults here so it will get rid of any points that aren't contained in any of the polygons ... that can be changed if needed.
+
+```{r sum amount expended by polygon}
+cdfw_joined <- st_join(cdfw_part2, cdfw_part1_filtered)
+basin_amount_expended <- cdfw_joined %>%
+  group_by(BASIN) %>%
+  summarize(Amount_Expended = sum(Amount_Expended, na.rm = TRUE))
+```
+
+This "automagically" also geographically joins up the polygons by basin so we can make a map. 
+
+```{r map of basin sums}
+ggplot() +
+  geom_sf(data = basin_amount_expended, aes(fill = Amount_Expended)) +
+  scale_fill_viridis_c(trans = 'log10', labels = scales::dollar_format(scale = 1/1000),
+                       name = 'Amount expended (thousands)')
+```
+
+## Joining with external vector data
+
+One thing you might want to do in your project is pull demographic data from the Census Bureau. There is an R package called `tidycensus` that lets you pull in Census data from their website. To use it, you first need to sign up for a free API key from the Census Bureau and then every time you use the package you would need to load that key into your R session.
+
+Let's say in this example we want to know the percent Black population in each of the basins, we can get that information at the Census tract level easily from the Census Bureau. We use the `get_acs()` function to get the most recent data. If you set `geometry = TRUE` it is provided in `sf` format with the tract boundaries. 
+
+We want the total population and the Black population variable IDs. You can figure them out by using the `load_variables()` function and searching the table. These are the five-year estimates for 2019 from the American Community Survey.
+
+```{r get census data, results = 'hide'}
+library(tidycensus)
+
+census_api_key(readLines('~/Documents/censusapikey.txt'))
+
+census_dat_cali <- get_acs(geography = 'tract',
+                           variables = c('B02001_001', 'B02001_003'),
+                           state = 'CA',
+                           year = 2019,
+                           geometry = TRUE)
+```
+
+Now reshape the data to get proportion Black population in each Census tract.
+
+```{r}
+census_dat_cali <- census_dat_cali %>%
+  select(-moe) %>%
+  spread(key = variable, value = estimate) %>%
+  rename(Total = B02001_001, Black = B02001_003) %>%
+  mutate(prop_Black = Black/Total)
+```
+
+Now we have some polygons covering the state of California with proportion Black population in each.
+
+```{r}
+ggplot() +
+  geom_sf(data = census_dat_cali, aes(fill = prop_Black), color = NA) +
+  scale_fill_viridis_c(option = 'magma')
+```
+
+The problem is that the boundaries of the Census tracts do not match up exactly with the boundaries of the polygons from CDFW. So we need to do another spatial join where we find the intersection area between all the Census tract polygons and all the CDFW polygons. I did not do this in this notebook for now because it's a little more involved and I wasn't sure if it was something your group would need. But if you think that's something you'd be interested in we can work on that later.
+
+## Joining with raster data
+
+Another thing you might want to do in your project is find some environmental predictors to use in your analysis. A lot of time environmental predictors are in raster (gridded) form. To match raster data with point data, you can get the pixel value from the raster that spatially matches each point. To match raster data with polygon data, you can average or total all the pixel values from the raster that are found within each polygon.
+
+In this example I will use some raster data I found at http://v1.cal-adapt.org/data/download/ which is a very coarse raster for the state of California with 2020 annual precipitation. No idea if that is something you will want but this is just an example.
+
+First let's load the raster data and plot it. We use the `stars` package for this.
+
+```{r load raster}
+library(stars)
+
+cali_precip_2020 <- read_stars(glue('{direc}/prcp_flx_ccsm3a2bcsd/prcp_flx_ccsm3a2bcsd_20200131.tif'))
+plot(cali_precip_2020)
+```
+
+To extract precipitation data at points, we use `st_extract()` to find the value of the raster pixel that contains each point. Let's do that for the part 1 data. We need everything to be in the same CRS so I will project the points which is much quicker than projecting the raster.
+
+```{r}
+cdfw_points_reproject <- st_transform(cdfw_part1_filtered, st_crs(cali_precip_2020))
+cdfw_points_precip <- st_extract(cali_precip_2020, cdfw_points_reproject)
+```
+
+Plot to see if it looks reasonable. 
+
+```{r}
+cdfw_points_precip <- cdfw_points_precip %>%
+  mutate(precip = prcp_flx_ccsm3a2bcsd_20200131.tif)
+
+ggplot() + 
+  geom_sf(data = cdfw_points_precip, aes(color = precip)) 
+```
+
+To extract precipitation data at polygons, we use the `aggregate()` function. Here I will get the average value for all the precipitation pixels in each of the CDFW polygons.
+
+```{r}
+cdfw_polygons_reproject <- st_transform(cdfw_part2, st_crs(cali_precip_2020))
+cali_precip_cdfw <- aggregate(cali_precip_2020, cdfw_polygons_reproject, FUN = mean, na.rm = TRUE)
+```
+
+Again, plot to see if it looks reasonable. Use `st_as_sf()` to turn the aggregated object back into a polygon object.
+
+```{r}
+cali_precip_cdfw <- cali_precip_cdfw %>%
+  st_as_sf() %>%
+  mutate(precip = prcp_flx_ccsm3a2bcsd_20200131.tif)
+  
+ggplot() + 
+  geom_sf(data = cali_precip_cdfw, aes(fill = precip))
+```
+
