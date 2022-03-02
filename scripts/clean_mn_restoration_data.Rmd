@@ -5,6 +5,10 @@ date: "3/2/2022"
 output: html_document
 ---
 
+# SET UP
+
+## PACKAGES
+
 ```{r}
 # load packages
 # tidy syntax
@@ -52,5 +56,134 @@ library(scales)
 # hydrologic data
 library(nhdR)
 library(nhdplusTools)
+```
 
+## GLOBAL OPTIONS
+
+```{r}
+# specify global options
+# no stringAsFactors
+options(stringsAsFactors = FALSE)
+
+# cache tigris sf objects
+options(tigris_use_cache = TRUE)
+
+# work in CRS EPSG 4269 (NAD83)
+global_crs <- st_crs(4269)
+
+# don't default to scientific notation in numeric display
+options(scipen = 999)
+
+# set a long timeout limit for file download
+options(timeout = 30000)
+
+# specify NHD ftypes to drop from analysis
+drop_ftypes <- c("Coastline", "Pipeline", "Connector")
+
+# set buffer distances
+buffer_drop_control <- set_units(1, "km") # distance between restoration projects and control points
+buffer_pollution <- set_units(15, "km") # distance for pollution attribute creation
+buffer_ses <- set_units(1, "km") # distance for SES attribute creation
+
+# specify visualization color options
+restoration_color <- "chartreuse4"
+control_color <- "darkorange1"
+drop_color <- "gold1"
+territory_color <- "lightblue"
+fill_accent <- "grey50"
+line_accent <- "lightblue4"
+line_mute <- "grey75"
+```
+
+## CUSTOM FUNCTIONS
+
+```{r}
+# import custom functions contained in separate .R file
+source(here("scripts", "final_code", "agu_poster_fxns.R"))
+```
+
+
+## MN BOUNDARY AND BASE MAP
+
+```{r}
+# import MN boundary sf object
+mn_boundary <- states() %>%
+  filter(NAME == "Minnesota") %>%
+  rename(name = NAME) %>%
+  dplyr::select(name) %>%
+  st_transform(crs = global_crs)
+
+# create MN base map object
+mn_base_map <- ggplot() +
+  geom_sf(data = mn_boundary, fill = "grey93") +
+  annotation_scale(data = mn_boundary,
+                   location = "tr",
+                   bar_cols = c("grey80", "white"),
+                   line_col = "darkgrey",
+                   text_col = "darkgrey") + 
+  annotation_north_arrow(data = mn_boundary,
+                         location = "bl",
+                         height = unit(0.7, "cm"),
+                         width = unit(0.5, "cm"),
+                         style = north_arrow_orienteering(fill = c("grey80", "grey80"),
+                                                          line_col = "darkgrey",
+                                                          text_col = "darkgrey",
+                                                          text_size = 6)) +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        panel.background = element_rect(fill = "white", color = "white"),
+        plot.background = element_rect(fill = "white", color = "white"))
+
+mn_base_map
+```
+
+# IMPORT AND CLEAN RESTORATION DATA
+
+## IMPORT, CLEAN COLUMN NAMES, DROP UNUSED FIELDS, FIX COORDINATES
+
+```{r}
+# import and clean restoration sites
+# NOTE - could keep objectives text fields (proposed and post-project evaluation)
+#         for classification but that may require manual work
+mn_restoration_sites <- read_csv(file = here("raw_data", "mn_restoration_projects",
+                                             "MN_legacy_contracts_20220201.csv")) %>%
+  rename(project_id = ID,
+         project_title = Title,
+         project_year = "Fiscal Year(s)",
+         funding_amount = "Fiscal Year Funding Amount",
+         other_funding_amount = "Other Funds Leveraged",
+         funding_recipient_type = "Recipient Type",
+         start_date = "Start Date",
+         end_date = "End Date",
+         project_status = Status,
+         latitude = Lat,
+         longitude = Lon) %>%
+  dplyr::select(project_id, project_title, project_year, funding_amount,
+                other_funding_amount, funding_recipient_type, start_date,
+                end_date, project_status, latitude, longitude) %>%
+  mutate(latitude_cleaned = str_remove(latitude, "\xa0"),
+         longitude_cleaned = str_remove(longitude, "\xa0"),
+         funding_amount = as.numeric(funding_amount)) %>%
+  filter(!is.na(latitude_cleaned) & !is.na(longitude_cleaned))
+
+# filter based on project status?
+unique(mn_restoration_sites$project_status)
+```
+
+## TRANSFORM TO SF OBJECT
+
+```{r}
+# convert to sf with global crs, using latitude and longitude coordinates
+mn_restoration_sites <- mn_restoration_sites %>%
+  st_as_sf(coords = c("longitude_cleaned", "latitude_cleaned"),
+           crs = global_crs)
+```
+
+## CHECK IT OUT ON A MAP
+
+```{r}
+mn_base_map +
+  geom_sf(data = mn_restoration_sites, aes(color = funding_amount)) +
+  scale_color_gradient2(low = "white", mid = "lightblue", high = "darkblue",
+                       midpoint = 50000)
 ```
