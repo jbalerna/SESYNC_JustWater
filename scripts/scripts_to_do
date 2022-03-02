@@ -1,0 +1,9 @@
+LUCY'S TO DO:
+
+- create set up files:
+    - environment set up (packages, options)
+    - custom functions
+    - analytic parameters
+    - base objects (e.g. base maps)
+
+- source set up files at head of all analytic scripts

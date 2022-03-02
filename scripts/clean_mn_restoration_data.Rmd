@@ -1,0 +1,56 @@
+---
+title: "clean_mn_restoration_data"
+author: "Lucy Andrews"
+date: "3/2/2022"
+output: html_document
+---
+
+```{r}
+# load packages
+# tidy syntax
+library(tidyverse)
+library(magrittr)
+
+# data cleaning and presentation
+library(janitor)
+library(glue)
+library(units)
+library(knitr)
+library(kableExtra)
+
+# file import and management
+library(here)
+library(readxl)
+library(googledrive)
+library(fst)
+
+# spatial data
+library(sf)
+library(raster)
+library(rgdal)
+library(tigris)
+library(rmapshaper)
+library(areal)
+
+# statistics
+library(spdep)
+library(corrplot)
+library(MatchIt)
+library(survival)
+library(randomForest)
+
+# census data
+library(tidycensus)
+
+# visualization
+library(ggnewscale)
+library(ggpubr)
+library(ggsn)
+library(ggspatial)
+library(scales)
+
+# hydrologic data
+library(nhdR)
+library(nhdplusTools)
+
+```
